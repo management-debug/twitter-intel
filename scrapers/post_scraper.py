@@ -42,36 +42,47 @@ def scrape_posts(username, account_id, days_back=None):
 
 
 def _parse_tweet(tweet, username, account_id, cutoff):
-    """Parse a single tweet into a post dict."""
+    """Parse a single tweet into a post dict.
+    ScrapeCreators nests tweet data under 'legacy', with views at top level.
+    """
+    # ScrapeCreators wraps tweet data in 'legacy'
+    legacy = tweet.get("legacy", tweet)
+
     # Get tweet ID
-    tweet_id = str(tweet.get("id_str", tweet.get("id", "")))
+    tweet_id = str(legacy.get("id_str", tweet.get("rest_id", "")))
     if not tweet_id:
         return None
 
     # Parse creation time
-    created = tweet.get("created_at", "")
+    created = legacy.get("created_at", "")
     create_time = _parse_twitter_date(created)
     if create_time and create_time < cutoff:
         return None
 
     # Get text (remove t.co links)
-    full_text = tweet.get("full_text", tweet.get("text", ""))
+    full_text = legacy.get("full_text", legacy.get("text", ""))
     caption = re.sub(r'https?://t\.co/\S+', '', str(full_text)).strip()
 
     # Engagement metrics
-    likes = _safe_int(tweet.get("favorite_count", 0))
-    views = _safe_int(tweet.get("views_count", tweet.get("impression_count", 0)))
-    bookmarks = _safe_int(tweet.get("bookmark_count", 0))
-    retweets = _safe_int(tweet.get("retweet_count", 0))
-    replies = _safe_int(tweet.get("reply_count", 0))
-    quote_count = _safe_int(tweet.get("quote_count", 0))
+    likes = _safe_int(legacy.get("favorite_count", 0))
+    bookmarks = _safe_int(legacy.get("bookmark_count", 0))
+    retweets = _safe_int(legacy.get("retweet_count", 0))
+    replies = _safe_int(legacy.get("reply_count", 0))
+    quote_count = _safe_int(legacy.get("quote_count", 0))
+
+    # Views are at top level in ScrapeCreators format: {"views": {"count": "12345"}}
+    views_obj = tweet.get("views", {})
+    if isinstance(views_obj, dict):
+        views = _safe_int(views_obj.get("count", 0))
+    else:
+        views = _safe_int(legacy.get("views_count", 0))
 
     # Determine media type
     media_type = "text"
     media_url = ""
     thumbnail_url = ""
 
-    ext = tweet.get("extended_entities") or tweet.get("entities") or {}
+    ext = legacy.get("extended_entities") or legacy.get("entities") or {}
     media_list = ext.get("media", [])
 
     if media_list:
