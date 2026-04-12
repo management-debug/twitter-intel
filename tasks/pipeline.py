@@ -2,6 +2,7 @@
 import logging
 from datetime import datetime, timezone
 
+from config import USE_SUPABASE
 from db.database import (
     get_pending_accounts, get_scraped_accounts, get_accounts,
     update_account, bulk_upsert_posts, create_job, update_job,
@@ -107,12 +108,19 @@ def run_full_pipeline(test_limit=0):
 
         log.info(f"Phase 2 complete: {total_posts} posts, {viral_found} viral")
 
-        # Phase 3: Media download
+        # Phase 3: Media download + upload to Supabase Storage
         log.info("Phase 3: Downloading media...")
         media_stats = download_all_media(all_posts, scraped_accs)
         total_media = media_stats["avatars"] + media_stats["images"] + media_stats["thumbnails"]
         update_job(job_id, {"images_downloaded": total_media})
         log.info(f"Phase 3 complete: {total_media} media files")
+
+        # Phase 4: Update avatar_local in DB for Supabase URLs
+        if USE_SUPABASE:
+            from config import SUPABASE_URL as SB_URL
+            for acc in scraped_accs:
+                sb_avatar = f"{SB_URL}/storage/v1/object/public/avatars/{acc['username']}.jpg"
+                update_account(acc["id"], {"avatar_local": sb_avatar})
 
         # Done
         update_job(job_id, {
