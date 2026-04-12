@@ -444,7 +444,7 @@ function renderCreatorsTable(creators) {
     const initials = (c.display_name || c.username || '?')[0].toUpperCase();
     const avatarHtml = `
       <span class="creator-avatar-placeholder" style="background:linear-gradient(135deg,${stringToColor(c.username)},${stringToColor2(c.username)})">${initials}</span>
-      <img class="creator-avatar img-lazy" data-src="/api/avatars/${encodeURIComponent(c.username)}"
+      <img class="creator-avatar img-lazy" data-src="${c.avatar_url || `/api/avatars/${encodeURIComponent(c.username)}`}"
            src="" alt="" onerror="this.style.display='none'" style="display:none;position:absolute;inset:0;" />
     `;
     const verifiedHtml = c.is_verified
@@ -560,7 +560,7 @@ async function openCreatorModal(id, username) {
     header.innerHTML = `
       <div style="position:relative;width:60px;height:60px;flex-shrink:0;">
         <div class="creator-avatar-placeholder" style="width:60px;height:60px;font-size:20px;background:linear-gradient(135deg,${stringToColor(c.username)},${stringToColor2(c.username)})">${initials}</div>
-        <img class="img-lazy" data-src="/api/avatars/${encodeURIComponent(c.username)}"
+        <img class="img-lazy" data-src="${c.avatar_url || `/api/avatars/${encodeURIComponent(c.username)}`}"
              src="" alt="" onerror="this.style.display='none'"
              style="position:absolute;inset:0;width:60px;height:60px;border-radius:50%;object-fit:cover;display:none;" />
       </div>
@@ -759,9 +759,9 @@ function buildPostCard(post) {
 
   let mediaHtml = '';
   if (hasMedia) {
-    const imgUrl = isVideo
-      ? `/api/thumbnails/${post.id}`
-      : `/api/images/${post.id}`;
+    const imgUrl = post.media_url
+      ? post.media_url
+      : (isVideo ? `/api/thumbnails/${post.id}` : `/api/images/${post.id}`);
     mediaHtml = `
       <div class="post-card-media">
         <div class="media-placeholder">${isVideo ? '🎬' : '📸'}</div>
@@ -858,7 +858,7 @@ async function openPostModal(postId) {
     // Media
     if (hasMedia) {
       if (isVideo) {
-        const thumb = `/api/thumbnails/${post.id}`;
+        const thumb = post.media_url || post.thumbnail_url || `/api/thumbnails/${post.id}`;
         mediaEl.innerHTML = `
           <img src="${thumb}" alt="Video thumbnail" style="width:100%;max-height:600px;object-fit:contain;"
                onerror="this.parentNode.innerHTML='<div class=\\'media-placeholder\\' style=\\'font-size:60px;position:static\\''>🎬</div>'" />
@@ -866,7 +866,7 @@ async function openPostModal(postId) {
         `;
         mediaEl.style.position = 'relative';
       } else {
-        const imgUrl = `/api/images/${post.id}`;
+        const imgUrl = post.media_url || `/api/images/${post.id}`;
         mediaEl.innerHTML = `
           <img src="${imgUrl}" alt="Post image" style="width:100%;max-height:600px;object-fit:contain;"
                onerror="this.parentNode.innerHTML='<div class=\\'media-placeholder\\' style=\\'font-size:60px;position:static\\''>📸</div>'" />

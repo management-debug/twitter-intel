@@ -256,25 +256,65 @@ async def watchlist_check(username: str, role=Depends(require_auth)):
 
 @app.get("/api/avatars/{username}")
 async def serve_avatar(username: str):
+    # Local file first
     path = AVATARS_DIR / f"{username}.jpg"
     if path.exists():
         return FileResponse(str(path), media_type="image/jpeg")
+    # Supabase storage
+    if USE_SUPABASE:
+        sb_url = f"{SUPABASE_URL}/storage/v1/object/public/avatars/{username}.jpg"
+        return RedirectResponse(sb_url, status_code=302)
+    # Fallback: redirect to Twitter CDN avatar
+    acc = get_account(username=username.lower())
+    if acc and acc.get("avatar_url"):
+        return RedirectResponse(acc["avatar_url"], status_code=302)
     raise HTTPException(404, "Avatar not found")
 
 
 @app.get("/api/images/{post_id}")
 async def serve_image(post_id: str):
+    # Local file first
     path = IMAGES_DIR / f"{post_id}.jpg"
     if path.exists():
         return FileResponse(str(path), media_type="image/jpeg")
+    # Supabase storage
+    if USE_SUPABASE:
+        sb_url = f"{SUPABASE_URL}/storage/v1/object/public/tweet-images/{post_id}.jpg"
+        # Check if exists, otherwise fall back to CDN
+        try:
+            r = httpx.head(sb_url, timeout=3)
+            if r.status_code == 200:
+                return RedirectResponse(sb_url, status_code=302)
+        except:
+            pass
+    # Fallback: redirect to original media URL from DB
+    post = get_post(int(post_id))
+    if post and post.get("media_url"):
+        return RedirectResponse(post["media_url"], status_code=302)
     raise HTTPException(404, "Image not found")
 
 
 @app.get("/api/thumbnails/{post_id}")
 async def serve_thumbnail(post_id: str):
+    # Local file first
     path = THUMBNAILS_DIR / f"{post_id}.jpg"
     if path.exists():
         return FileResponse(str(path), media_type="image/jpeg")
+    # Supabase storage
+    if USE_SUPABASE:
+        sb_url = f"{SUPABASE_URL}/storage/v1/object/public/tweet-thumbnails/{post_id}.jpg"
+        try:
+            r = httpx.head(sb_url, timeout=3)
+            if r.status_code == 200:
+                return RedirectResponse(sb_url, status_code=302)
+        except:
+            pass
+    # Fallback: redirect to original thumbnail/media URL
+    post = get_post(int(post_id))
+    if post:
+        url = post.get("thumbnail_url") or post.get("media_url")
+        if url:
+            return RedirectResponse(url, status_code=302)
     raise HTTPException(404, "Thumbnail not found")
 
 
