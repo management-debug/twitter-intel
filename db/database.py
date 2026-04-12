@@ -434,7 +434,7 @@ def get_posts(page=1, limit=50, sort="likes", media_type=None, viral_only=False,
         if media_type:
             params["media_type"] = f"eq.{media_type}"
         if viral_only:
-            params["is_viral"] = "eq.true"
+            params["is_viral"] = "eq.1"
         if min_mult > 0:
             params["performance_multiplier"] = f"gte.{min_mult}"
         if account_id:
@@ -561,9 +561,9 @@ def get_dashboard_stats():
         scraped = _sb_count("accounts", {"scrape_status": "eq.scraped"})
         pending = _sb_count("accounts", {"scrape_status": "eq.pending"})
         total_posts = _sb_count("posts")
-        viral_photos = _sb_count("posts", {"is_viral": "eq.true", "media_type": "eq.photo"})
-        viral_videos = _sb_count("posts", {"is_viral": "eq.true", "media_type": "eq.video"})
-        viral_texts = _sb_count("posts", {"is_viral": "eq.true", "media_type": "eq.text"})
+        viral_photos = _sb_count("posts", {"is_viral": "eq.1", "media_type": "eq.photo"})
+        viral_videos = _sb_count("posts", {"is_viral": "eq.1", "media_type": "eq.video"})
+        viral_texts = _sb_count("posts", {"is_viral": "eq.1", "media_type": "eq.text"})
         photos = _sb_count("posts", {"media_type": "eq.photo"})
         videos = _sb_count("posts", {"media_type": "eq.video"})
         texts = _sb_count("posts", {"media_type": "eq.text"})
