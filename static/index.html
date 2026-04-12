@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Twitter Intel Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/static/style.css?v=1" />
+</head>
+<body>
+
+  <!-- ════════════════════════════════════════════════════ LOGIN MODAL -->
+  <div id="login-modal" class="modal-overlay active">
+    <div class="modal-box login-box">
+      <div class="login-logo">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="#1d9bf0"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.747l7.73-8.835L1.254 2.25H8.08l4.259 5.632L18.244 2.25zm-1.161 17.52h1.833L7.084 4.126H5.117L17.083 19.77z"/></svg>
+        <span>Twitter Intel</span>
+      </div>
+      <h2>Sign In</h2>
+      <p class="login-sub">Intelligence dashboard for X creators</p>
+      <form id="login-form">
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" id="login-email" placeholder="admin@example.com" autocomplete="email" />
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" id="login-password" placeholder="••••••••" autocomplete="current-password" />
+        </div>
+        <div id="login-error" class="form-error hidden"></div>
+        <button type="submit" class="btn btn-primary btn-full" id="login-btn">Sign In</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════ MAIN APP -->
+  <div id="app" class="hidden">
+
+    <!-- TOP NAV -->
+    <nav class="topnav">
+      <div class="topnav-brand">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="#1d9bf0"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.747l7.73-8.835L1.254 2.25H8.08l4.259 5.632L18.244 2.25zm-1.161 17.52h1.833L7.084 4.126H5.117L17.083 19.77z"/></svg>
+        <span>Twitter Intel</span>
+      </div>
+      <div class="topnav-tabs" id="tab-bar">
+        <button class="tab-btn active" data-tab="dashboard">Dashboard</button>
+        <button class="tab-btn" data-tab="creators">Creators</button>
+        <button class="tab-btn" data-tab="photos">Viral Photos</button>
+        <button class="tab-btn" data-tab="videos">Viral Videos</button>
+        <button class="tab-btn" data-tab="text">Viral Text</button>
+        <button class="tab-btn" data-tab="strategy">Strategy</button>
+        <button class="tab-btn" data-tab="guide">Guide</button>
+        <button class="tab-btn admin-only" data-tab="add">+ Add</button>
+      </div>
+      <div class="topnav-right">
+        <span id="nav-role-badge" class="role-badge"></span>
+        <button class="btn btn-ghost btn-sm" id="logout-btn">Sign out</button>
+      </div>
+    </nav>
+
+    <!-- ─── TAB: DASHBOARD ─── -->
+    <div id="tab-dashboard" class="tab-content active">
+      <div class="page-header">
+        <h1>Dashboard</h1>
+        <p>Overview of your Twitter intelligence pipeline</p>
+      </div>
+
+      <!-- Stats row -->
+      <div class="stats-grid" id="stats-grid">
+        <div class="stat-card gradient-blue">
+          <div class="stat-icon">👥</div>
+          <div class="stat-info">
+            <div class="stat-value" id="stat-creators">—</div>
+            <div class="stat-label">Tracked Creators</div>
+          </div>
+        </div>
+        <div class="stat-card gradient-purple">
+          <div class="stat-icon">📝</div>
+          <div class="stat-info">
+            <div class="stat-value" id="stat-posts">—</div>
+            <div class="stat-label">Total Posts</div>
+          </div>
+        </div>
+        <div class="stat-card gradient-green">
+          <div class="stat-icon">🔥</div>
+          <div class="stat-info">
+            <div class="stat-value" id="stat-viral">—</div>
+            <div class="stat-label">Viral Posts</div>
+          </div>
+        </div>
+        <div class="stat-card gradient-orange">
+          <div class="stat-icon">📸</div>
+          <div class="stat-info">
+            <div class="stat-value" id="stat-viral-photos">—</div>
+            <div class="stat-label">Viral Photos</div>
+          </div>
+        </div>
+        <div class="stat-card gradient-pink">
+          <div class="stat-icon">🎬</div>
+          <div class="stat-info">
+            <div class="stat-value" id="stat-viral-videos">—</div>
+            <div class="stat-label">Viral Videos</div>
+          </div>
+        </div>
+        <div class="stat-card gradient-cyan">
+          <div class="stat-icon">✍️</div>
+          <div class="stat-info">
+            <div class="stat-value" id="stat-viral-text">—</div>
+            <div class="stat-label">Viral Text</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Scrape controls (admin only) -->
+      <div class="section admin-only" id="scrape-section">
+        <div class="section-header">
+          <h2>Scrape Controls</h2>
+          <div id="scrape-status-badge" class="status-badge idle">Idle</div>
+        </div>
+        <div class="scrape-controls">
+          <div class="pin-group">
+            <label>Admin PIN</label>
+            <input type="password" id="scrape-pin" placeholder="••••" maxlength="10" class="pin-input" />
+          </div>
+          <div class="scrape-buttons">
+            <button class="btn btn-primary" id="btn-scrape-full">Full Scrape</button>
+            <button class="btn btn-secondary" id="btn-scrape-new">New Only</button>
+            <button class="btn btn-secondary" id="btn-scrape-refresh">Refresh</button>
+            <button class="btn btn-danger" id="btn-scrape-stop">Stop</button>
+          </div>
+          <div class="test-group">
+            <label>Test limit (0 = full)</label>
+            <input type="number" id="scrape-test-limit" value="0" min="0" max="100" class="test-input" />
+          </div>
+        </div>
+        <div id="scrape-progress" class="scrape-progress hidden">
+          <div class="progress-bar-track">
+            <div class="progress-bar-fill" id="progress-fill"></div>
+          </div>
+          <div class="progress-text" id="progress-text">Starting…</div>
+        </div>
+      </div>
+
+      <!-- Recent jobs -->
+      <div class="section">
+        <div class="section-header">
+          <h2>Recent Jobs</h2>
+          <button class="btn btn-ghost btn-sm" id="refresh-jobs-btn">Refresh</button>
+        </div>
+        <div class="table-wrap">
+          <table class="data-table" id="jobs-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Type</th>
+                <th>Status</th>
+                <th>Creators</th>
+                <th>Posts</th>
+                <th>Started</th>
+                <th>Duration</th>
+                <th>Error</th>
+              </tr>
+            </thead>
+            <tbody id="jobs-tbody">
+              <tr><td colspan="8" class="empty-row">Loading…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── TAB: CREATORS ─── -->
+    <div id="tab-creators" class="tab-content hidden">
+      <div class="page-header">
+        <h1>Creators</h1>
+        <p>All tracked Twitter/X creator accounts</p>
+      </div>
+      <div class="toolbar">
+        <div class="search-wrap">
+          <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" id="creators-search" placeholder="Search creators…" class="search-input" />
+        </div>
+        <select id="creators-sort" class="select-input">
+          <option value="followers">Sort: Followers</option>
+          <option value="avg_likes">Sort: Avg Likes</option>
+          <option value="post_count">Sort: Post Count</option>
+          <option value="username">Sort: Username</option>
+        </select>
+      </div>
+      <div class="table-wrap">
+        <table class="data-table sortable-table" id="creators-table">
+          <thead>
+            <tr>
+              <th></th>
+              <th class="sortable" data-col="username">Username <span class="sort-arrow">↕</span></th>
+              <th class="sortable" data-col="followers">Followers <span class="sort-arrow">↕</span></th>
+              <th class="sortable" data-col="avg_likes">Avg Likes <span class="sort-arrow">↕</span></th>
+              <th class="sortable" data-col="post_count">Posts <span class="sort-arrow">↕</span></th>
+              <th>Verified</th>
+              <th>Watchlist</th>
+              <th class="admin-only">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="creators-tbody">
+            <tr><td colspan="8" class="empty-row">Loading…</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div id="creators-count" class="result-count"></div>
+    </div>
+
+    <!-- ─── TAB: VIRAL PHOTOS ─── -->
+    <div id="tab-photos" class="tab-content hidden">
+      <div class="page-header">
+        <h1>Viral Photos</h1>
+        <p>Photo posts exceeding viral engagement thresholds</p>
+      </div>
+      <div class="toolbar">
+        <div class="filter-group">
+          <select id="photos-period" class="select-input">
+            <option value="all">All Time</option>
+            <option value="month">This Month</option>
+            <option value="week">This Week</option>
+            <option value="today">Today</option>
+          </select>
+          <select id="photos-sort" class="select-input">
+            <option value="likes">Sort: Likes</option>
+            <option value="views">Sort: Views</option>
+            <option value="bookmarks">Sort: Bookmarks</option>
+            <option value="created_at">Sort: Newest</option>
+          </select>
+          <select id="photos-mult" class="select-input">
+            <option value="0">Any Multiplier</option>
+            <option value="1.5">1.5x+</option>
+            <option value="3">3x+</option>
+            <option value="5">5x+</option>
+            <option value="10">10x+</option>
+          </select>
+          <div class="search-wrap">
+            <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="text" id="photos-search" placeholder="Search captions…" class="search-input" />
+          </div>
+        </div>
+      </div>
+      <div class="posts-grid" id="photos-grid"></div>
+      <div class="load-more-row">
+        <button class="btn btn-secondary" id="photos-load-more">Load More</button>
+        <div id="photos-count" class="result-count"></div>
+      </div>
+    </div>
+
+    <!-- ─── TAB: VIRAL VIDEOS ─── -->
+    <div id="tab-videos" class="tab-content hidden">
+      <div class="page-header">
+        <h1>Viral Videos</h1>
+        <p>Video posts exceeding viral engagement thresholds</p>
+      </div>
+      <div class="toolbar">
+        <div class="filter-group">
+          <select id="videos-period" class="select-input">
+            <option value="all">All Time</option>
+            <option value="month">This Month</option>
+            <option value="week">This Week</option>
+            <option value="today">Today</option>
+          </select>
+          <select id="videos-sort" class="select-input">
+            <option value="views">Sort: Views</option>
+            <option value="likes">Sort: Likes</option>
+            <option value="bookmarks">Sort: Bookmarks</option>
+            <option value="created_at">Sort: Newest</option>
+          </select>
+          <select id="videos-mult" class="select-input">
+            <option value="0">Any Multiplier</option>
+            <option value="1.5">1.5x+</option>
+            <option value="3">3x+</option>
+            <option value="5">5x+</option>
+            <option value="10">10x+</option>
+          </select>
+          <div class="search-wrap">
+            <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="text" id="videos-search" placeholder="Search captions…" class="search-input" />
+          </div>
+        </div>
+      </div>
+      <div class="posts-grid" id="videos-grid"></div>
+      <div class="load-more-row">
+        <button class="btn btn-secondary" id="videos-load-more">Load More</button>
+        <div id="videos-count" class="result-count"></div>
+      </div>
+    </div>
+
+    <!-- ─── TAB: VIRAL TEXT ─── -->
+    <div id="tab-text" class="tab-content hidden">
+      <div class="page-header">
+        <h1>Viral Text</h1>
+        <p>Text-only tweets with viral engagement</p>
+      </div>
+      <div class="toolbar">
+        <div class="filter-group">
+          <select id="text-period" class="select-input">
+            <option value="all">All Time</option>
+            <option value="month">This Month</option>
+            <option value="week">This Week</option>
+            <option value="today">Today</option>
+          </select>
+          <select id="text-sort" class="select-input">
+            <option value="likes">Sort: Likes</option>
+            <option value="views">Sort: Views</option>
+            <option value="bookmarks">Sort: Bookmarks</option>
+            <option value="retweets">Sort: Retweets</option>
+            <option value="created_at">Sort: Newest</option>
+          </select>
+          <select id="text-mult" class="select-input">
+            <option value="0">Any Multiplier</option>
+            <option value="1.5">1.5x+</option>
+            <option value="3">3x+</option>
+            <option value="5">5x+</option>
+            <option value="10">10x+</option>
+          </select>
+          <div class="search-wrap">
+            <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="text" id="text-search" placeholder="Search tweets…" class="search-input" />
+          </div>
+        </div>
+      </div>
+      <div class="text-posts-list" id="text-list"></div>
+      <div class="load-more-row">
+        <button class="btn btn-secondary" id="text-load-more">Load More</button>
+        <div id="text-count" class="result-count"></div>
+      </div>
+    </div>
+
+    <!-- ─── TAB: STRATEGY ─── -->
+    <div id="tab-strategy" class="tab-content hidden">
+      <div class="page-header">
+        <h1>Strategy</h1>
+        <p>Data-driven insights from viral post analysis</p>
+      </div>
+
+      <div class="strategy-grid">
+        <!-- Format comparison -->
+        <div class="strategy-card wide">
+          <h3>Format Performance</h3>
+          <div class="bar-chart" id="format-chart"></div>
+        </div>
+
+        <!-- Caption categories -->
+        <div class="strategy-card wide">
+          <h3>Caption Category Performance</h3>
+          <div class="bar-chart" id="caption-chart"></div>
+        </div>
+
+        <!-- Algorithm weights -->
+        <div class="strategy-card">
+          <h3>Algorithm Weights</h3>
+          <table class="algo-table" id="algo-table">
+            <thead><tr><th>Signal</th><th>Weight</th><th>Notes</th></tr></thead>
+            <tbody id="algo-tbody"></tbody>
+          </table>
+        </div>
+
+        <!-- Best posting times -->
+        <div class="strategy-card">
+          <h3>Best Posting Times (EST)</h3>
+          <div class="time-grid" id="time-grid"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── TAB: GUIDE ─── -->
+    <div id="tab-guide" class="tab-content hidden">
+      <div class="page-header">
+        <h1>Guide</h1>
+        <p>Operational guide for using this dashboard</p>
+      </div>
+      <div id="guide-content" class="guide-content"></div>
+    </div>
+
+    <!-- ─── TAB: ADD ─── -->
+    <div id="tab-add" class="tab-content hidden admin-only">
+      <div class="page-header">
+        <h1>Add Creators</h1>
+        <p>Add new Twitter/X creators to track</p>
+      </div>
+
+      <div class="add-grid">
+        <!-- Single add -->
+        <div class="add-card">
+          <h3>Add Single Creator</h3>
+          <p class="add-sub">Enter a Twitter/X username to start tracking</p>
+          <div class="form-group">
+            <label>Username</label>
+            <div class="input-with-btn">
+              <input type="text" id="add-single-input" placeholder="@username" class="text-input" />
+              <button class="btn btn-primary" id="add-single-btn">Add</button>
+            </div>
+          </div>
+          <div id="add-single-result" class="add-result hidden"></div>
+        </div>
+
+        <!-- Bulk add -->
+        <div class="add-card">
+          <h3>Bulk Add Creators</h3>
+          <p class="add-sub">One username per line. @ prefix is optional.</p>
+          <div class="form-group">
+            <label>Usernames</label>
+            <textarea id="add-bulk-input" placeholder="username1&#10;username2&#10;username3" rows="10" class="text-area"></textarea>
+          </div>
+          <button class="btn btn-primary" id="add-bulk-btn">Add All</button>
+          <div id="add-bulk-result" class="add-result hidden"></div>
+        </div>
+      </div>
+
+      <!-- Import progress log -->
+      <div class="section" id="import-log-section" style="display:none">
+        <div class="section-header">
+          <h2>Import Progress</h2>
+        </div>
+        <div class="import-log" id="import-log"></div>
+      </div>
+    </div>
+
+  </div><!-- /#app -->
+
+  <!-- ════════════════════════════════════════════════════ POST DETAIL MODAL -->
+  <div id="post-modal" class="modal-overlay hidden">
+    <div class="modal-box post-modal-box">
+      <button class="modal-close" id="post-modal-close">✕</button>
+      <div class="post-modal-inner">
+        <div class="post-modal-media" id="post-modal-media"></div>
+        <div class="post-modal-info">
+          <div class="post-modal-author" id="post-modal-author"></div>
+          <div class="post-modal-caption" id="post-modal-caption"></div>
+          <div class="post-modal-stats" id="post-modal-stats"></div>
+          <div class="post-modal-meta" id="post-modal-meta"></div>
+          <div class="post-modal-actions">
+            <button class="btn btn-secondary" id="post-copy-btn">Copy Caption</button>
+            <a class="btn btn-ghost" id="post-open-link" target="_blank">Open on X ↗</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════ CREATOR DETAIL MODAL -->
+  <div id="creator-modal" class="modal-overlay hidden">
+    <div class="modal-box creator-modal-box">
+      <button class="modal-close" id="creator-modal-close">✕</button>
+      <div class="creator-modal-header" id="creator-modal-header"></div>
+      <div class="creator-modal-tabs">
+        <button class="creator-tab-btn active" data-ctype="all">All Posts</button>
+        <button class="creator-tab-btn" data-ctype="photo">Photos</button>
+        <button class="creator-tab-btn" data-ctype="video">Videos</button>
+        <button class="creator-tab-btn" data-ctype="text">Text</button>
+      </div>
+      <div class="posts-grid creator-posts-grid" id="creator-posts-grid"></div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════ TOAST -->
+  <div id="toast-container"></div>
+
+  <script src="/static/app.js?v=1"></script>
+</body>
+</html>
