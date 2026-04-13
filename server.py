@@ -294,6 +294,40 @@ async def serve_image(post_id: str):
     raise HTTPException(404, "Image not found")
 
 
+@app.get("/api/videos/{post_id}")
+async def serve_video(post_id: str):
+    """Proxy video from Twitter CDN or Supabase Storage."""
+    # Supabase storage first
+    if USE_SUPABASE:
+        sb_url = f"{SUPABASE_URL}/storage/v1/object/public/tweet-videos/{post_id}.mp4"
+        try:
+            r = httpx.head(sb_url, timeout=3)
+            if r.status_code == 200:
+                return RedirectResponse(sb_url, status_code=302)
+        except:
+            pass
+    # Get video URL from DB and proxy it
+    post = get_post(int(post_id))
+    if not post:
+        raise HTTPException(404, "Post not found")
+    video_url = post.get("media_url", "")
+    if not video_url or "video.twimg.com" not in video_url:
+        raise HTTPException(404, "No video URL")
+    # Stream the video through our server
+    try:
+        r = httpx.get(video_url, headers={"User-Agent": "Mozilla/5.0"}, timeout=30, follow_redirects=True)
+        if r.status_code == 200:
+            from fastapi.responses import Response
+            return Response(
+                content=r.content,
+                media_type="video/mp4",
+                headers={"Cache-Control": "public, max-age=86400"}
+            )
+    except Exception as e:
+        log.error(f"Video proxy error: {e}")
+    raise HTTPException(502, "Could not fetch video")
+
+
 @app.get("/api/thumbnails/{post_id}")
 async def serve_thumbnail(post_id: str):
     # Local file first

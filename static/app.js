@@ -772,13 +772,14 @@ function buildPostCard(post) {
       </div>`;
 
     if (hasVideoSrc) {
-      // Video with lazy autoplay (same pattern as IG Intel)
+      // Video with lazy autoplay — serve through our own proxy (same-origin, like IG Intel)
+      const videoSrc = `/api/videos/${post.id}`;
       mediaHtml = `
         <div class="post-card-media video-ratio">
-          <video muted loop playsinline preload="none" data-src="${post.media_url}"
+          <video muted loop playsinline preload="none" data-src="${videoSrc}"
                  poster="${thumbUrl}"
                  style="width:100%;height:100%;object-fit:cover;display:block"></video>
-          <div class="video-sound-btn" onclick="event.stopPropagation();toggleVideoSound(this)">🔇</div>
+          <button onclick="event.stopPropagation();toggleVideoSound(this)" style="position:absolute;bottom:36px;right:6px;background:rgba(0,0,0,0.55);border:none;color:#fff;width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:12px;display:flex;align-items:center;justify-content:center;z-index:2" title="Toggle sound">&#128264;</button>
           ${overlay}${multBadge}
           <div class="media-type-badge">video</div>
         </div>`;
@@ -877,21 +878,12 @@ async function openPostModal(postId) {
       if (isVideo && post.media_url && post.media_url.includes('video.twimg.com')) {
         const poster = post.thumbnail_url || '';
         mediaEl.innerHTML = `
-          <video src="${post.media_url}" poster="${poster}"
-                 autoplay muted loop playsinline
+          <video src="/api/videos/${post.id}" poster="${poster}"
+                 autoplay muted loop playsinline controls
                  style="width:100%;max-height:600px;object-fit:contain;border-radius:8px;">
           </video>
-          <div class="modal-sound-btn" style="position:absolute;bottom:16px;right:16px;background:rgba(0,0,0,0.6);color:#fff;padding:6px 12px;border-radius:20px;cursor:pointer;font-size:13px;z-index:5;">🔇 Unmute</div>
         `;
         mediaEl.style.position = 'relative';
-        const vid = mediaEl.querySelector('video');
-        const btn = mediaEl.querySelector('.modal-sound-btn');
-        if (btn && vid) {
-          btn.addEventListener('click', () => {
-            vid.muted = !vid.muted;
-            btn.textContent = vid.muted ? '🔇 Unmute' : '🔊 Mute';
-          });
-        }
       } else if (isVideo) {
         const thumb = post.thumbnail_url || post.media_url || `/api/thumbnails/${post.id}`;
         mediaEl.innerHTML = `
@@ -1858,10 +1850,10 @@ function observeVideos() {
 }
 
 function toggleVideoSound(btn) {
-  const video = btn.parentElement.querySelector('video');
+  const video = btn.closest('.post-card-media').querySelector('video');
   if (!video) return;
   video.muted = !video.muted;
-  btn.textContent = video.muted ? '🔇' : '🔊';
+  btn.innerHTML = video.muted ? '&#128264;' : '&#128266;';
 }
 
 // Legacy compat — called in several places
