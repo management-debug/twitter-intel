@@ -759,41 +759,38 @@ function buildPostCard(post) {
 
   let mediaHtml = '';
   if (hasMedia) {
-    if (isVideo && post.media_url && post.media_url.includes('video.twimg.com')) {
-      // Actual video with autoplay
-      const thumbUrl = post.thumbnail_url || post.media_url || '';
+    const hasVideoSrc = isVideo && post.media_url && post.media_url.includes('video.twimg.com');
+    const thumbUrl = post.thumbnail_url || '';
+    const imgUrl = post.media_url || `/api/images/${post.id}`;
+    const multBadge = post.performance_multiplier > 1 ? `<div class="viral-badge">${post.performance_multiplier}x</div>` : '';
+    const overlay = `
+      <div class="post-card-overlay">
+        <div class="post-card-overlay-stats">
+          <span class="overlay-stat">❤️ ${fmtNum(post.likes)}</span>
+          ${post.views ? `<span class="overlay-stat">👁 ${fmtNum(post.views)}</span>` : ''}
+        </div>
+      </div>`;
+
+    if (hasVideoSrc) {
+      // Video with lazy autoplay (same pattern as IG Intel)
       mediaHtml = `
-        <div class="post-card-media">
-          <video class="video-autoplay" src="${post.media_url}" poster="${thumbUrl}"
-                 autoplay muted loop playsinline preload="metadata"
-                 style="width:100%;height:100%;object-fit:cover;position:absolute;top:0;left:0;">
-          </video>
-          <div class="video-sound-btn" title="Toggle sound">🔇</div>
-          <div class="post-card-overlay">
-            <div class="post-card-overlay-stats">
-              <span class="overlay-stat">❤️ ${fmtNum(post.likes)}</span>
-              ${post.views ? `<span class="overlay-stat">👁 ${fmtNum(post.views)}</span>` : ''}
-            </div>
-          </div>
-          ${post.viral_mult ? `<div class="viral-badge">${multLabel(post.viral_mult)}</div>` : ''}
+        <div class="post-card-media video-ratio">
+          <video muted loop playsinline preload="none" data-src="${post.media_url}"
+                 poster="${thumbUrl}"
+                 style="width:100%;height:100%;object-fit:cover;display:block"></video>
+          <div class="video-sound-btn" onclick="event.stopPropagation();toggleVideoSound(this)">🔇</div>
+          ${overlay}${multBadge}
           <div class="media-type-badge">video</div>
         </div>`;
     } else {
-      // Photo or video thumbnail fallback
-      const imgUrl = post.media_url || (isVideo ? `/api/thumbnails/${post.id}` : `/api/images/${post.id}`);
+      // Photo or video thumbnail - native lazy loading
       mediaHtml = `
-        <div class="post-card-media">
-          <div class="media-placeholder">${isVideo ? '🎬' : '📸'}</div>
-          <img class="img-lazy" data-src="${imgUrl}" src="" alt=""
+        <div class="post-card-media${isVideo ? ' video-ratio' : ''}">
+          <img src="${imgUrl}" loading="lazy"
+               style="width:100%;height:100%;object-fit:cover;display:block"
                onerror="this.style.display='none'" />
           ${isVideo ? `<div class="video-play-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="white"><polygon points="5 3 19 12 5 21 5 3"/></svg></div>` : ''}
-          <div class="post-card-overlay">
-            <div class="post-card-overlay-stats">
-              <span class="overlay-stat">❤️ ${fmtNum(post.likes)}</span>
-              ${post.views ? `<span class="overlay-stat">👁 ${fmtNum(post.views)}</span>` : ''}
-            </div>
-          </div>
-          ${post.viral_mult ? `<div class="viral-badge">${multLabel(post.viral_mult)}</div>` : ''}
+          ${overlay}${multBadge}
           <div class="media-type-badge">${mt}</div>
         </div>`;
     }
@@ -1836,68 +1833,40 @@ function guideSearch(query) {
 // ─── LAZY IMAGES ────────────────────────────────────────────────────
 let lazyObserver = null;
 
-function initLazyImages() {
-  const imgs = $$('img.img-lazy[data-src]:not([src])');
-  // Also re-check ones with src="" that haven't loaded
-  const allLazy = $$('img.img-lazy[data-src]');
+// ─── Video Autoplay on Visible (IntersectionObserver) — same as IG Intel ───
+const videoObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    const video = entry.target;
+    if (entry.isIntersecting) {
+      if (!video.src && video.dataset.src) {
+        video.src = video.dataset.src;
+      }
+      video.play().catch(() => {});
+    } else {
+      video.pause();
+    }
+  });
+}, { rootMargin: '100px', threshold: 0.25 });
 
-  if (!lazyObserver) {
-    lazyObserver = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          const img = entry.target;
-          const src = img.dataset.src;
-          if (src) {
-            img.src = src;
-            img.style.display = '';
-            img.addEventListener('load', () => img.classList.add('loaded'), { once: true });
-            lazyObserver.unobserve(img);
-          }
-        }
-      });
-    }, { rootMargin: '200px' });
-  }
-
-  allLazy.forEach(img => lazyObserver.observe(img));
-
-  // ─── Video autoplay on scroll ───
-  initLazyVideos();
-}
-
-let videoObserver = null;
-function initLazyVideos() {
-  const videos = $$('video.video-autoplay');
-  if (!videos.length) return;
-
-  if (!videoObserver) {
-    videoObserver = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        const video = entry.target;
-        if (entry.isIntersecting) {
-          video.play().catch(() => {});
-        } else {
-          video.pause();
-        }
-      });
-    }, { rootMargin: '50px', threshold: 0.25 });
-  }
-
-  videos.forEach(v => {
+function observeVideos() {
+  document.querySelectorAll('.post-card video[data-src]').forEach(v => {
     if (!v._observed) {
       v._observed = true;
       videoObserver.observe(v);
-      // Sound toggle button
-      const soundBtn = v.parentElement?.querySelector('.video-sound-btn');
-      if (soundBtn && !soundBtn._bound) {
-        soundBtn._bound = true;
-        soundBtn.addEventListener('click', (e) => {
-          e.stopPropagation();
-          v.muted = !v.muted;
-          soundBtn.textContent = v.muted ? '🔇' : '🔊';
-        });
-      }
     }
   });
+}
+
+function toggleVideoSound(btn) {
+  const video = btn.parentElement.querySelector('video');
+  if (!video) return;
+  video.muted = !video.muted;
+  btn.textContent = video.muted ? '🔇' : '🔊';
+}
+
+// Legacy compat — called in several places
+function initLazyImages() {
+  observeVideos();
 }
 
 // ─── AVATAR COLOR HELPERS ────────────────────────────────────────────

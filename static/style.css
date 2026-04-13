@@ -632,6 +632,9 @@ select option {
   background: var(--bg3);
   overflow: hidden;
 }
+.post-card-media.video-ratio {
+  padding-bottom: 133%; /* 9:16 aspect ratio for vertical videos */
+}
 
 .post-card-media img,
 .post-card-media video {
