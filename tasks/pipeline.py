@@ -281,18 +281,28 @@ def run_refresh_pipeline():
                             "completed_at": datetime.now(timezone.utc).isoformat()})
 
 
+def _median(values):
+    """Calculate median of a list of numbers."""
+    if not values:
+        return 0
+    s = sorted(values)
+    n = len(s)
+    if n % 2 == 1:
+        return s[n // 2]
+    return (s[n // 2 - 1] + s[n // 2]) / 2
+
+
 def _update_account_averages(account_id, posts):
-    """Recalculate account averages from posts."""
+    """Recalculate account MEDIAN averages from posts (resistant to outliers)."""
     photos = [p for p in posts if p["media_type"] == "photo"]
     videos = [p for p in posts if p["media_type"] == "video"]
     texts = [p for p in posts if p["media_type"] == "text"]
-    all_posts = posts
 
-    avg_likes = sum(p["likes"] for p in all_posts) / len(all_posts) if all_posts else 0
-    avg_views = sum(p["views"] for p in all_posts) / len(all_posts) if all_posts else 0
-    avg_photo = sum(p["likes"] for p in photos) / len(photos) if photos else 0
-    avg_video = sum(p["views"] for p in videos) / len(videos) if videos else 0
-    avg_text = sum(p["likes"] for p in texts) / len(texts) if texts else 0
+    avg_likes = _median([p["likes"] for p in posts])
+    avg_views = _median([p["views"] for p in posts])
+    avg_photo = _median([p["likes"] for p in photos])
+    avg_video = _median([p["views"] for p in videos])
+    avg_text = _median([p["likes"] for p in texts])
 
     update_account(account_id, {
         "avg_likes_30d": round(avg_likes, 1),

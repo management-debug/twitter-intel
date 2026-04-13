@@ -743,14 +743,52 @@ async function loadViralTab(tab, page = 1, append = false) {
 
     initLazyImages();
     state.pages[tab] = page + 1;
-    countEl.textContent = `${grid.children.length} of ${fmtNum(total)} results`;
-    loadBtn.disabled = posts.length < 50;
-    loadBtn.textContent = posts.length < 50 ? 'No more results' : 'Load More';
+    countEl.textContent = `${grid.children.length} results`;
+
+    // Infinite scroll: hide button, set up observer on sentinel
+    if (posts.length < 50) {
+      loadBtn.style.display = 'none';
+      state[`${tab}_done`] = true;
+    } else {
+      loadBtn.style.display = 'none';
+      state[`${tab}_done`] = false;
+      setupInfiniteScroll(tab);
+    }
   } catch (err) {
     toast(err.message, 'error');
-    loadBtn.disabled = false;
-    loadBtn.textContent = 'Load More';
   }
+}
+
+// ─── Infinite Scroll ────────────────────────────────────────────────
+const _scrollObservers = {};
+function setupInfiniteScroll(tab) {
+  const cfg = tabConfig[tab];
+  const grid = $(`#${cfg.gridId}`);
+  if (!grid) return;
+
+  // Remove old sentinel
+  const oldSentinel = grid.querySelector('.scroll-sentinel');
+  if (oldSentinel) oldSentinel.remove();
+
+  // Add sentinel div at bottom
+  const sentinel = document.createElement('div');
+  sentinel.className = 'scroll-sentinel';
+  sentinel.style.height = '1px';
+  grid.parentElement.appendChild(sentinel);
+
+  // Disconnect old observer
+  if (_scrollObservers[tab]) _scrollObservers[tab].disconnect();
+
+  _scrollObservers[tab] = new IntersectionObserver((entries) => {
+    if (entries[0].isIntersecting && !state[`${tab}_loading`] && !state[`${tab}_done`]) {
+      state[`${tab}_loading`] = true;
+      loadViralTab(tab, state.pages[tab], true).then(() => {
+        state[`${tab}_loading`] = false;
+      });
+    }
+  }, { rootMargin: '400px' });
+
+  _scrollObservers[tab].observe(sentinel);
 }
 
 // ─── POST CARD BUILDER ───────────────────────────────────────────────
