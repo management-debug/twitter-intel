@@ -204,6 +204,40 @@ def download_tweet_thumbnail(post_id, thumbnail_url):
     return local_path
 
 
+def download_tweet_video(post_id, video_url):
+    """Download tweet video .mp4 → local + Supabase. Returns public URL or local path."""
+    if not video_url or 'video.twimg.com' not in video_url:
+        return None
+
+    post_id = str(post_id)
+    sb_path = f"{post_id}.mp4"
+
+    if USE_SUPABASE and _sb_exists("tweet-videos", sb_path):
+        return f"{SUPABASE_URL}/storage/v1/object/public/tweet-videos/{sb_path}"
+
+    local_path = os.path.join(str(VIDEOS_DIR), f"{post_id}.mp4")
+    if os.path.exists(local_path) and os.path.getsize(local_path) > 1000:
+        if USE_SUPABASE:
+            with open(local_path, 'rb') as f:
+                _sb_upload("tweet-videos", sb_path, f.read(), content_type="video/mp4")
+        return local_path
+
+    raw = _download_bytes(video_url)
+    if not raw:
+        return None
+
+    # Save locally (no compression for video)
+    _save_local(local_path, raw)
+
+    # Upload to Supabase
+    if USE_SUPABASE:
+        sb_url = _sb_upload("tweet-videos", sb_path, raw, content_type="video/mp4")
+        if sb_url:
+            return sb_url
+
+    return local_path
+
+
 # ─── Batch Operations ───────────────────────────────────────────────────────
 
 def batch_download_images(items, download_fn, max_workers=6):
@@ -235,7 +269,7 @@ def download_all_media(posts, accounts):
     """Download all media for posts and accounts → local + Supabase Storage.
     Returns dict with download counts.
     """
-    stats = {"avatars": 0, "images": 0, "thumbnails": 0}
+    stats = {"avatars": 0, "images": 0, "thumbnails": 0, "videos": 0}
 
     # Download avatars (all accounts)
     avatar_items = [(a["username"], a.get("avatar_url", "")) for a in accounts if a.get("avatar_url")]
@@ -252,6 +286,16 @@ def download_all_media(posts, accounts):
     if photo_items:
         stats["images"] = batch_download_images(photo_items, download_tweet_image, max_workers=6)
         log.info(f"Downloaded {stats['images']}/{len(photo_items)} tweet images")
+
+    # Download tweet videos (.mp4 files)
+    video_items = []
+    for p in posts:
+        if p.get("media_type") == "video" and p.get("media_url") and 'video.twimg.com' in p.get("media_url", ""):
+            pid = str(p.get("id", p.get("tweet_id", "")))
+            video_items.append((pid, p["media_url"]))
+    if video_items:
+        stats["videos"] = batch_download_images(video_items, download_tweet_video, max_workers=4)
+        log.info(f"Downloaded {stats['videos']}/{len(video_items)} tweet videos")
 
     # Download video thumbnails
     thumb_items = []

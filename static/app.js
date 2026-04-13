@@ -772,8 +772,8 @@ function buildPostCard(post) {
       </div>`;
 
     if (hasVideoSrc) {
-      // Video with lazy autoplay — serve through our own proxy (same-origin, like IG Intel)
-      const videoSrc = `/api/videos/${post.id}`;
+      // Video with lazy autoplay — serve from Supabase Storage (same as IG Intel reel-videos bucket)
+      const videoSrc = `https://ttdsvkpqobfutsahblos.supabase.co/storage/v1/object/public/tweet-videos/${post.id}.mp4`;
       mediaHtml = `
         <div class="post-card-media video-ratio">
           <video muted loop playsinline preload="none" data-src="${videoSrc}"
@@ -878,7 +878,7 @@ async function openPostModal(postId) {
       if (isVideo && post.media_url && post.media_url.includes('video.twimg.com')) {
         const poster = post.thumbnail_url || '';
         mediaEl.innerHTML = `
-          <video src="/api/videos/${post.id}" poster="${poster}"
+          <video src="https://ttdsvkpqobfutsahblos.supabase.co/storage/v1/object/public/tweet-videos/${post.id}.mp4" poster="${poster}"
                  autoplay muted loop playsinline controls
                  style="width:100%;max-height:600px;object-fit:contain;border-radius:8px;">
           </video>
