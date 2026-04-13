@@ -759,24 +759,45 @@ function buildPostCard(post) {
 
   let mediaHtml = '';
   if (hasMedia) {
-    const imgUrl = post.media_url
-      ? post.media_url
-      : (isVideo ? `/api/thumbnails/${post.id}` : `/api/images/${post.id}`);
-    mediaHtml = `
-      <div class="post-card-media">
-        <div class="media-placeholder">${isVideo ? '🎬' : '📸'}</div>
-        <img class="img-lazy" data-src="${imgUrl}" src="" alt=""
-             onerror="this.style.display='none'" />
-        ${isVideo ? `<div class="video-play-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="white"><polygon points="5 3 19 12 5 21 5 3"/></svg></div>` : ''}
-        <div class="post-card-overlay">
-          <div class="post-card-overlay-stats">
-            <span class="overlay-stat">❤️ ${fmtNum(post.likes)}</span>
-            ${post.views ? `<span class="overlay-stat">👁 ${fmtNum(post.views)}</span>` : ''}
+    if (isVideo && post.media_url && post.media_url.includes('video.twimg.com')) {
+      // Actual video with autoplay
+      const thumbUrl = post.thumbnail_url || post.media_url || '';
+      mediaHtml = `
+        <div class="post-card-media">
+          <div class="media-placeholder">🎬</div>
+          <video class="video-lazy" data-src="${post.media_url}" poster="${thumbUrl}"
+                 muted loop playsinline preload="none"
+                 style="width:100%;height:100%;object-fit:cover;position:absolute;top:0;left:0;display:none;">
+          </video>
+          <div class="video-sound-btn" title="Toggle sound">🔇</div>
+          <div class="post-card-overlay">
+            <div class="post-card-overlay-stats">
+              <span class="overlay-stat">❤️ ${fmtNum(post.likes)}</span>
+              ${post.views ? `<span class="overlay-stat">👁 ${fmtNum(post.views)}</span>` : ''}
+            </div>
           </div>
-        </div>
-        ${post.viral_mult ? `<div class="viral-badge">${multLabel(post.viral_mult)}</div>` : ''}
-        <div class="media-type-badge">${mt}</div>
-      </div>`;
+          ${post.viral_mult ? `<div class="viral-badge">${multLabel(post.viral_mult)}</div>` : ''}
+          <div class="media-type-badge">video</div>
+        </div>`;
+    } else {
+      // Photo or video thumbnail fallback
+      const imgUrl = post.media_url || (isVideo ? `/api/thumbnails/${post.id}` : `/api/images/${post.id}`);
+      mediaHtml = `
+        <div class="post-card-media">
+          <div class="media-placeholder">${isVideo ? '🎬' : '📸'}</div>
+          <img class="img-lazy" data-src="${imgUrl}" src="" alt=""
+               onerror="this.style.display='none'" />
+          ${isVideo ? `<div class="video-play-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="white"><polygon points="5 3 19 12 5 21 5 3"/></svg></div>` : ''}
+          <div class="post-card-overlay">
+            <div class="post-card-overlay-stats">
+              <span class="overlay-stat">❤️ ${fmtNum(post.likes)}</span>
+              ${post.views ? `<span class="overlay-stat">👁 ${fmtNum(post.views)}</span>` : ''}
+            </div>
+          </div>
+          ${post.viral_mult ? `<div class="viral-badge">${multLabel(post.viral_mult)}</div>` : ''}
+          <div class="media-type-badge">${mt}</div>
+        </div>`;
+    }
   } else {
     mediaHtml = `
       <div class="post-card-media" style="padding-bottom:56.25%;">
@@ -857,8 +878,26 @@ async function openPostModal(postId) {
 
     // Media
     if (hasMedia) {
-      if (isVideo) {
-        const thumb = post.media_url || post.thumbnail_url || `/api/thumbnails/${post.id}`;
+      if (isVideo && post.media_url && post.media_url.includes('video.twimg.com')) {
+        const poster = post.thumbnail_url || '';
+        mediaEl.innerHTML = `
+          <video src="${post.media_url}" poster="${poster}"
+                 autoplay muted loop playsinline
+                 style="width:100%;max-height:600px;object-fit:contain;border-radius:8px;">
+          </video>
+          <div class="modal-sound-btn" style="position:absolute;bottom:16px;right:16px;background:rgba(0,0,0,0.6);color:#fff;padding:6px 12px;border-radius:20px;cursor:pointer;font-size:13px;z-index:5;">🔇 Unmute</div>
+        `;
+        mediaEl.style.position = 'relative';
+        const vid = mediaEl.querySelector('video');
+        const btn = mediaEl.querySelector('.modal-sound-btn');
+        if (btn && vid) {
+          btn.addEventListener('click', () => {
+            vid.muted = !vid.muted;
+            btn.textContent = vid.muted ? '🔇 Unmute' : '🔊 Mute';
+          });
+        }
+      } else if (isVideo) {
+        const thumb = post.thumbnail_url || post.media_url || `/api/thumbnails/${post.id}`;
         mediaEl.innerHTML = `
           <img src="${thumb}" alt="Video thumbnail" style="width:100%;max-height:600px;object-fit:contain;"
                onerror="this.parentNode.innerHTML='<div class=\\'media-placeholder\\' style=\\'font-size:60px;position:static\\''>🎬</div>'" />
@@ -1181,6 +1220,50 @@ function initLazyImages() {
   }
 
   allLazy.forEach(img => lazyObserver.observe(img));
+
+  // ─── Video autoplay on scroll ───
+  initLazyVideos();
+}
+
+let videoObserver = null;
+function initLazyVideos() {
+  const videos = $$('video.video-lazy[data-src]');
+  if (!videos.length) return;
+
+  if (!videoObserver) {
+    videoObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        const video = entry.target;
+        if (entry.isIntersecting) {
+          // Load src if not loaded yet
+          if (!video.src && video.dataset.src) {
+            video.src = video.dataset.src;
+            video.style.display = '';
+            video.load();
+          }
+          video.play().catch(() => {});
+        } else {
+          if (video.src) {
+            video.pause();
+          }
+        }
+      });
+    }, { rootMargin: '100px', threshold: 0.3 });
+  }
+
+  videos.forEach(v => {
+    videoObserver.observe(v);
+    // Sound toggle button
+    const soundBtn = v.parentElement?.querySelector('.video-sound-btn');
+    if (soundBtn && !soundBtn._bound) {
+      soundBtn._bound = true;
+      soundBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        v.muted = !v.muted;
+        soundBtn.textContent = v.muted ? '🔇' : '🔊';
+      });
+    }
+  });
 }
 
 // ─── AVATAR COLOR HELPERS ────────────────────────────────────────────
