@@ -1608,6 +1608,43 @@ select option {
 .no-results-icon { font-size: 40px; margin-bottom: 12px; }
 .no-results p { font-size: 14px; margin-top: 6px; }
 
+/* Period filter buttons (IG Intel style) */
+.period-buttons { display: flex; gap: 4px; flex-wrap: wrap; }
+.period-btn {
+  padding: 6px 14px;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--text3);
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.period-btn:hover {
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.04);
+}
+.period-btn.active {
+  background: rgba(29, 155, 240, 0.12);
+  color: #fff;
+  border-color: rgba(29, 155, 240, 0.25);
+  font-weight: 600;
+}
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 16px;
+}
+.toolbar .count {
+  font-size: 13px;
+  color: var(--text3);
+  margin-right: 8px;
+}
+
 /* Video autoplay */
 .video-sound-btn {
   position: absolute;

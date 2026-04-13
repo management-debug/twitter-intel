@@ -642,9 +642,9 @@ const tabConfig = {
     gridId:     'photos-grid',
     countId:    'photos-count',
     loadMoreId: 'photos-load-more',
-    periodId:   'photos-period',
+    periodBtns: 'photos-period-buttons',
     sortId:     'photos-sort',
-    multId:     'photos-mult',
+    multBtns:   'photos-mult-buttons',
     searchId:   'photos-search',
   },
   videos: {
@@ -652,9 +652,9 @@ const tabConfig = {
     gridId:     'videos-grid',
     countId:    'videos-count',
     loadMoreId: 'videos-load-more',
-    periodId:   'videos-period',
+    periodBtns: 'videos-period-buttons',
     sortId:     'videos-sort',
-    multId:     'videos-mult',
+    multBtns:   'videos-mult-buttons',
     searchId:   'videos-search',
   },
   text: {
@@ -662,9 +662,9 @@ const tabConfig = {
     gridId:     'text-list',
     countId:    'text-count',
     loadMoreId: 'text-load-more',
-    periodId:   'text-period',
+    periodBtns: 'text-period-buttons',
     sortId:     'text-sort',
-    multId:     'text-mult',
+    multBtns:   'text-mult-buttons',
     searchId:   'text-search',
   },
 };
@@ -675,9 +675,11 @@ async function loadViralTab(tab, page = 1, append = false) {
   const loadBtn = $(`#${cfg.loadMoreId}`);
   const countEl = $(`#${cfg.countId}`);
 
-  const period  = $(`#${cfg.periodId}`).value;
+  const periodBtn = $(`#${cfg.periodBtns} .period-btn.active`);
+  const period  = periodBtn ? periodBtn.dataset.value : 'all';
   const sort    = $(`#${cfg.sortId}`).value;
-  const mult    = parseFloat($(`#${cfg.multId}`).value) || 0;
+  const multBtn = $(`#${cfg.multBtns} .period-btn.active`);
+  const mult    = multBtn ? parseFloat(multBtn.dataset.value) || 0 : 0;
   const search  = $(`#${cfg.searchId}`).value.trim();
 
   if (!append) {
@@ -1986,9 +1988,23 @@ function bindViralFilters(tab) {
   const reloadFn = () => { cacheClear(`viral_${tab}_`); loadViralTab(tab, 1, false); };
   const debouncedReload = debounce(reloadFn, 300);
 
-  $(`#${cfg.periodId}`).addEventListener('change', reloadFn);
+  // Period pill buttons
+  $$(`#${cfg.periodBtns} .period-btn`).forEach(btn => {
+    btn.addEventListener('click', () => {
+      $$(`#${cfg.periodBtns} .period-btn`).forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      reloadFn();
+    });
+  });
+  // Multiplier pill buttons
+  $$(`#${cfg.multBtns} .period-btn`).forEach(btn => {
+    btn.addEventListener('click', () => {
+      $$(`#${cfg.multBtns} .period-btn`).forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      reloadFn();
+    });
+  });
   $(`#${cfg.sortId}`).addEventListener('change', reloadFn);
-  $(`#${cfg.multId}`).addEventListener('change', reloadFn);
   $(`#${cfg.searchId}`).addEventListener('input', debouncedReload);
 }
 

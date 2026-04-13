@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/static/style.css?v=8" />
+  <link rel="stylesheet" href="/static/style.css?v=9" />
 </head>
 <body>
 
@@ -218,26 +218,27 @@
         <p>Photo posts exceeding viral engagement thresholds</p>
       </div>
       <div class="toolbar">
-        <div class="filter-group">
-          <select id="photos-period" class="select-input">
-            <option value="all">All Time</option>
-            <option value="month">This Month</option>
-            <option value="week">This Week</option>
-            <option value="today">Today</option>
-          </select>
+        <span class="count" id="photos-count"></span>
+        <div class="period-buttons" id="photos-period-buttons">
+          <button class="period-btn active" data-value="all">All Time</button>
+          <button class="period-btn" data-value="month">This Month</button>
+          <button class="period-btn" data-value="week">This Week</button>
+          <button class="period-btn" data-value="today">Today</button>
+        </div>
+        <div class="controls" style="display:flex;flex-wrap:wrap;gap:8px;align-items:center">
           <select id="photos-sort" class="select-input">
             <option value="likes">Sort: Likes</option>
             <option value="views">Sort: Views</option>
             <option value="bookmarks">Sort: Bookmarks</option>
-            <option value="created_at">Sort: Newest</option>
+            <option value="create_time">Sort: Newest</option>
           </select>
-          <select id="photos-mult" class="select-input">
-            <option value="0">Any Multiplier</option>
-            <option value="1.5">1.5x+</option>
-            <option value="3">3x+</option>
-            <option value="5">5x+</option>
-            <option value="10">10x+</option>
-          </select>
+          <div class="period-buttons" id="photos-mult-buttons">
+            <button class="period-btn active" data-value="0">All</button>
+            <button class="period-btn" data-value="1.5">1.5x+</button>
+            <button class="period-btn" data-value="3">3x+</button>
+            <button class="period-btn" data-value="5">5x+</button>
+            <button class="period-btn" data-value="10">10x+</button>
+          </div>
           <div class="search-wrap">
             <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
             <input type="text" id="photos-search" placeholder="Search captions…" class="search-input" />
@@ -258,26 +259,27 @@
         <p>Video posts exceeding viral engagement thresholds</p>
       </div>
       <div class="toolbar">
-        <div class="filter-group">
-          <select id="videos-period" class="select-input">
-            <option value="all">All Time</option>
-            <option value="month">This Month</option>
-            <option value="week">This Week</option>
-            <option value="today">Today</option>
-          </select>
+        <span class="count" id="videos-count"></span>
+        <div class="period-buttons" id="videos-period-buttons">
+          <button class="period-btn active" data-value="all">All Time</button>
+          <button class="period-btn" data-value="month">This Month</button>
+          <button class="period-btn" data-value="week">This Week</button>
+          <button class="period-btn" data-value="today">Today</button>
+        </div>
+        <div class="controls" style="display:flex;flex-wrap:wrap;gap:8px;align-items:center">
           <select id="videos-sort" class="select-input">
             <option value="views">Sort: Views</option>
             <option value="likes">Sort: Likes</option>
             <option value="bookmarks">Sort: Bookmarks</option>
-            <option value="created_at">Sort: Newest</option>
+            <option value="create_time">Sort: Newest</option>
           </select>
-          <select id="videos-mult" class="select-input">
-            <option value="0">Any Multiplier</option>
-            <option value="1.5">1.5x+</option>
-            <option value="3">3x+</option>
-            <option value="5">5x+</option>
-            <option value="10">10x+</option>
-          </select>
+          <div class="period-buttons" id="videos-mult-buttons">
+            <button class="period-btn active" data-value="0">All</button>
+            <button class="period-btn" data-value="1.5">1.5x+</button>
+            <button class="period-btn" data-value="3">3x+</button>
+            <button class="period-btn" data-value="5">5x+</button>
+            <button class="period-btn" data-value="10">10x+</button>
+          </div>
           <div class="search-wrap">
             <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
             <input type="text" id="videos-search" placeholder="Search captions…" class="search-input" />
@@ -287,7 +289,6 @@
       <div class="posts-grid" id="videos-grid"></div>
       <div class="load-more-row">
         <button class="btn btn-secondary" id="videos-load-more">Load More</button>
-        <div id="videos-count" class="result-count"></div>
       </div>
     </div>
 
@@ -298,13 +299,14 @@
         <p>Text-only tweets with viral engagement</p>
       </div>
       <div class="toolbar">
-        <div class="filter-group">
-          <select id="text-period" class="select-input">
-            <option value="all">All Time</option>
-            <option value="month">This Month</option>
-            <option value="week">This Week</option>
-            <option value="today">Today</option>
-          </select>
+        <span class="count" id="text-count"></span>
+        <div class="period-buttons" id="text-period-buttons">
+          <button class="period-btn active" data-value="all">All Time</button>
+          <button class="period-btn" data-value="month">This Month</button>
+          <button class="period-btn" data-value="week">This Week</button>
+          <button class="period-btn" data-value="today">Today</button>
+        </div>
+        <div class="controls" style="display:flex;flex-wrap:wrap;gap:8px;align-items:center">
           <select id="text-sort" class="select-input">
             <option value="likes">Sort: Likes</option>
             <option value="views">Sort: Views</option>
@@ -312,13 +314,13 @@
             <option value="retweets">Sort: Retweets</option>
             <option value="created_at">Sort: Newest</option>
           </select>
-          <select id="text-mult" class="select-input">
-            <option value="0">Any Multiplier</option>
-            <option value="1.5">1.5x+</option>
-            <option value="3">3x+</option>
-            <option value="5">5x+</option>
-            <option value="10">10x+</option>
-          </select>
+          <div class="period-buttons" id="text-mult-buttons">
+            <button class="period-btn active" data-value="0">All</button>
+            <button class="period-btn" data-value="1.5">1.5x+</button>
+            <button class="period-btn" data-value="3">3x+</button>
+            <button class="period-btn" data-value="5">5x+</button>
+            <button class="period-btn" data-value="10">10x+</button>
+          </div>
           <div class="search-wrap">
             <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
             <input type="text" id="text-search" placeholder="Search tweets…" class="search-input" />
@@ -328,7 +330,6 @@
       <div class="text-posts-list" id="text-list"></div>
       <div class="load-more-row">
         <button class="btn btn-secondary" id="text-load-more">Load More</button>
-        <div id="text-count" class="result-count"></div>
       </div>
     </div>
 
@@ -462,6 +463,6 @@
   <!-- ════════════════════════════════════════════════════ TOAST -->
   <div id="toast-container"></div>
 
-  <script src="/static/app.js?v=8"></script>
+  <script src="/static/app.js?v=9"></script>
 </body>
 </html>
