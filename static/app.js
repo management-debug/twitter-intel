@@ -757,10 +757,10 @@ function buildPostCard(post) {
   const isVideo = mt === 'video';
   const hasMedia = mt === 'photo' || mt === 'video';
 
+  // ─── Media rendering (1:1 IG Intel pattern) ───
   let mediaHtml = '';
   if (hasMedia) {
-    const hasVideoSrc = isVideo && post.media_url && post.media_url.includes('video.twimg.com');
-    const thumbUrl = post.thumbnail_url || '';
+    const thumbUrl = post.thumbnail_url || post.media_url || '';
     const imgUrl = post.media_url || `/api/images/${post.id}`;
     const multBadge = post.performance_multiplier > 1 ? `<div class="viral-badge">${post.performance_multiplier}x</div>` : '';
     const overlay = `
@@ -771,28 +771,31 @@ function buildPostCard(post) {
         </div>
       </div>`;
 
-    if (hasVideoSrc) {
-      // Video with lazy autoplay — serve from Supabase Storage (same as IG Intel reel-videos bucket)
-      const videoSrc = `https://ttdsvkpqobfutsahblos.supabase.co/storage/v1/object/public/tweet-videos/${post.id}.mp4`;
+    if (isVideo && post.media_local) {
+      // Video downloaded → autoplay with IntersectionObserver (same as IG Intel)
       mediaHtml = `
         <div class="post-card-media video-ratio">
-          <video muted loop playsinline preload="none" data-src="${videoSrc}"
-                 poster="${thumbUrl}"
-                 style="width:100%;height:100%;object-fit:cover;display:block"></video>
+          <video muted loop playsinline preload="none" data-src="${post.media_local}" poster="${thumbUrl}" style="width:100%;height:100%;object-fit:cover;display:block"></video>
           <button onclick="event.stopPropagation();toggleVideoSound(this)" style="position:absolute;bottom:36px;right:6px;background:rgba(0,0,0,0.55);border:none;color:#fff;width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:12px;display:flex;align-items:center;justify-content:center;z-index:2" title="Toggle sound">&#128264;</button>
           ${overlay}${multBadge}
           <div class="media-type-badge">video</div>
         </div>`;
-    } else {
-      // Photo or video thumbnail - native lazy loading
+    } else if (isVideo) {
+      // Video not yet downloaded → show thumbnail
       mediaHtml = `
-        <div class="post-card-media${isVideo ? ' video-ratio' : ''}">
-          <img src="${imgUrl}" loading="lazy"
-               style="width:100%;height:100%;object-fit:cover;display:block"
-               onerror="this.style.display='none'" />
-          ${isVideo ? `<div class="video-play-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="white"><polygon points="5 3 19 12 5 21 5 3"/></svg></div>` : ''}
+        <div class="post-card-media video-ratio">
+          <img src="${thumbUrl}" loading="lazy" style="width:100%;height:100%;object-fit:cover;display:block" onerror="this.style.background='#111'" />
+          <div class="video-play-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="white"><polygon points="5 3 19 12 5 21 5 3"/></svg></div>
           ${overlay}${multBadge}
-          <div class="media-type-badge">${mt}</div>
+          <div class="media-type-badge">video</div>
+        </div>`;
+    } else {
+      // Photo — native lazy loading
+      mediaHtml = `
+        <div class="post-card-media">
+          <img src="${imgUrl}" loading="lazy" style="width:100%;height:100%;object-fit:cover;display:block" onerror="this.style.background='#111'" />
+          ${overlay}${multBadge}
+          <div class="media-type-badge">photo</div>
         </div>`;
     }
   } else {
@@ -875,14 +878,9 @@ async function openPostModal(postId) {
 
     // Media
     if (hasMedia) {
-      if (isVideo && post.media_url && post.media_url.includes('video.twimg.com')) {
-        const poster = post.thumbnail_url || '';
-        mediaEl.innerHTML = `
-          <video src="https://ttdsvkpqobfutsahblos.supabase.co/storage/v1/object/public/tweet-videos/${post.id}.mp4" poster="${poster}"
-                 autoplay muted loop playsinline controls
-                 style="width:100%;max-height:600px;object-fit:contain;border-radius:8px;">
-          </video>
-        `;
+      if (isVideo && post.media_local) {
+        // Video downloaded → play from Supabase/local
+        mediaEl.innerHTML = `<div style="max-width:400px;margin:0 auto"><video controls loop playsinline autoplay src="${post.media_local}" style="width:100%;border-radius:8px;max-height:500px"></video></div>`;
         mediaEl.style.position = 'relative';
       } else if (isVideo) {
         const thumb = post.thumbnail_url || post.media_url || `/api/thumbnails/${post.id}`;
