@@ -17,7 +17,7 @@ from db.database import (
     init_db, cancel_stale_jobs,
     get_dashboard_stats, get_top_creators,
     get_accounts, get_account, add_account, bulk_add_accounts, update_account, delete_account,
-    get_posts, get_post, get_account_posts, delete_post,
+    get_posts, get_post, get_post_count, get_account_posts, delete_post,
     get_jobs, get_job,
     add_to_watchlist, remove_from_watchlist, get_watchlist, is_watched,
 )
@@ -199,8 +199,11 @@ async def viral_posts(page: int = 1, limit: int = 50, sort: str = "likes",
                       media_type: str = None, period: str = "all",
                       min_mult: float = 0, search: str = "",
                       role=Depends(require_auth)):
-    return get_posts(page=page, limit=limit, sort=sort, media_type=media_type,
-                     viral_only=True, period=period, min_mult=min_mult, search=search)
+    posts = get_posts(page=page, limit=limit, sort=sort, media_type=media_type,
+                      viral_only=True, period=period, min_mult=min_mult, search=search)
+    total = get_post_count(media_type=media_type, viral_only=True, period=period,
+                           min_mult=min_mult, search=search)
+    return {"posts": posts, "total": total}
 
 
 @app.get("/api/posts")

@@ -489,6 +489,44 @@ def get_post(post_id):
     return dict(row) if row else None
 
 
+def get_post_count(media_type=None, viral_only=False, period="all", min_mult=0, search=""):
+    """Get total count of posts matching filters."""
+    if USE_SUPABASE:
+        params = {"select": "id"}
+        if media_type:
+            params["media_type"] = f"eq.{media_type}"
+        if viral_only:
+            params["is_viral"] = "eq.1"
+        if min_mult > 0:
+            params["performance_multiplier"] = f"gte.{min_mult}"
+        if search:
+            params["caption"] = f"ilike.%{search}%"
+        if period != "all":
+            cutoff = _period_cutoff(period)
+            if cutoff:
+                params["create_time"] = f"gte.{cutoff}"
+        return _sb_count("posts", params)
+
+    conn = get_db()
+    q = "SELECT COUNT(*) FROM posts WHERE 1=1"
+    args = []
+    if media_type:
+        q += " AND media_type = ?"; args.append(media_type)
+    if viral_only:
+        q += " AND is_viral = 1"
+    if min_mult > 0:
+        q += " AND performance_multiplier >= ?"; args.append(min_mult)
+    if search:
+        q += " AND caption LIKE ?"; args.append(f"%{search}%")
+    if period != "all":
+        cutoff = _period_cutoff(period)
+        if cutoff:
+            q += " AND create_time >= ?"; args.append(cutoff)
+    count = conn.execute(q, args).fetchone()[0]
+    conn.close()
+    return count
+
+
 def get_account_posts(account_id, media_type=None, limit=100):
     """Get all posts for a specific account."""
     if USE_SUPABASE:

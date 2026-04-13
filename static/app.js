@@ -743,7 +743,7 @@ async function loadViralTab(tab, page = 1, append = false) {
 
     initLazyImages();
     state.pages[tab] = page + 1;
-    countEl.textContent = `${grid.children.length} results`;
+    countEl.textContent = total > 0 ? `${fmtNum(total)} results` : `${grid.children.length} results`;
 
     // Infinite scroll: hide button, set up observer on sentinel
     if (posts.length < 50) {
