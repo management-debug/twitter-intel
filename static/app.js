@@ -957,8 +957,9 @@ async function openPostModal(postId) {
     `;
     initLazyImages();
 
-    // Caption
-    captionEl.textContent = post.caption || '';
+    // Caption (strip any remaining t.co links)
+    const cleanCaption = (post.caption || '').replace(/https?:\/\/t\.co\/\S+/g, '').trim();
+    captionEl.textContent = cleanCaption;
 
     // Stats
     const statsItems = [
@@ -979,9 +980,7 @@ async function openPostModal(postId) {
 
     // Meta
     metaEl.innerHTML = `
-      ${post.created_at ? `<div>Posted: ${new Date(post.created_at).toLocaleString()}</div>` : ''}
-      ${post.scraped_at ? `<div>Scraped: ${fmtDate(post.scraped_at)}</div>` : ''}
-      ${post.tweet_id   ? `<div>Tweet ID: ${post.tweet_id}</div>` : ''}
+      ${post.create_time ? `<div style="color:var(--text3);font-size:12px">Posted ${fmtDate(post.create_time)}</div>` : ''}
     `;
 
     // Copy + Link
