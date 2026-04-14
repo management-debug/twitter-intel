@@ -628,12 +628,12 @@ select option {
 .post-card-media {
   position: relative;
   width: 100%;
-  padding-bottom: 100%;
+  padding-bottom: 125%; /* 4:5 like Instagram - fits Twitter photos well */
   background: var(--bg3);
   overflow: hidden;
 }
 .post-card-media.video-ratio {
-  padding-bottom: 133%; /* 9:16 aspect ratio for vertical videos */
+  padding-bottom: 133%; /* 9:16 for vertical videos */
 }
 
 .post-card-media img,
@@ -739,7 +739,8 @@ select option {
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
-  margin-bottom: 8px;
+  margin-bottom: 4px;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.5);
 }
 
 .post-card-stats {
@@ -908,24 +909,26 @@ select option {
 /* ── Post Detail Modal ───────────────────────────────────────────── */
 .post-modal-box {
   width: 100%;
-  max-width: 900px;
+  max-width: 520px;
   max-height: 90vh;
   overflow-y: auto;
+  margin: auto;
 }
 
 .post-modal-inner {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+  display: flex;
+  flex-direction: column;
 }
 
 .post-modal-media {
-  min-height: 400px;
+  min-height: 300px;
+  max-height: 500px;
   background: var(--bg);
   display: flex;
   align-items: center;
   justify-content: center;
-  border-right: 1px solid var(--border);
   overflow: hidden;
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
   border-radius: var(--radius-lg) 0 0 var(--radius-lg);
 }
 
