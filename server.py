@@ -4,6 +4,7 @@ import logging
 from pathlib import Path
 from datetime import datetime, timezone
 
+import httpx
 import uvicorn
 from fastapi import FastAPI, Request, HTTPException, Depends
 from fastapi.staticfiles import StaticFiles
@@ -11,7 +12,8 @@ from fastapi.responses import FileResponse, RedirectResponse, JSONResponse
 
 from config import (
     PORT, STATIC_DIR, AVATARS_DIR, IMAGES_DIR, THUMBNAILS_DIR,
-    ADMIN_EMAIL, ADMIN_PASSWORD, WORKER_PASSWORD, SCRAPE_PIN, USE_SUPABASE,
+    ADMIN_EMAIL, ADMIN_PASSWORD, WORKER_PASSWORD, SCRAPE_PIN,
+    USE_SUPABASE, SUPABASE_URL,
 )
 from db.database import (
     init_db, cancel_stale_jobs,
@@ -288,7 +290,7 @@ async def serve_image(post_id: str):
             r = httpx.head(sb_url, timeout=3)
             if r.status_code == 200:
                 return RedirectResponse(sb_url, status_code=302)
-        except:
+        except Exception:
             pass
     # Fallback: redirect to original media URL from DB
     post = get_post(int(post_id))
@@ -307,7 +309,7 @@ async def serve_video(post_id: str):
             r = httpx.head(sb_url, timeout=3)
             if r.status_code == 200:
                 return RedirectResponse(sb_url, status_code=302)
-        except:
+        except Exception:
             pass
     # Get video URL from DB and proxy it
     post = get_post(int(post_id))
@@ -344,7 +346,7 @@ async def serve_thumbnail(post_id: str):
             r = httpx.head(sb_url, timeout=3)
             if r.status_code == 200:
                 return RedirectResponse(sb_url, status_code=302)
-        except:
+        except Exception:
             pass
     # Fallback: redirect to original thumbnail/media URL
     post = get_post(int(post_id))

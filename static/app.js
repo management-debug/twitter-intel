@@ -291,12 +291,13 @@ async function loadStats() {
   try {
     const data = await apiGet('/api/dashboard/stats', 'dashboard_stats');
     if (!data) return;
-    $('#stat-creators').textContent     = fmtNum(data.total_creators ?? 0);
+    const viralTotal = (data.viral_photos ?? 0) + (data.viral_videos ?? 0) + (data.viral_texts ?? 0);
+    $('#stat-creators').textContent     = fmtNum(data.total_accounts ?? 0);
     $('#stat-posts').textContent        = fmtNum(data.total_posts ?? 0);
-    $('#stat-viral').textContent        = fmtNum(data.viral_posts ?? 0);
+    $('#stat-viral').textContent        = fmtNum(viralTotal);
     $('#stat-viral-photos').textContent = fmtNum(data.viral_photos ?? 0);
     $('#stat-viral-videos').textContent = fmtNum(data.viral_videos ?? 0);
-    $('#stat-viral-text').textContent   = fmtNum(data.viral_text ?? 0);
+    $('#stat-viral-text').textContent   = fmtNum(data.viral_texts ?? 0);
   } catch (err) {
     console.error('Stats error:', err);
   }
@@ -312,15 +313,15 @@ async function loadJobs() {
       return;
     }
     tbody.innerHTML = jobs.map(j => {
-      const dur = j.finished_at && j.started_at
-        ? fmtDuration((new Date(j.finished_at) - new Date(j.started_at)) / 1000)
-        : j.started_at ? 'Running…' : '—';
+      const dur = j.completed_at && j.started_at
+        ? fmtDuration((new Date(j.completed_at) - new Date(j.started_at)) / 1000)
+        : j.started_at && j.status === 'running' ? 'Running…' : '—';
       return `<tr>
         <td>${j.id}</td>
         <td><span class="job-type">${escHtml(j.job_type || '—')}</span></td>
         <td><span class="status-badge ${j.status || 'idle'}">${escHtml(j.status || '—')}</span></td>
-        <td>${fmtNum(j.creators_scraped)}</td>
-        <td>${fmtNum(j.posts_found)}</td>
+        <td>${fmtNum(j.processed_accounts)}</td>
+        <td>${fmtNum(j.total_posts_found)}</td>
         <td>${fmtDate(j.started_at)}</td>
         <td>${dur}</td>
         <td class="text-muted" style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${escHtml(j.error_message || '')}">${escHtml(j.error_message || '—')}</td>
@@ -353,16 +354,21 @@ async function pollScrapeStatus() {
       badge.className   = 'status-badge running';
       prog.classList.remove('hidden');
       if (s.current_job) {
-        const pct = s.current_job.progress_pct ?? 0;
+        const j = s.current_job;
+        const pct = j.total_accounts > 0
+          ? Math.round((j.processed_accounts / j.total_accounts) * 100)
+          : 0;
         $('#progress-fill').style.width = `${pct}%`;
-        $('#progress-text').textContent = s.current_job.progress_msg || `${pct}% complete`;
+        $('#progress-text').textContent =
+          `${fmtNum(j.processed_accounts || 0)} / ${fmtNum(j.total_accounts || 0)} accounts · ${pct}%`;
       }
     } else {
       const job = s.current_job;
       if (job) {
-        badge.textContent = job.status === 'done' ? 'Done' : (job.status || 'Idle');
+        const done = job.status === 'completed' || job.status === 'failed' || job.status === 'cancelled';
+        badge.textContent = done ? (job.status[0].toUpperCase() + job.status.slice(1)) : (job.status || 'Idle');
         badge.className   = `status-badge ${job.status || 'idle'}`;
-        if (job.status === 'done') {
+        if (done) {
           prog.classList.add('hidden');
           $('#progress-fill').style.width = '100%';
           cacheClear('scrape_jobs');
@@ -464,9 +470,9 @@ function renderCreatorsTable(creators) {
         </div>
         ${c.display_name && c.display_name !== c.username ? `<div style="font-size:11px;color:var(--text3)">${escHtml(c.display_name)}</div>` : ''}
       </td>
-      <td>${fmtNum(c.followers_count)}</td>
-      <td>${fmtNum(c.avg_likes)}</td>
-      <td>${fmtNum(c.post_count)}</td>
+      <td>${fmtNum(c.followers)}</td>
+      <td>${fmtNum(c.avg_likes_30d)}</td>
+      <td>${fmtNum(c.tweet_count)}</td>
       <td>${verifiedHtml || '<span style="color:var(--text3)">—</span>'}</td>
       <td>
         <button class="star-btn ${c.is_watched ? 'watched' : ''}" data-username="${escHtml(c.username)}" title="Watchlist">
@@ -568,10 +574,10 @@ async function openCreatorModal(id, username) {
         <div class="creator-modal-name">${escHtml(c.display_name || c.username)}</div>
         <div class="creator-modal-handle">@${escHtml(c.username)}</div>
         <div class="creator-modal-stats">
-          <span class="creator-stat"><strong>${fmtNum(c.followers_count)}</strong> followers</span>
-          <span class="creator-stat"><strong>${fmtNum(c.post_count)}</strong> posts</span>
-          <span class="creator-stat"><strong>${fmtNum(c.avg_likes)}</strong> avg likes</span>
-          ${c.avg_views ? `<span class="creator-stat"><strong>${fmtNum(c.avg_views)}</strong> avg views</span>` : ''}
+          <span class="creator-stat"><strong>${fmtNum(c.followers)}</strong> followers</span>
+          <span class="creator-stat"><strong>${fmtNum(c.tweet_count)}</strong> posts</span>
+          <span class="creator-stat"><strong>${fmtNum(c.avg_likes_30d)}</strong> avg likes</span>
+          ${c.avg_views_30d ? `<span class="creator-stat"><strong>${fmtNum(c.avg_views_30d)}</strong> avg views</span>` : ''}
         </div>
       </div>
       <div>
@@ -802,7 +808,7 @@ function buildPostCard(post) {
   if (hasMedia) {
     const thumbUrl = post.thumbnail_url || post.media_url || '';
     const imgUrl = post.media_url || `/api/images/${post.id}`;
-    const multBadge = post.performance_multiplier > 1 ? `<div class="viral-badge">${post.performance_multiplier}x</div>` : '';
+    const multBadge = post.performance_multiplier > 1.5 ? `<div class="viral-badge">${multLabel(post.performance_multiplier)}</div>` : '';
     const overlay = `
       <div class="post-card-overlay">
         <div class="post-card-overlay-stats">
@@ -842,7 +848,7 @@ function buildPostCard(post) {
     mediaHtml = `
       <div class="post-card-media" style="padding-bottom:56.25%;">
         <div class="media-placeholder">✍️</div>
-        ${post.viral_mult ? `<div class="viral-badge">${multLabel(post.viral_mult)}</div>` : ''}
+        ${post.performance_multiplier ? `<div class="viral-badge">${multLabel(post.performance_multiplier)}</div>` : ''}
       </div>`;
   }
 
@@ -864,7 +870,7 @@ function buildPostCard(post) {
 }
 
 function buildTextPostCard(post) {
-  const mult = post.viral_mult;
+  const mult = post.performance_multiplier;
   const multHtml = mult ? `<span class="mult-badge ${multClass(mult)}">${multLabel(mult)}</span>` : '';
   const captionFull = post.caption || '';
   return `<div class="text-post-card" data-id="${post.id}">
@@ -873,7 +879,7 @@ function buildTextPostCard(post) {
         <span class="text-post-author">@${escHtml(post.username || '—')}</span>
         ${multHtml}
       </div>
-      <div class="text-post-meta">${fmtDate(post.created_at)}</div>
+      <div class="text-post-meta">${fmtDate(post.create_time)}</div>
     </div>
     <div class="text-post-caption">${escHtml(captionFull.slice(0, 500))}${captionFull.length > 500 ? '…' : ''}</div>
     <div class="text-post-footer">
@@ -968,7 +974,7 @@ async function openPostModal(postId) {
       { label: 'Bookmarks', value: post.bookmarks },
       { label: 'Retweets', value: post.retweets },
       { label: 'Replies', value: post.replies },
-      { label: 'Viral Mult', value: post.viral_mult ? `${post.viral_mult.toFixed(2)}x` : null },
+      { label: 'Viral Mult', value: post.performance_multiplier ? `${post.performance_multiplier.toFixed(2)}x` : null },
     ].filter(s => s.value != null && s.value !== 0 && s.value !== '');
 
     statsEl.innerHTML = statsItems.map(s => `
