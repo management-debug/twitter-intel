@@ -1,5 +1,7 @@
 """Scraping pipeline orchestration."""
 import logging
+import threading
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timezone
 
 from config import USE_SUPABASE
@@ -14,6 +16,8 @@ from scrapers.media_downloader import download_all_media
 from tasks.task_manager import should_stop
 
 log = logging.getLogger(__name__)
+
+REFRESH_WORKERS = 8
 
 
 def run_full_pipeline(test_limit=0):
@@ -214,66 +218,101 @@ def run_new_only_pipeline():
                             "completed_at": datetime.now(timezone.utc).isoformat()})
 
 
+def _refresh_one_account(acc):
+    """Refresh a single account. Thread-safe — no shared state writes.
+    Returns (posts_count, viral_count). Errors logged but not raised so one
+    bad account doesn't poison the batch.
+    """
+    try:
+        profile = scrape_profile(acc["username"])
+        if profile:
+            update_account(acc["id"], {
+                "followers": profile["followers"],
+                "following": profile["following"],
+                "tweet_count": profile["tweet_count"],
+                "bio": profile["bio"],
+                "bio_link": profile.get("bio_link", ""),
+                "is_verified": profile["is_verified"],
+                "last_scraped_at": datetime.now(timezone.utc).isoformat(),
+            })
+
+        posts = scrape_posts(acc["username"], acc["id"], days_back=7)
+        avg_likes = acc.get("avg_likes_30d", 0) or 0
+        avg_views = acc.get("avg_views_30d", 0) or 0
+
+        viral_count = 0
+        for p in posts:
+            is_v, mult = calc_viral(p["media_type"], p["likes"], p["views"], avg_likes, avg_views)
+            p["is_viral"] = 1 if is_v else 0
+            p["performance_multiplier"] = mult
+            if is_v:
+                viral_count += 1
+
+        if posts:
+            bulk_upsert_posts(posts)
+
+        return len(posts), viral_count
+    except Exception as e:
+        log.warning(f"Refresh failed for @{acc.get('username','?')}: {e}")
+        return 0, 0
+
+
 def run_refresh_pipeline():
-    """Refresh existing accounts (re-scrape posts for last 7 days)."""
+    """Refresh existing accounts in parallel (re-scrape posts for last 7 days)."""
     job_id = create_job("refresh")
-    log.info(f"Starting REFRESH pipeline (job #{job_id})")
+    log.info(f"Starting REFRESH pipeline (job #{job_id}, {REFRESH_WORKERS} workers)")
 
     try:
         accounts = get_scraped_accounts()
         total = len(accounts)
         update_job(job_id, {"total_accounts": total})
 
-        processed = 0
-        total_posts = 0
-        viral_found = 0
+        counters = {"processed": 0, "posts": 0, "viral": 0}
+        lock = threading.Lock()
+        cancelled = False
 
-        for acc in accounts:
-            if should_stop():
-                update_job(job_id, {"status": "cancelled"})
-                return
+        with ThreadPoolExecutor(max_workers=REFRESH_WORKERS) as executor:
+            futures = {executor.submit(_refresh_one_account, acc): acc for acc in accounts}
+            for fut in as_completed(futures):
+                if should_stop():
+                    cancelled = True
+                    # Best-effort cancel; in-flight workers will still finish
+                    for f in futures:
+                        f.cancel()
+                    break
+                posts_n, viral_n = fut.result()
+                with lock:
+                    counters["processed"] += 1
+                    counters["posts"] += posts_n
+                    counters["viral"] += viral_n
+                    # Live progress every 10 accounts
+                    if counters["processed"] % 10 == 0 or counters["processed"] == total:
+                        update_job(job_id, {
+                            "processed_accounts": counters["processed"],
+                            "total_posts_found": counters["posts"],
+                            "viral_found": counters["viral"],
+                        })
 
-            # Re-scrape profile for updated stats
-            profile = scrape_profile(acc["username"])
-            if profile:
-                update_account(acc["id"], {
-                    "followers": profile["followers"],
-                    "following": profile["following"],
-                    "tweet_count": profile["tweet_count"],
-                    "bio": profile["bio"],
-                    "bio_link": profile.get("bio_link", ""),
-                    "is_verified": profile["is_verified"],
-                    "last_scraped_at": datetime.now(timezone.utc).isoformat(),
-                })
-
-            # Posts (last 7 days only)
-            posts = scrape_posts(acc["username"], acc["id"], days_back=7)
-            avg_likes = acc.get("avg_likes_30d", 0) or 0
-            avg_views = acc.get("avg_views_30d", 0) or 0
-
-            for p in posts:
-                is_v, mult = calc_viral(p["media_type"], p["likes"], p["views"], avg_likes, avg_views)
-                p["is_viral"] = 1 if is_v else 0
-                p["performance_multiplier"] = mult
-                if is_v:
-                    viral_found += 1
-
-            if posts:
-                bulk_upsert_posts(posts)
-                total_posts += len(posts)
-
-            processed += 1
-            if processed % 10 == 0:
-                update_job(job_id, {"processed_accounts": processed, "total_posts_found": total_posts, "viral_found": viral_found})
+        if cancelled:
+            update_job(job_id, {
+                "status": "cancelled",
+                "error_message": "Stopped by user",
+                "processed_accounts": counters["processed"],
+                "total_posts_found": counters["posts"],
+                "viral_found": counters["viral"],
+                "completed_at": datetime.now(timezone.utc).isoformat(),
+            })
+            log.info(f"REFRESH cancelled after {counters['processed']}/{total}")
+            return
 
         update_job(job_id, {
             "status": "completed",
-            "processed_accounts": processed,
-            "total_posts_found": total_posts,
-            "viral_found": viral_found,
+            "processed_accounts": counters["processed"],
+            "total_posts_found": counters["posts"],
+            "viral_found": counters["viral"],
             "completed_at": datetime.now(timezone.utc).isoformat(),
         })
-        log.info(f"REFRESH pipeline complete! {total_posts} new posts, {viral_found} viral")
+        log.info(f"REFRESH pipeline complete! {counters['posts']} new posts, {counters['viral']} viral")
 
     except Exception as e:
         log.error(f"Pipeline error: {e}", exc_info=True)
