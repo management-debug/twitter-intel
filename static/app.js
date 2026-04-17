@@ -17,6 +17,7 @@ const state = {
   activeTab:  localStorage.getItem('twi_tab')   || 'dashboard',
   cache:      new Map(),       // key → {data, ts}
   pollTimer:  null,
+  lastScrapeRunning: false,
   // pagination state per media tab
   pages: { photos: 1, videos: 1, text: 1 },
   // current creator detail
@@ -362,6 +363,7 @@ async function pollScrapeStatus() {
         $('#progress-text').textContent =
           `${fmtNum(j.processed_accounts || 0)} / ${fmtNum(j.total_accounts || 0)} accounts · ${pct}%`;
       }
+      state.lastScrapeRunning = true;
     } else {
       const job = s.current_job;
       if (job) {
@@ -371,16 +373,20 @@ async function pollScrapeStatus() {
         if (done) {
           prog.classList.add('hidden');
           $('#progress-fill').style.width = '100%';
-          cacheClear('scrape_jobs');
-          cacheClear('dashboard_stats');
-          loadStats();
-          loadJobs();
+          // Only refresh tables on the running→done transition, not on every tick
+          if (state.lastScrapeRunning) {
+            cacheClear('scrape_jobs');
+            cacheClear('dashboard_stats');
+            loadStats();
+            loadJobs();
+          }
         }
       } else {
         badge.textContent = 'Idle';
         badge.className   = 'status-badge idle';
         prog.classList.add('hidden');
       }
+      state.lastScrapeRunning = false;
     }
   } catch (_) {}
 }
