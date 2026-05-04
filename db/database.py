@@ -436,26 +436,44 @@ def bulk_upsert_posts(posts):
     return out
 
 
-def get_posts_missing_media(scraped_after=None, limit=10000):
+def get_posts_missing_media(scraped_after=None, limit=50000):
     """Posts that have a CDN media_url/thumbnail_url but no media_local yet —
     candidates for the backfill downloader. media_local can be either NULL
     or an empty string depending on insert path, so we fetch posts with any
-    CDN url and filter media_local client-side."""
+    CDN url and filter media_local client-side. Walks the table in pages of
+    1000 (PostgREST default cap) so a single backfill covers everything."""
     if USE_SUPABASE:
-        params = {
-            "select": "id,tweet_id,username,media_type,media_url,thumbnail_url,media_local,thumbnail_local",
-            "media_type": "in.(photo,video)",
-            "order": "scraped_at.desc",
-            "limit": limit,
-        }
-        if scraped_after:
-            params["scraped_at"] = f"gte.{scraped_after}"
-        rows = _sb_get("posts", params)
-        return [
-            r for r in rows
-            if not (r.get("media_local") or "").strip()
-            and ((r.get("media_url") or "").strip() or (r.get("thumbnail_url") or "").strip())
-        ]
+        select = "id,tweet_id,username,media_type,media_url,thumbnail_url,media_local,thumbnail_local"
+        page_size = 1000
+        out = []
+        # Walk by id ascending — stable cursor that also bypasses scraped_at
+        # gaps so the whole table gets covered.
+        last_id = 0
+        while len(out) < limit:
+            params = {
+                "select": select,
+                "media_type": "in.(photo,video)",
+                "id": f"gt.{last_id}",
+                "order": "id.asc",
+                "limit": page_size,
+            }
+            if scraped_after:
+                params["scraped_at"] = f"gte.{scraped_after}"
+            rows = _sb_get("posts", params)
+            if not rows:
+                break
+            for r in rows:
+                if (
+                    not (r.get("media_local") or "").strip()
+                    and ((r.get("media_url") or "").strip() or (r.get("thumbnail_url") or "").strip())
+                ):
+                    out.append(r)
+                    if len(out) >= limit:
+                        break
+            last_id = rows[-1]["id"]
+            if len(rows) < page_size:
+                break
+        return out
 
     conn = get_db()
     where = [
@@ -469,7 +487,7 @@ def get_posts_missing_media(scraped_after=None, limit=10000):
         args.append(scraped_after)
     rows = conn.execute(
         f"SELECT id, tweet_id, username, media_type, media_url, thumbnail_url, media_local, thumbnail_local "
-        f"FROM posts WHERE {' AND '.join(where)} ORDER BY scraped_at DESC LIMIT ?",
+        f"FROM posts WHERE {' AND '.join(where)} ORDER BY id ASC LIMIT ?",
         args + [limit]
     ).fetchall()
     conn.close()
