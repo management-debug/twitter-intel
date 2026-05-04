@@ -218,6 +218,29 @@ async def debug_storage(role=Depends(require_admin)):
     return out
 
 
+@app.get("/api/debug/list-files")
+async def debug_list_files(bucket: str = "tweet-images", prefix: str = "", role=Depends(require_admin)):
+    """List actual files in a Supabase bucket so we can see what's there."""
+    from config import SUPABASE_SERVICE_KEY
+    if not USE_SUPABASE:
+        return {"error": "supabase not configured"}
+    h = {
+        "apikey": SUPABASE_SERVICE_KEY,
+        "Authorization": f"Bearer {SUPABASE_SERVICE_KEY}",
+        "Content-Type": "application/json",
+    }
+    try:
+        r = httpx.post(
+            f"{SUPABASE_URL}/storage/v1/object/list/{bucket}",
+            headers=h,
+            json={"limit": 100, "prefix": prefix, "sortBy": {"column": "created_at", "order": "desc"}},
+            timeout=10,
+        )
+        return {"status": r.status_code, "files": r.json() if r.status_code == 200 else r.text}
+    except Exception as e:
+        return {"error": str(e)}
+
+
 @app.post("/api/debug/create-buckets")
 async def debug_create_buckets(role=Depends(require_admin)):
     """Create the four storage buckets we depend on if they don't exist.
