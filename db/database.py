@@ -403,15 +403,22 @@ def upsert_post(post_data):
 
 
 def bulk_upsert_posts(posts):
-    """Bulk insert/update posts."""
+    """Bulk insert/update posts. Returns the upserted rows with DB ids populated.
+    The DB id is what serve_image / serve_video keys on, so callers downloading
+    media after a refresh need the round-trip ids."""
+    if not posts:
+        return []
     if USE_SUPABASE:
-        # Batch in chunks of 500
+        out = []
         for i in range(0, len(posts), 500):
             chunk = posts[i:i+500]
-            _sb_insert("posts", chunk, upsert_col="tweet_id")
-        return
+            res = _sb_insert("posts", chunk, upsert_col="tweet_id")
+            if isinstance(res, list):
+                out.extend(res)
+        return out
 
     conn = get_db()
+    out = []
     for p in posts:
         existing = conn.execute("SELECT id FROM posts WHERE tweet_id = ?", (p["tweet_id"],)).fetchone()
         if existing:
@@ -421,7 +428,29 @@ def bulk_upsert_posts(posts):
         else:
             cols = ", ".join(p.keys())
             placeholders = ", ".join("?" * len(p))
-            conn.execute(f"INSERT INTO posts ({cols}) VALUES ({placeholders})", list(p.values()))
+            cur = conn.execute(f"INSERT INTO posts ({cols}) VALUES ({placeholders})", list(p.values()))
+            pid = cur.lastrowid
+        out.append({**p, "id": pid})
+    conn.commit()
+    conn.close()
+    return out
+
+
+def update_post_media(post_id, media_local=None, thumbnail_local=None):
+    """Patch media_local / thumbnail_local for a single post."""
+    fields = {}
+    if media_local is not None:
+        fields["media_local"] = media_local
+    if thumbnail_local is not None:
+        fields["thumbnail_local"] = thumbnail_local
+    if not fields:
+        return
+    if USE_SUPABASE:
+        _sb_update("posts", {"id": post_id}, fields)
+        return
+    conn = get_db()
+    sets = ", ".join(f"{k} = ?" for k in fields.keys())
+    conn.execute(f"UPDATE posts SET {sets} WHERE id = ?", list(fields.values()) + [post_id])
     conn.commit()
     conn.close()
 

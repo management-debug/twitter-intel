@@ -7,7 +7,8 @@ from datetime import datetime, timezone
 from config import USE_SUPABASE
 from db.database import (
     get_pending_accounts, get_scraped_accounts, get_accounts,
-    update_account, bulk_upsert_posts, create_job, update_job,
+    update_account, bulk_upsert_posts, update_post_media,
+    create_job, update_job,
     calc_viral,
 )
 from scrapers.profile_scraper import scrape_profile
@@ -220,8 +221,9 @@ def run_new_only_pipeline():
 
 def _refresh_one_account(acc, days_back=7):
     """Refresh a single account. Thread-safe — no shared state writes.
-    Returns (posts_count, viral_count). Errors logged but not raised so one
-    bad account doesn't poison the batch.
+    Returns (upserted_rows, viral_count). Upserted rows have DB id populated,
+    which the media downloader needs to key files correctly. Errors logged
+    but not raised so one bad account doesn't poison the batch.
     """
     try:
         profile = scrape_profile(acc["username"])
@@ -248,18 +250,17 @@ def _refresh_one_account(acc, days_back=7):
             if is_v:
                 viral_count += 1
 
-        if posts:
-            bulk_upsert_posts(posts)
-
-        return len(posts), viral_count
+        upserted = bulk_upsert_posts(posts) if posts else []
+        return upserted, viral_count
     except Exception as e:
         log.warning(f"Refresh failed for @{acc.get('username','?')}: {e}")
-        return 0, 0
+        return [], 0
 
 
 def _run_refresh_window(job_type, days_back, label):
     """Shared refresh implementation. Re-scrapes posts for the last `days_back`
-    days across all scraped accounts, in parallel."""
+    days across all scraped accounts, in parallel. Then downloads media so
+    images/videos survive past the ~24h Twitter CDN expiry."""
     job_id = create_job(job_type)
     log.info(f"Starting {label} pipeline (job #{job_id}, {REFRESH_WORKERS} workers, {days_back}d window)")
 
@@ -269,6 +270,7 @@ def _run_refresh_window(job_type, days_back, label):
         update_job(job_id, {"total_accounts": total})
 
         counters = {"processed": 0, "posts": 0, "viral": 0}
+        all_upserted = []
         lock = threading.Lock()
         cancelled = False
 
@@ -280,11 +282,12 @@ def _run_refresh_window(job_type, days_back, label):
                     for f in futures:
                         f.cancel()
                     break
-                posts_n, viral_n = fut.result()
+                upserted, viral_n = fut.result()
                 with lock:
                     counters["processed"] += 1
-                    counters["posts"] += posts_n
+                    counters["posts"] += len(upserted)
                     counters["viral"] += viral_n
+                    all_upserted.extend(upserted)
                     if counters["processed"] % 10 == 0 or counters["processed"] == total:
                         update_job(job_id, {
                             "processed_accounts": counters["processed"],
@@ -304,19 +307,75 @@ def _run_refresh_window(job_type, days_back, label):
             log.info(f"{label} cancelled after {counters['processed']}/{total}")
             return
 
+        # Phase 2: download media so the dashboard isn't dependent on
+        # Twitter's expiring CDN URLs. download_all_media skips files already
+        # present locally / in Supabase, so re-running is cheap.
+        media_stats = {"avatars": 0, "images": 0, "thumbnails": 0, "videos": 0}
+        try:
+            posts_with_media = [
+                p for p in all_upserted
+                if p.get("media_url") or p.get("thumbnail_url")
+            ]
+            if posts_with_media:
+                log.info(f"{label} phase 2: downloading media for {len(posts_with_media)} posts...")
+                media_stats = download_all_media(posts_with_media, accounts)
+                _persist_media_paths(posts_with_media, media_stats)
+        except Exception as e:
+            log.error(f"{label} media download failed: {e}", exc_info=True)
+
         update_job(job_id, {
             "status": "completed",
             "processed_accounts": counters["processed"],
             "total_posts_found": counters["posts"],
             "viral_found": counters["viral"],
+            "images_downloaded": (
+                media_stats.get("images", 0)
+                + media_stats.get("videos", 0)
+                + media_stats.get("thumbnails", 0)
+            ),
             "completed_at": datetime.now(timezone.utc).isoformat(),
         })
-        log.info(f"{label} pipeline complete! {counters['posts']} new posts, {counters['viral']} viral")
+        log.info(
+            f"{label} complete! {counters['posts']} posts, {counters['viral']} viral, "
+            f"media: {media_stats}"
+        )
 
     except Exception as e:
         log.error(f"Pipeline error: {e}", exc_info=True)
         update_job(job_id, {"status": "failed", "error_message": str(e)[:500],
                             "completed_at": datetime.now(timezone.utc).isoformat()})
+
+
+def _persist_media_paths(posts_with_media, media_stats):
+    """Write the public Supabase URL (or local path) into media_local /
+    thumbnail_local for each post, so the dashboard can render past the
+    Twitter CDN expiry without falling through every time. Best-effort —
+    errors are swallowed per-post."""
+    if not USE_SUPABASE:
+        return
+    from config import SUPABASE_URL as SB_URL
+
+    for p in posts_with_media:
+        pid = p.get("id")
+        if not pid:
+            continue
+        media_type = p.get("media_type")
+        try:
+            if media_type == "photo" and p.get("media_url"):
+                update_post_media(
+                    pid,
+                    media_local=f"{SB_URL}/storage/v1/object/public/tweet-images/{pid}.jpg",
+                )
+            elif media_type == "video":
+                fields = {}
+                if p.get("media_url") and "video.twimg.com" in p.get("media_url", ""):
+                    fields["media_local"] = f"{SB_URL}/storage/v1/object/public/tweet-videos/{pid}.mp4"
+                if p.get("thumbnail_url") or p.get("media_url"):
+                    fields["thumbnail_local"] = f"{SB_URL}/storage/v1/object/public/tweet-thumbnails/{pid}.jpg"
+                if fields:
+                    update_post_media(pid, **fields)
+        except Exception as e:
+            log.debug(f"media_local persist failed for post {pid}: {e}")
 
 
 def run_refresh_pipeline():
