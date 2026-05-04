@@ -436,27 +436,33 @@ def bulk_upsert_posts(posts):
     return out
 
 
-def get_posts_missing_media(scraped_after=None, limit=5000):
+def get_posts_missing_media(scraped_after=None, limit=10000):
     """Posts that have a CDN media_url/thumbnail_url but no media_local yet —
-    candidates for the backfill downloader. Defaults to no time filter."""
+    candidates for the backfill downloader. media_local can be either NULL
+    or an empty string depending on insert path, so we fetch posts with any
+    CDN url and filter media_local client-side."""
     if USE_SUPABASE:
         params = {
             "select": "id,tweet_id,username,media_type,media_url,thumbnail_url,media_local,thumbnail_local",
-            "or": "(media_url.neq.,thumbnail_url.neq.)",
-            "media_local": "is.null",
+            "media_type": "in.(photo,video)",
             "order": "scraped_at.desc",
             "limit": limit,
         }
         if scraped_after:
             params["scraped_at"] = f"gte.{scraped_after}"
-        # Supabase doesn't accept "is.null" alongside an empty-string default —
-        # fall back to a server-side filter for empty strings on the result.
         rows = _sb_get("posts", params)
-        # Server may have stored '' instead of NULL; filter both out.
-        return [r for r in rows if not r.get("media_local") and (r.get("media_url") or r.get("thumbnail_url"))]
+        return [
+            r for r in rows
+            if not (r.get("media_local") or "").strip()
+            and ((r.get("media_url") or "").strip() or (r.get("thumbnail_url") or "").strip())
+        ]
 
     conn = get_db()
-    where = ["(media_url != '' OR thumbnail_url != '')", "(media_local IS NULL OR media_local = '')"]
+    where = [
+        "media_type IN ('photo','video')",
+        "(media_url != '' OR thumbnail_url != '')",
+        "(media_local IS NULL OR media_local = '')",
+    ]
     args = []
     if scraped_after:
         where.append("scraped_at >= ?")
