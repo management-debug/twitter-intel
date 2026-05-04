@@ -177,6 +177,70 @@ async def scrape_monthly_refresh(pin: str = "", role=Depends(require_admin)):
     return {"status": "started", "window_days": 30}
 
 
+@app.get("/api/debug/storage")
+async def debug_storage(role=Depends(require_admin)):
+    """Diagnose Supabase Storage: test upload, head, and list buckets.
+    Helps figure out why media files aren't appearing publicly."""
+    from config import SUPABASE_SERVICE_KEY
+    out = {"USE_SUPABASE": USE_SUPABASE, "SUPABASE_URL": SUPABASE_URL}
+    if not USE_SUPABASE:
+        return out
+
+    h = {
+        "apikey": SUPABASE_SERVICE_KEY,
+        "Authorization": f"Bearer {SUPABASE_SERVICE_KEY}",
+    }
+    # 1) List buckets
+    try:
+        r = httpx.get(f"{SUPABASE_URL}/storage/v1/bucket", headers=h, timeout=10)
+        out["list_buckets_status"] = r.status_code
+        out["list_buckets_body"] = r.text[:1000]
+    except Exception as e:
+        out["list_buckets_error"] = str(e)
+
+    # 2) Try a test upload
+    try:
+        url = f"{SUPABASE_URL}/storage/v1/object/tweet-images/_diag_test.txt"
+        r = httpx.post(url, headers={**h, "Content-Type": "text/plain", "x-upsert": "true"},
+                       content=b"diag", timeout=10)
+        out["upload_status"] = r.status_code
+        out["upload_body"] = r.text[:500]
+    except Exception as e:
+        out["upload_error"] = str(e)
+
+    # 3) HEAD the public URL
+    try:
+        r = httpx.head(f"{SUPABASE_URL}/storage/v1/object/public/tweet-images/_diag_test.txt", timeout=5)
+        out["public_head_status"] = r.status_code
+    except Exception as e:
+        out["public_head_error"] = str(e)
+
+    return out
+
+
+@app.post("/api/debug/create-buckets")
+async def debug_create_buckets(role=Depends(require_admin)):
+    """Create the four storage buckets we depend on if they don't exist.
+    Idempotent — Supabase returns 409 on duplicate which we treat as ok."""
+    from config import SUPABASE_SERVICE_KEY
+    if not USE_SUPABASE:
+        raise HTTPException(400, "Supabase not configured")
+    h = {
+        "apikey": SUPABASE_SERVICE_KEY,
+        "Authorization": f"Bearer {SUPABASE_SERVICE_KEY}",
+        "Content-Type": "application/json",
+    }
+    results = {}
+    for name in ["avatars", "tweet-images", "tweet-thumbnails", "tweet-videos"]:
+        body = {"id": name, "name": name, "public": True}
+        try:
+            r = httpx.post(f"{SUPABASE_URL}/storage/v1/bucket", headers=h, json=body, timeout=10)
+            results[name] = {"status": r.status_code, "body": r.text[:200]}
+        except Exception as e:
+            results[name] = {"error": str(e)}
+    return results
+
+
 @app.post("/api/scrape/media-backfill")
 async def scrape_media_backfill(pin: str = "", role=Depends(require_admin)):
     """Download missing media (images/videos/thumbnails) for posts that
