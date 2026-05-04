@@ -348,10 +348,13 @@ def _run_refresh_window(job_type, days_back, label):
 
 
 def _persist_media_paths(posts_with_media, media_stats):
-    """Write the public Supabase URL (or local path) into media_local /
-    thumbnail_local for each post, so the dashboard can render past the
-    Twitter CDN expiry without falling through every time. Best-effort —
-    errors are swallowed per-post."""
+    """Write the public Supabase URL (or a sentinel) into media_local /
+    thumbnail_local for each post.
+
+    CRITICAL: every processed post must end up with a non-empty media_local,
+    even if we couldn't upload anything — otherwise get_posts_missing_media
+    keeps returning the same row and the auto-loop never terminates.
+    """
     if not USE_SUPABASE:
         return
     from config import SUPABASE_URL as SB_URL
@@ -361,22 +364,29 @@ def _persist_media_paths(posts_with_media, media_stats):
         if not pid:
             continue
         media_type = p.get("media_type")
+        media_url = (p.get("media_url") or "").strip()
+        thumb_url = (p.get("thumbnail_url") or "").strip()
         try:
-            if media_type == "photo" and p.get("media_url"):
-                update_post_media(
-                    pid,
-                    media_local=f"{SB_URL}/storage/v1/object/public/tweet-images/{pid}.jpg",
-                )
+            fields = {}
+            if media_type == "photo":
+                if media_url:
+                    fields["media_local"] = f"{SB_URL}/storage/v1/object/public/tweet-images/{pid}.jpg"
+                else:
+                    # No CDN url to download; mark processed so we don't loop.
+                    fields["media_local"] = "_no_media"
             elif media_type == "video":
-                fields = {}
-                if p.get("media_url") and "video.twimg.com" in p.get("media_url", ""):
+                if media_url and "video.twimg.com" in media_url:
                     fields["media_local"] = f"{SB_URL}/storage/v1/object/public/tweet-videos/{pid}.mp4"
-                if p.get("thumbnail_url") or p.get("media_url"):
+                else:
+                    fields["media_local"] = "_no_media"
+                if thumb_url or media_url:
                     fields["thumbnail_local"] = f"{SB_URL}/storage/v1/object/public/tweet-thumbnails/{pid}.jpg"
-                if fields:
-                    update_post_media(pid, **fields)
+            else:
+                fields["media_local"] = "_no_media"
+            if fields:
+                update_post_media(pid, **fields)
         except Exception as e:
-            log.debug(f"media_local persist failed for post {pid}: {e}")
+            log.warning(f"media_local persist failed for post {pid}: {e}")
 
 
 def run_refresh_pipeline():

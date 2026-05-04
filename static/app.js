@@ -852,8 +852,8 @@ function buildPostCard(post) {
   // ─── Media rendering (1:1 IG Intel pattern) ───
   let mediaHtml = '';
   if (hasMedia) {
-    const thumbUrl = post.thumbnail_local || post.thumbnail_url || post.media_url || '';
-    const imgUrl = post.media_local || post.media_url || `/api/images/${post.id}`;
+    const thumbUrl = ((post.thumbnail_local && !post.thumbnail_local.startsWith('_')) ? post.thumbnail_local : '') || post.thumbnail_url || post.media_url || '';
+    const imgUrl = (post.media_local && !post.media_local.startsWith('_')) ? post.media_local : (post.media_url || `/api/images/${post.id}`);
     const multBadge = post.performance_multiplier > 1.5 ? `<div class="viral-badge">${multLabel(post.performance_multiplier)}</div>` : '';
     const overlay = `
       <div class="post-card-overlay">
@@ -863,7 +863,7 @@ function buildPostCard(post) {
         </div>
       </div>`;
 
-    if (isVideo && post.media_local) {
+    if (isVideo && post.media_local && !post.media_local.startsWith('_')) {
       // Video downloaded → autoplay with IntersectionObserver (same as IG Intel)
       mediaHtml = `
         <div class="post-card-media video-ratio">
@@ -970,12 +970,12 @@ async function openPostModal(postId) {
 
     // Media
     if (hasMedia) {
-      if (isVideo && post.media_local) {
+      if (isVideo && post.media_local && !post.media_local.startsWith('_')) {
         // Video downloaded → play from Supabase/local
         mediaEl.innerHTML = `<div style="max-width:400px;margin:0 auto"><video controls loop playsinline autoplay src="${post.media_local}" style="width:100%;border-radius:8px;max-height:500px"></video></div>`;
         mediaEl.style.position = 'relative';
       } else if (isVideo) {
-        const thumb = post.thumbnail_local || post.thumbnail_url || post.media_url || `/api/thumbnails/${post.id}`;
+        const thumb = ((post.thumbnail_local && !post.thumbnail_local.startsWith('_')) ? post.thumbnail_local : '') || post.thumbnail_url || post.media_url || `/api/thumbnails/${post.id}`;
         mediaEl.innerHTML = `
           <img src="${thumb}" alt="Video thumbnail" style="width:100%;max-height:600px;object-fit:contain;"
                onerror="this.parentNode.innerHTML='<div class=\\'media-placeholder\\' style=\\'font-size:60px;position:static\\''>🎬</div>'" />
@@ -983,7 +983,7 @@ async function openPostModal(postId) {
         `;
         mediaEl.style.position = 'relative';
       } else {
-        const imgUrl = post.media_local || post.media_url || `/api/images/${post.id}`;
+        const imgUrl = (post.media_local && !post.media_local.startsWith('_')) ? post.media_local : (post.media_url || `/api/images/${post.id}`);
         mediaEl.innerHTML = `
           <img src="${imgUrl}" alt="Post image" style="width:100%;max-height:600px;object-fit:contain;"
                onerror="this.parentNode.innerHTML='<div class=\\'media-placeholder\\' style=\\'font-size:60px;position:static\\''>📸</div>'" />
