@@ -2,6 +2,8 @@
 import sqlite3
 import json
 import logging
+import time
+from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
@@ -194,6 +196,13 @@ def _sb_count(table, filters=None):
     r.raise_for_status()
     cr = r.headers.get("content-range", "0/0")
     return int(cr.split("/")[-1]) if "/" in cr else 0
+
+
+# Dashboard stats cache — 60s TTL. Stats are summary numbers that don't need
+# to be live to the second; without this, every tab switch fires 10 Supabase
+# count queries.
+_STATS_CACHE = {"data": None, "ts": 0}
+_STATS_TTL = 60
 
 
 # ─── Supabase Storage ───────────────────────────────────────────────────────
@@ -595,28 +604,39 @@ def calc_viral(media_type, likes, views, avg_likes, avg_views):
 def get_dashboard_stats():
     """Get overview stats for dashboard."""
     if USE_SUPABASE:
-        total_accounts = _sb_count("accounts")
-        scraped = _sb_count("accounts", {"scrape_status": "eq.scraped"})
-        pending = _sb_count("accounts", {"scrape_status": "eq.pending"})
-        total_posts = _sb_count("posts")
-        viral_photos = _sb_count("posts", {"is_viral": "eq.1", "media_type": "eq.photo"})
-        viral_videos = _sb_count("posts", {"is_viral": "eq.1", "media_type": "eq.video"})
-        viral_texts = _sb_count("posts", {"is_viral": "eq.1", "media_type": "eq.text"})
-        photos = _sb_count("posts", {"media_type": "eq.photo"})
-        videos = _sb_count("posts", {"media_type": "eq.video"})
-        texts = _sb_count("posts", {"media_type": "eq.text"})
-        return {
-            "total_accounts": total_accounts,
-            "scraped_accounts": scraped,
-            "pending_accounts": pending,
-            "total_posts": total_posts,
-            "photo_posts": photos,
-            "video_posts": videos,
-            "text_posts": texts,
-            "viral_photos": viral_photos,
-            "viral_videos": viral_videos,
-            "viral_texts": viral_texts,
+        now = time.time()
+        if _STATS_CACHE["data"] and (now - _STATS_CACHE["ts"]) < _STATS_TTL:
+            return _STATS_CACHE["data"]
+
+        # Run all Supabase counts concurrently — slowest call dominates
+        # instead of summing 10 sequential roundtrips.
+        with ThreadPoolExecutor(max_workers=10) as ex:
+            f_total_accounts = ex.submit(_sb_count, "accounts")
+            f_scraped        = ex.submit(_sb_count, "accounts", {"scrape_status": "eq.scraped"})
+            f_pending        = ex.submit(_sb_count, "accounts", {"scrape_status": "eq.pending"})
+            f_total_posts    = ex.submit(_sb_count, "posts")
+            f_viral_photos   = ex.submit(_sb_count, "posts", {"is_viral": "eq.1", "media_type": "eq.photo"})
+            f_viral_videos   = ex.submit(_sb_count, "posts", {"is_viral": "eq.1", "media_type": "eq.video"})
+            f_viral_texts    = ex.submit(_sb_count, "posts", {"is_viral": "eq.1", "media_type": "eq.text"})
+            f_photos         = ex.submit(_sb_count, "posts", {"media_type": "eq.photo"})
+            f_videos         = ex.submit(_sb_count, "posts", {"media_type": "eq.video"})
+            f_texts          = ex.submit(_sb_count, "posts", {"media_type": "eq.text"})
+
+        result = {
+            "total_accounts": f_total_accounts.result(),
+            "scraped_accounts": f_scraped.result(),
+            "pending_accounts": f_pending.result(),
+            "total_posts": f_total_posts.result(),
+            "photo_posts": f_photos.result(),
+            "video_posts": f_videos.result(),
+            "text_posts": f_texts.result(),
+            "viral_photos": f_viral_photos.result(),
+            "viral_videos": f_viral_videos.result(),
+            "viral_texts": f_viral_texts.result(),
         }
+        _STATS_CACHE["data"] = result
+        _STATS_CACHE["ts"] = now
+        return result
 
     conn = get_db()
     stats = {

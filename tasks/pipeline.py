@@ -218,7 +218,7 @@ def run_new_only_pipeline():
                             "completed_at": datetime.now(timezone.utc).isoformat()})
 
 
-def _refresh_one_account(acc):
+def _refresh_one_account(acc, days_back=7):
     """Refresh a single account. Thread-safe — no shared state writes.
     Returns (posts_count, viral_count). Errors logged but not raised so one
     bad account doesn't poison the batch.
@@ -236,7 +236,7 @@ def _refresh_one_account(acc):
                 "last_scraped_at": datetime.now(timezone.utc).isoformat(),
             })
 
-        posts = scrape_posts(acc["username"], acc["id"], days_back=7)
+        posts = scrape_posts(acc["username"], acc["id"], days_back=days_back)
         avg_likes = acc.get("avg_likes_30d", 0) or 0
         avg_views = acc.get("avg_views_30d", 0) or 0
 
@@ -257,10 +257,11 @@ def _refresh_one_account(acc):
         return 0, 0
 
 
-def run_refresh_pipeline():
-    """Refresh existing accounts in parallel (re-scrape posts for last 7 days)."""
-    job_id = create_job("refresh")
-    log.info(f"Starting REFRESH pipeline (job #{job_id}, {REFRESH_WORKERS} workers)")
+def _run_refresh_window(job_type, days_back, label):
+    """Shared refresh implementation. Re-scrapes posts for the last `days_back`
+    days across all scraped accounts, in parallel."""
+    job_id = create_job(job_type)
+    log.info(f"Starting {label} pipeline (job #{job_id}, {REFRESH_WORKERS} workers, {days_back}d window)")
 
     try:
         accounts = get_scraped_accounts()
@@ -272,11 +273,10 @@ def run_refresh_pipeline():
         cancelled = False
 
         with ThreadPoolExecutor(max_workers=REFRESH_WORKERS) as executor:
-            futures = {executor.submit(_refresh_one_account, acc): acc for acc in accounts}
+            futures = {executor.submit(_refresh_one_account, acc, days_back): acc for acc in accounts}
             for fut in as_completed(futures):
                 if should_stop():
                     cancelled = True
-                    # Best-effort cancel; in-flight workers will still finish
                     for f in futures:
                         f.cancel()
                     break
@@ -285,7 +285,6 @@ def run_refresh_pipeline():
                     counters["processed"] += 1
                     counters["posts"] += posts_n
                     counters["viral"] += viral_n
-                    # Live progress every 10 accounts
                     if counters["processed"] % 10 == 0 or counters["processed"] == total:
                         update_job(job_id, {
                             "processed_accounts": counters["processed"],
@@ -302,7 +301,7 @@ def run_refresh_pipeline():
                 "viral_found": counters["viral"],
                 "completed_at": datetime.now(timezone.utc).isoformat(),
             })
-            log.info(f"REFRESH cancelled after {counters['processed']}/{total}")
+            log.info(f"{label} cancelled after {counters['processed']}/{total}")
             return
 
         update_job(job_id, {
@@ -312,12 +311,22 @@ def run_refresh_pipeline():
             "viral_found": counters["viral"],
             "completed_at": datetime.now(timezone.utc).isoformat(),
         })
-        log.info(f"REFRESH pipeline complete! {counters['posts']} new posts, {counters['viral']} viral")
+        log.info(f"{label} pipeline complete! {counters['posts']} new posts, {counters['viral']} viral")
 
     except Exception as e:
         log.error(f"Pipeline error: {e}", exc_info=True)
         update_job(job_id, {"status": "failed", "error_message": str(e)[:500],
                             "completed_at": datetime.now(timezone.utc).isoformat()})
+
+
+def run_refresh_pipeline():
+    """Refresh existing accounts (last 7 days)."""
+    _run_refresh_window("refresh", days_back=7, label="REFRESH")
+
+
+def run_monthly_refresh_pipeline():
+    """Refresh existing accounts (last 30 days)."""
+    _run_refresh_window("monthly_refresh", days_back=30, label="MONTHLY REFRESH")
 
 
 def _median(values):

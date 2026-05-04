@@ -140,7 +140,16 @@ async function apiFetch(path, options = {}) {
   const headers = { 'Content-Type': 'application/json' };
   if (state.token) headers['Authorization'] = `Bearer ${state.token}`;
   const res = await fetch(API + path, { ...options, headers: { ...headers, ...(options.headers || {}) } });
-  if (res.status === 401) { logout(); return null; }
+  if (res.status === 401) {
+    // Don't surprise the user with a silent kick — explain why we're logging out.
+    if (state.token) {
+      toast('Session expired — please sign in again', 'info', 2200);
+      setTimeout(logout, 1500);
+    } else {
+      logout();
+    }
+    return null;
+  }
   if (!res.ok) {
     let msg = `HTTP ${res.status}`;
     try { const j = await res.json(); msg = j.detail || msg; } catch (_) {}
@@ -285,7 +294,10 @@ function loadTab(tab) {
 async function loadDashboard() {
   loadStats();
   loadJobs();
-  if (state.role === 'admin') startPolling();
+  if (state.role === 'admin') {
+    loadAutoRefresh();
+    startPolling();
+  }
 }
 
 async function loadStats() {
@@ -416,6 +428,34 @@ async function stopScrape() {
     await apiPost('/api/scrape/stop');
     toast('Stop signal sent', 'info');
   } catch (err) {
+    toast(err.message, 'error');
+  }
+}
+
+async function loadAutoRefresh() {
+  if (state.role !== 'admin') return;
+  try {
+    const data = await apiGet('/api/settings/auto-refresh');
+    if (!data) return;
+    const toggle = $('#auto-refresh-toggle');
+    const sub    = $('#auto-refresh-sub');
+    if (toggle) toggle.checked = !!data.enabled;
+    if (sub) {
+      const next = data.next_run ? new Date(data.next_run).toLocaleString() : '—';
+      sub.textContent = `${data.schedule || '1st of month, 02:00 Europe/Berlin'} · 30-day window · next: ${next}`;
+    }
+  } catch (_) {}
+}
+
+async function toggleAutoRefresh(e) {
+  const enabled = e.target.checked;
+  try {
+    const data = await apiPost(`/api/settings/auto-refresh?enabled=${enabled}`);
+    if (!data) { e.target.checked = !enabled; return; }
+    toast(enabled ? 'Auto-refresh enabled' : 'Auto-refresh disabled', 'success');
+    loadAutoRefresh();
+  } catch (err) {
+    e.target.checked = !enabled;
     toast(err.message, 'error');
   }
 }
@@ -1970,7 +2010,13 @@ function bindEvents() {
     $('#btn-scrape-full').addEventListener('click', () => startScrape('full'));
     $('#btn-scrape-new').addEventListener('click', () => startScrape('new-only'));
     $('#btn-scrape-refresh').addEventListener('click', () => startScrape('refresh'));
+    $('#btn-scrape-monthly').addEventListener('click', () => startScrape('monthly-refresh'));
     $('#btn-scrape-stop').addEventListener('click', stopScrape);
+    const arToggle = $('#auto-refresh-toggle');
+    if (arToggle) {
+      arToggle.addEventListener('change', toggleAutoRefresh);
+      loadAutoRefresh();
+    }
     $('#refresh-jobs-btn').addEventListener('click', () => { cacheClear('scrape_jobs'); loadJobs(); });
   }
 

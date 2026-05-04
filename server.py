@@ -1,5 +1,6 @@
 """Twitter Intel Dashboard - FastAPI Server"""
 import os
+import json
 import logging
 from pathlib import Path
 from datetime import datetime, timezone
@@ -8,12 +9,13 @@ import httpx
 import uvicorn
 from fastapi import FastAPI, Request, HTTPException, Depends
 from fastapi.staticfiles import StaticFiles
+from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import FileResponse, RedirectResponse, JSONResponse
 
 from config import (
     PORT, STATIC_DIR, AVATARS_DIR, IMAGES_DIR, THUMBNAILS_DIR,
     ADMIN_EMAIL, ADMIN_PASSWORD, WORKER_PASSWORD, SCRAPE_PIN,
-    USE_SUPABASE, SUPABASE_URL,
+    USE_SUPABASE, SUPABASE_URL, BASE_DIR,
 )
 from db.database import (
     init_db, cancel_stale_jobs,
@@ -24,12 +26,53 @@ from db.database import (
     add_to_watchlist, remove_from_watchlist, get_watchlist, is_watched,
 )
 from tasks import task_manager
-from tasks.pipeline import run_full_pipeline, run_new_only_pipeline, run_refresh_pipeline
+from tasks.pipeline import (
+    run_full_pipeline, run_new_only_pipeline,
+    run_refresh_pipeline, run_monthly_refresh_pipeline,
+)
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(name)s: %(message)s")
 log = logging.getLogger(__name__)
 
 app = FastAPI(title="Twitter Intel", docs_url=None, redoc_url=None)
+
+# GZip — workers in PH on slow mobile data were loading uncompressed assets.
+# index.html / app.js / style.css ≈ 165 KB → ~40 KB with gzip.
+app.add_middleware(GZipMiddleware, minimum_size=1000)
+
+
+# Long-lived cache for static assets. CSS/JS are cache-busted via ?v=N in
+# index.html, so safe to cache for a year. HTML stays uncached so deploys
+# propagate immediately.
+class _CachedStaticFiles(StaticFiles):
+    async def get_response(self, path, scope):
+        resp = await super().get_response(path, scope)
+        if resp.status_code == 200 and not path.endswith(".html"):
+            resp.headers["Cache-Control"] = "public, max-age=31536000, immutable"
+        return resp
+
+
+# ─── Settings (file-backed JSON) ───────────────────────────────────────────
+# Auto-refresh toggle is persisted here. On Railway the data dir is ephemeral
+# across deploys, so admin re-toggles after a redeploy if needed.
+_SETTINGS_PATH = BASE_DIR / "data" / "settings.json"
+
+
+def _load_settings():
+    if not _SETTINGS_PATH.exists():
+        return {}
+    try:
+        return json.loads(_SETTINGS_PATH.read_text())
+    except Exception:
+        return {}
+
+
+def _save_settings(data: dict):
+    _SETTINGS_PATH.parent.mkdir(parents=True, exist_ok=True)
+    _SETTINGS_PATH.write_text(json.dumps(data, indent=2))
+
+
+_scheduler = None
 
 
 # ─── Auth ───────────────────────────────────────────────────────────────────
@@ -121,6 +164,16 @@ async def scrape_refresh(pin: str = "", role=Depends(require_admin)):
         raise HTTPException(409, "A scrape is already running")
     task_manager.start_task(run_refresh_pipeline)
     return {"status": "started"}
+
+
+@app.post("/api/scrape/monthly-refresh")
+async def scrape_monthly_refresh(pin: str = "", role=Depends(require_admin)):
+    if pin != SCRAPE_PIN:
+        raise HTTPException(403, "Invalid PIN")
+    if task_manager.is_running():
+        raise HTTPException(409, "A scrape is already running")
+    task_manager.start_task(run_monthly_refresh_pipeline)
+    return {"status": "started", "window_days": 30}
 
 
 @app.post("/api/scrape/stop")
@@ -357,9 +410,59 @@ async def serve_thumbnail(post_id: str):
     raise HTTPException(404, "Thumbnail not found")
 
 
+# ─── Auto-Refresh Settings ─────────────────────────────────────────────────
+
+@app.get("/api/settings/auto-refresh")
+async def get_auto_refresh(role=Depends(require_admin)):
+    """Current auto-refresh state + next scheduled run."""
+    settings = _load_settings()
+    enabled = bool(settings.get("auto_refresh_enabled", False))
+    next_run = None
+    if _scheduler:
+        try:
+            job = _scheduler.get_job("monthly_auto_refresh")
+            if job and job.next_run_time:
+                next_run = job.next_run_time.isoformat()
+        except Exception:
+            pass
+    return {
+        "enabled": enabled,
+        "next_run": next_run,
+        "schedule": "1st of month, 02:00 Europe/Berlin",
+    }
+
+
+@app.post("/api/settings/auto-refresh")
+async def set_auto_refresh(enabled: bool, role=Depends(require_admin)):
+    settings = _load_settings()
+    settings["auto_refresh_enabled"] = bool(enabled)
+    _save_settings(settings)
+    log.info(f"Auto-refresh toggle → {enabled}")
+    return {"enabled": bool(enabled)}
+
+
+def _auto_refresh_job():
+    """Cron-fired monthly refresh. Skips if disabled or another scrape running."""
+    try:
+        settings = _load_settings()
+        if not settings.get("auto_refresh_enabled"):
+            log.info("Auto-refresh: disabled, skipping")
+            return
+        if task_manager.is_running():
+            log.warning("Auto-refresh: scrape already running, skipping this slot")
+            return
+        started = task_manager.start_task(run_monthly_refresh_pipeline)
+        if started:
+            log.info("Auto-refresh: started monthly refresh")
+        else:
+            log.error("Auto-refresh: could not start task")
+    except Exception as e:
+        log.error(f"Auto-refresh job crashed: {e}", exc_info=True)
+
+
 # ─── Static Files & SPA ────────────────────────────────────────────────────
 
-app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
+app.mount("/static", _CachedStaticFiles(directory=str(STATIC_DIR)), name="static")
 
 
 @app.get("/")
@@ -371,9 +474,39 @@ async def index():
 
 @app.on_event("startup")
 async def startup():
+    global _scheduler
     init_db()
     cancel_stale_jobs()
+
+    # Monthly auto-refresh: 1st of each month at 02:00 Europe/Berlin
+    try:
+        from apscheduler.schedulers.background import BackgroundScheduler
+        from apscheduler.triggers.cron import CronTrigger
+        import pytz
+        _scheduler = BackgroundScheduler(timezone=pytz.timezone("Europe/Berlin"))
+        _scheduler.add_job(
+            _auto_refresh_job,
+            trigger=CronTrigger(day=1, hour=2, minute=0, timezone="Europe/Berlin"),
+            id="monthly_auto_refresh",
+            max_instances=1,
+            coalesce=True,
+            misfire_grace_time=3600,
+        )
+        _scheduler.start()
+        log.info("Scheduler started: monthly auto-refresh = 1st of month, 02:00 Europe/Berlin")
+    except Exception as e:
+        log.warning(f"Scheduler init failed: {e}")
+
     log.info(f"Twitter Intel running on port {PORT} | Supabase: {USE_SUPABASE}")
+
+
+@app.on_event("shutdown")
+async def shutdown():
+    if _scheduler:
+        try:
+            _scheduler.shutdown(wait=False)
+        except Exception:
+            pass
 
 
 if __name__ == "__main__":
