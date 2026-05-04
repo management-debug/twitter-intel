@@ -436,6 +436,40 @@ def bulk_upsert_posts(posts):
     return out
 
 
+def get_posts_missing_media(scraped_after=None, limit=5000):
+    """Posts that have a CDN media_url/thumbnail_url but no media_local yet —
+    candidates for the backfill downloader. Defaults to no time filter."""
+    if USE_SUPABASE:
+        params = {
+            "select": "id,tweet_id,username,media_type,media_url,thumbnail_url,media_local,thumbnail_local",
+            "or": "(media_url.neq.,thumbnail_url.neq.)",
+            "media_local": "is.null",
+            "order": "scraped_at.desc",
+            "limit": limit,
+        }
+        if scraped_after:
+            params["scraped_at"] = f"gte.{scraped_after}"
+        # Supabase doesn't accept "is.null" alongside an empty-string default —
+        # fall back to a server-side filter for empty strings on the result.
+        rows = _sb_get("posts", params)
+        # Server may have stored '' instead of NULL; filter both out.
+        return [r for r in rows if not r.get("media_local") and (r.get("media_url") or r.get("thumbnail_url"))]
+
+    conn = get_db()
+    where = ["(media_url != '' OR thumbnail_url != '')", "(media_local IS NULL OR media_local = '')"]
+    args = []
+    if scraped_after:
+        where.append("scraped_at >= ?")
+        args.append(scraped_after)
+    rows = conn.execute(
+        f"SELECT id, tweet_id, username, media_type, media_url, thumbnail_url, media_local, thumbnail_local "
+        f"FROM posts WHERE {' AND '.join(where)} ORDER BY scraped_at DESC LIMIT ?",
+        args + [limit]
+    ).fetchall()
+    conn.close()
+    return [dict(r) for r in rows]
+
+
 def update_post_media(post_id, media_local=None, thumbnail_local=None):
     """Patch media_local / thumbnail_local for a single post."""
     fields = {}

@@ -29,6 +29,7 @@ from tasks import task_manager
 from tasks.pipeline import (
     run_full_pipeline, run_new_only_pipeline,
     run_refresh_pipeline, run_monthly_refresh_pipeline,
+    run_media_backfill_pipeline,
 )
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(name)s: %(message)s")
@@ -174,6 +175,18 @@ async def scrape_monthly_refresh(pin: str = "", role=Depends(require_admin)):
         raise HTTPException(409, "A scrape is already running")
     task_manager.start_task(run_monthly_refresh_pipeline)
     return {"status": "started", "window_days": 30}
+
+
+@app.post("/api/scrape/media-backfill")
+async def scrape_media_backfill(pin: str = "", role=Depends(require_admin)):
+    """Download missing media (images/videos/thumbnails) for posts that
+    already exist in the DB. No API credits used."""
+    if pin != SCRAPE_PIN:
+        raise HTTPException(403, "Invalid PIN")
+    if task_manager.is_running():
+        raise HTTPException(409, "A scrape is already running")
+    task_manager.start_task(run_media_backfill_pipeline)
+    return {"status": "started"}
 
 
 @app.post("/api/scrape/stop")

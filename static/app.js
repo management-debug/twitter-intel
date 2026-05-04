@@ -2011,6 +2011,7 @@ function bindEvents() {
     $('#btn-scrape-new').addEventListener('click', () => startScrape('new-only'));
     $('#btn-scrape-refresh').addEventListener('click', () => startScrape('refresh'));
     $('#btn-scrape-monthly').addEventListener('click', () => startScrape('monthly-refresh'));
+    $('#btn-scrape-backfill').addEventListener('click', () => startScrape('media-backfill'));
     $('#btn-scrape-stop').addEventListener('click', stopScrape);
     const arToggle = $('#auto-refresh-toggle');
     if (arToggle) {

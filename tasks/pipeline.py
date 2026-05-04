@@ -8,6 +8,7 @@ from config import USE_SUPABASE
 from db.database import (
     get_pending_accounts, get_scraped_accounts, get_accounts,
     update_account, bulk_upsert_posts, update_post_media,
+    get_posts_missing_media,
     create_job, update_job,
     calc_viral,
 )
@@ -386,6 +387,72 @@ def run_refresh_pipeline():
 def run_monthly_refresh_pipeline():
     """Refresh existing accounts (last 30 days)."""
     _run_refresh_window("monthly_refresh", days_back=30, label="MONTHLY REFRESH")
+
+
+def run_media_backfill_pipeline():
+    """Download media for posts whose media_local is empty. Doesn't re-scrape,
+    so no API credits — just walks the DB for gaps and pulls from Twitter CDN
+    while the URLs are still alive."""
+    job_id = create_job("media_backfill")
+    log.info(f"Starting MEDIA BACKFILL pipeline (job #{job_id})")
+
+    try:
+        posts = get_posts_missing_media(limit=10000)
+        total = len(posts)
+        update_job(job_id, {"total_accounts": 0, "total_posts_found": total})
+        log.info(f"Backfill: {total} posts need media")
+
+        if not posts:
+            update_job(job_id, {
+                "status": "completed",
+                "completed_at": datetime.now(timezone.utc).isoformat(),
+            })
+            return
+
+        # download_all_media expects 'accounts' for avatar downloads — pass
+        # accounts derived from the posts so we also catch any missing avatars.
+        accs_by_user = {p["username"]: {"username": p["username"]} for p in posts if p.get("username")}
+        accounts = list(accs_by_user.values())
+        # Enrich with avatar_url from get_scraped_accounts so avatars actually download
+        scraped = get_scraped_accounts()
+        scraped_idx = {a["username"]: a for a in scraped}
+        for a in accounts:
+            src = scraped_idx.get(a["username"])
+            if src and src.get("avatar_url"):
+                a["avatar_url"] = src["avatar_url"]
+
+        # Process in chunks so a long backfill can show progress and respect Stop.
+        CHUNK = 200
+        downloaded = 0
+        for i in range(0, total, CHUNK):
+            if should_stop():
+                update_job(job_id, {
+                    "status": "cancelled",
+                    "error_message": "Stopped by user",
+                    "completed_at": datetime.now(timezone.utc).isoformat(),
+                })
+                log.info(f"Backfill cancelled after {i}/{total}")
+                return
+            chunk = posts[i:i+CHUNK]
+            stats = download_all_media(chunk, accounts if i == 0 else [])
+            _persist_media_paths(chunk, stats)
+            downloaded += stats.get("images", 0) + stats.get("videos", 0) + stats.get("thumbnails", 0)
+            update_job(job_id, {
+                "processed_accounts": min(i + CHUNK, total),
+                "images_downloaded": downloaded,
+            })
+
+        update_job(job_id, {
+            "status": "completed",
+            "images_downloaded": downloaded,
+            "completed_at": datetime.now(timezone.utc).isoformat(),
+        })
+        log.info(f"BACKFILL complete! {downloaded} media files downloaded")
+
+    except Exception as e:
+        log.error(f"Backfill error: {e}", exc_info=True)
+        update_job(job_id, {"status": "failed", "error_message": str(e)[:500],
+                            "completed_at": datetime.now(timezone.utc).isoformat()})
 
 
 def _median(values):
