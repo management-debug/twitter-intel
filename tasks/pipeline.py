@@ -392,62 +392,80 @@ def run_monthly_refresh_pipeline():
 def run_media_backfill_pipeline():
     """Download media for posts whose media_local is empty. Doesn't re-scrape,
     so no API credits — just walks the DB for gaps and pulls from Twitter CDN
-    while the URLs are still alive."""
+    while the URLs are still alive. Auto-loops in batches of 10K so the whole
+    table gets covered in a single job, no manual re-trigger needed."""
     job_id = create_job("media_backfill")
     log.info(f"Starting MEDIA BACKFILL pipeline (job #{job_id})")
 
     try:
-        posts = get_posts_missing_media(limit=10000)
-        total = len(posts)
-        update_job(job_id, {"total_accounts": 0, "total_posts_found": total})
-        log.info(f"Backfill: {total} posts need media")
-
-        if not posts:
-            update_job(job_id, {
-                "status": "completed",
-                "completed_at": datetime.now(timezone.utc).isoformat(),
-            })
-            return
-
-        # download_all_media expects 'accounts' for avatar downloads — pass
-        # accounts derived from the posts so we also catch any missing avatars.
-        accs_by_user = {p["username"]: {"username": p["username"]} for p in posts if p.get("username")}
-        accounts = list(accs_by_user.values())
-        # Enrich with avatar_url from get_scraped_accounts so avatars actually download
         scraped = get_scraped_accounts()
         scraped_idx = {a["username"]: a for a in scraped}
-        for a in accounts:
-            src = scraped_idx.get(a["username"])
-            if src and src.get("avatar_url"):
-                a["avatar_url"] = src["avatar_url"]
 
-        # Process in chunks so a long backfill can show progress and respect Stop.
+        BATCH = 10000
         CHUNK = 200
         downloaded = 0
-        for i in range(0, total, CHUNK):
+        processed = 0
+        round_num = 0
+
+        while True:
             if should_stop():
                 update_job(job_id, {
                     "status": "cancelled",
                     "error_message": "Stopped by user",
                     "completed_at": datetime.now(timezone.utc).isoformat(),
                 })
-                log.info(f"Backfill cancelled after {i}/{total}")
+                log.info(f"Backfill cancelled after {processed} posts")
                 return
-            chunk = posts[i:i+CHUNK]
-            stats = download_all_media(chunk, accounts if i == 0 else [])
-            _persist_media_paths(chunk, stats)
-            downloaded += stats.get("images", 0) + stats.get("videos", 0) + stats.get("thumbnails", 0)
+
+            posts = get_posts_missing_media(limit=BATCH)
+            if not posts:
+                log.info(f"BACKFILL round {round_num}: 0 posts left — done")
+                break
+
+            round_num += 1
+            log.info(f"BACKFILL round {round_num}: {len(posts)} posts to process")
+
+            # Build accounts list for avatar downloads from this batch's posts.
+            accs_by_user = {p["username"]: {"username": p["username"]} for p in posts if p.get("username")}
+            accounts = list(accs_by_user.values())
+            for a in accounts:
+                src = scraped_idx.get(a["username"])
+                if src and src.get("avatar_url"):
+                    a["avatar_url"] = src["avatar_url"]
+
             update_job(job_id, {
-                "processed_accounts": min(i + CHUNK, total),
-                "images_downloaded": downloaded,
+                "total_posts_found": processed + len(posts),
+                "processed_accounts": processed,
             })
+
+            for i in range(0, len(posts), CHUNK):
+                if should_stop():
+                    update_job(job_id, {
+                        "status": "cancelled",
+                        "error_message": "Stopped by user",
+                        "completed_at": datetime.now(timezone.utc).isoformat(),
+                    })
+                    return
+                chunk = posts[i:i+CHUNK]
+                # avatars only on the very first chunk of the very first round
+                stats = download_all_media(chunk, accounts if (round_num == 1 and i == 0) else [])
+                _persist_media_paths(chunk, stats)
+                downloaded += stats.get("images", 0) + stats.get("videos", 0) + stats.get("thumbnails", 0)
+                processed += len(chunk)
+                update_job(job_id, {
+                    "processed_accounts": processed,
+                    "images_downloaded": downloaded,
+                })
+
+            # Loop back to fetch next batch — there may be more older posts.
 
         update_job(job_id, {
             "status": "completed",
+            "processed_accounts": processed,
             "images_downloaded": downloaded,
             "completed_at": datetime.now(timezone.utc).isoformat(),
         })
-        log.info(f"BACKFILL complete! {downloaded} media files downloaded")
+        log.info(f"BACKFILL complete! {processed} posts, {downloaded} media files in {round_num} rounds")
 
     except Exception as e:
         log.error(f"Backfill error: {e}", exc_info=True)
