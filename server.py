@@ -10,7 +10,7 @@ import uvicorn
 from fastapi import FastAPI, Request, HTTPException, Depends
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.gzip import GZipMiddleware
-from fastapi.responses import FileResponse, RedirectResponse, JSONResponse
+from fastapi.responses import FileResponse, RedirectResponse, JSONResponse, PlainTextResponse
 
 from config import (
     PORT, STATIC_DIR, AVATARS_DIR, IMAGES_DIR, THUMBNAILS_DIR,
@@ -568,6 +568,11 @@ app.mount("/static", _CachedStaticFiles(directory=str(STATIC_DIR)), name="static
 @app.get("/")
 async def index():
     return FileResponse(str(STATIC_DIR / "index.html"))
+
+
+@app.get("/robots.txt")
+async def robots():
+    return PlainTextResponse("User-agent: *\nDisallow: /\n")
 
 
 # ─── Startup ────────────────────────────────────────────────────────────────

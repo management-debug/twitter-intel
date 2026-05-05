@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════════════════
-   Twitter Intel Dashboard — app.js v1
+   SA Pulse Forge — app.js v1
    SPA logic: Auth, Tabs, API, Creators, Viral Posts, Strategy
 ═══════════════════════════════════════════════════════════════════ */
 
@@ -500,7 +500,7 @@ function renderCreatorsTable(creators) {
            src="" alt="" onerror="this.style.display='none'" style="display:none;position:absolute;inset:0;" />
     `;
     const verifiedHtml = c.is_verified
-      ? `<span class="verified-badge" title="Verified"><svg width="16" height="16" viewBox="0 0 24 24" fill="#1d9bf0"><path d="M22.25 12c0-1.43-.88-2.67-2.19-3.34.46-1.39.2-2.9-.81-3.91s-2.52-1.27-3.91-.81C14.67 2.88 13.43 2 12 2s-2.67.88-3.34 2.19c-1.39-.46-2.9-.2-3.91.81s-1.27 2.52-.81 3.91C2.88 9.33 2 10.57 2 12s.88 2.67 2.19 3.34c-.46 1.39-.2 2.9.81 3.91s2.52 1.27 3.91.81C9.33 21.12 10.57 22 12 22s2.67-.88 3.34-2.19c1.39.46 2.9.2 3.91-.81s1.27-2.52.81-3.91C21.12 14.67 22 13.43 22 12zm-6.28-1.72-4 5.5a.75.75 0 0 1-1.14.09l-2-2a.75.75 0 0 1 1.06-1.06l1.4 1.4 3.49-4.8a.75.75 0 0 1 1.19.87z"/></svg></span>`
+      ? `<span class="verified-badge" title="Verified"><svg width="16" height="16" viewBox="0 0 24 24" fill="#635bff"><path d="M22.25 12c0-1.43-.88-2.67-2.19-3.34.46-1.39.2-2.9-.81-3.91s-2.52-1.27-3.91-.81C14.67 2.88 13.43 2 12 2s-2.67.88-3.34 2.19c-1.39-.46-2.9-.2-3.91.81s-1.27 2.52-.81 3.91C2.88 9.33 2 10.57 2 12s.88 2.67 2.19 3.34c-.46 1.39-.2 2.9.81 3.91s2.52 1.27 3.91.81C9.33 21.12 10.57 22 12 22s2.67-.88 3.34-2.19c1.39.46 2.9.2 3.91-.81s1.27-2.52.81-3.91C21.12 14.67 22 13.43 22 12zm-6.28-1.72-4 5.5a.75.75 0 0 1-1.14.09l-2-2a.75.75 0 0 1 1.06-1.06l1.4 1.4 3.49-4.8a.75.75 0 0 1 1.19.87z"/></svg></span>`
       : '';
 
     return `<tr data-id="${c.id}" data-username="${escHtml(c.username)}">
@@ -1136,15 +1136,15 @@ async function addBulk() {
 // ─── STRATEGY TAB ────────────────────────────────────────────────────
 const strategyData = {
   formats: [
-    { label: 'Photo posts',    value: 8.4, color: '#1d9bf0' },
-    { label: 'Video posts',    value: 12.1, color: '#7856ff' },
+    { label: 'Photo posts',    value: 8.4, color: '#635bff' },
+    { label: 'Video posts',    value: 12.1, color: '#22d3ee' },
     { label: 'Text only',      value: 4.2, color: '#00ba7c' },
     { label: 'Thread starter', value: 6.7, color: '#ffad1f' },
   ],
   captions: [
-    { label: 'Question hook',    value: 9.8, color: '#1d9bf0' },
-    { label: 'Controversial take',value: 11.2, color: '#f91880' },
-    { label: 'Personal story',   value: 8.5, color: '#7856ff' },
+    { label: 'Question hook',    value: 9.8, color: '#635bff' },
+    { label: 'Controversial take',value: 11.2, color: '#ff6b8a' },
+    { label: 'Personal story',   value: 8.5, color: '#22d3ee' },
     { label: 'Tips & advice',    value: 7.3, color: '#00ba7c' },
     { label: 'Humor / meme',     value: 10.4, color: '#ffad1f' },
     { label: 'Call to action',   value: 6.1, color: '#ff7a00' },
@@ -1271,19 +1271,19 @@ function renderGuide() {
       .guide-wrap { max-width: 900px; margin: 0 auto; padding: 24px 20px 60px; }
       .guide-search-wrap { position: sticky; top: 0; z-index: 10; background: #0a0a0f; padding: 12px 0 8px; margin-bottom: 16px; }
       .guide-search-input { width: 100%; padding: 10px 16px; border-radius: 8px; background: #16181c; border: 1px solid #2f3336; color: #e7e9ea; font-size: 14px; outline: none; box-sizing: border-box; }
-      .guide-search-input:focus { border-color: #1d9bf0; box-shadow: 0 0 0 2px rgba(29,155,240,.15); }
+      .guide-search-input:focus { border-color: #635bff; box-shadow: 0 0 0 2px rgba(99, 91, 255,.15); }
       .guide-search-input::placeholder { color: #536471; }
       .guide-no-results { color: #536471; text-align: center; padding: 32px 0; font-size: 14px; }
       .guide-toc { background: #16181c; border: 1px solid #2f3336; border-radius: 12px; padding: 20px 24px; margin-bottom: 28px; }
-      .guide-toc h3 { margin: 0 0 14px; font-size: 13px; text-transform: uppercase; letter-spacing: .08em; color: #1d9bf0; }
+      .guide-toc h3 { margin: 0 0 14px; font-size: 13px; text-transform: uppercase; letter-spacing: .08em; color: #635bff; }
       .guide-toc-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 4px 16px; }
       .guide-toc-link { color: #8b98a5; font-size: 13px; text-decoration: none; padding: 3px 0; display: block; transition: color .15s; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-      .guide-toc-link:hover { color: #1d9bf0; }
+      .guide-toc-link:hover { color: #635bff; }
       .guide-section { margin-bottom: 10px; border-radius: 12px; border: 1px solid #2f3336; overflow: hidden; }
       .guide-section-header { display: flex; align-items: center; justify-content: space-between; padding: 14px 20px; cursor: pointer; user-select: none; background: #16181c; transition: background .15s; }
       .guide-section-header:hover { background: #1e2127; }
       .guide-section-header h2 { margin: 0; font-size: 15px; font-weight: 600; color: #e7e9ea; display: flex; align-items: center; gap: 10px; }
-      .guide-section-letter { display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px; border-radius: 6px; background: rgba(29,155,240,.15); color: #1d9bf0; font-size: 12px; font-weight: 700; flex-shrink: 0; }
+      .guide-section-letter { display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px; border-radius: 6px; background: rgba(99, 91, 255,.15); color: #635bff; font-size: 12px; font-weight: 700; flex-shrink: 0; }
       .guide-chevron { color: #536471; transition: transform .2s; flex-shrink: 0; }
       .guide-section.open .guide-chevron { transform: rotate(180deg); }
       .guide-section-body { display: none; padding: 20px 24px; background: #0d0d12; border-top: 1px solid #2f3336; }
@@ -1294,10 +1294,10 @@ function renderGuide() {
       .guide-section-body ul, .guide-section-body ol { padding-left: 20px; margin: 0 0 14px; }
       .guide-section-body li { color: #c4cdd5; font-size: 14px; line-height: 1.7; }
       .guide-section-body strong { color: #e7e9ea; font-weight: 600; }
-      .guide-section-body code { background: #1e2127; color: #1d9bf0; padding: 1px 5px; border-radius: 4px; font-size: 12px; }
+      .guide-section-body code { background: #1e2127; color: #635bff; padding: 1px 5px; border-radius: 4px; font-size: 12px; }
       .guide-table-wrap { overflow-x: auto; margin: 14px 0; }
       .guide-table { width: 100%; border-collapse: collapse; font-size: 13px; }
-      .guide-table th { background: #1a1d23; color: #1d9bf0; text-align: left; padding: 8px 12px; border-bottom: 2px solid #2f3336; font-weight: 600; }
+      .guide-table th { background: #1a1d23; color: #635bff; text-align: left; padding: 8px 12px; border-bottom: 2px solid #2f3336; font-weight: 600; }
       .guide-table td { padding: 8px 12px; border-bottom: 1px solid #2f3336; color: #c4cdd5; vertical-align: top; }
       .guide-table tr:last-child td { border-bottom: none; }
       .guide-table tr:hover td { background: rgba(255,255,255,.02); }
@@ -1306,36 +1306,36 @@ function renderGuide() {
       .guide-warn-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
       .guide-warn-body { font-size: 13px; color: #c4cdd5; line-height: 1.6; }
       .guide-warn-body strong { color: #ff7a00; }
-      .guide-critical { background: rgba(249,24,128,.08); border: 1px solid rgba(249,24,128,.35); border-radius: 8px; padding: 12px 16px; margin: 14px 0; display: flex; gap: 10px; align-items: flex-start; }
-      .guide-critical .guide-warn-body strong { color: #f91880; }
+      .guide-critical { background: rgba(255, 107, 138,.08); border: 1px solid rgba(255, 107, 138,.35); border-radius: 8px; padding: 12px 16px; margin: 14px 0; display: flex; gap: 10px; align-items: flex-start; }
+      .guide-critical .guide-warn-body strong { color: #ff6b8a; }
       .guide-code-block { background: #0a0a0f; border: 1px solid #2f3336; border-radius: 8px; overflow: hidden; margin: 14px 0; }
       .guide-code-header { background: #16181c; padding: 6px 14px; font-size: 11px; color: #536471; text-transform: uppercase; letter-spacing: .06em; }
       .guide-code-line { display: flex; align-items: center; justify-content: space-between; padding: 6px 14px; border-top: 1px solid #1a1d23; gap: 10px; }
       .guide-code-line:first-of-type { border-top: none; }
       .guide-code-line span { font-family: 'Menlo','Monaco','Consolas',monospace; font-size: 13px; color: #c4cdd5; flex: 1; word-break: break-word; }
       .guide-code-copy { flex-shrink: 0; background: none; border: 1px solid #2f3336; color: #536471; padding: 2px 8px; border-radius: 4px; font-size: 11px; cursor: pointer; transition: all .15s; }
-      .guide-code-copy:hover { border-color: #1d9bf0; color: #1d9bf0; }
+      .guide-code-copy:hover { border-color: #635bff; color: #635bff; }
       .guide-rules-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 10px; margin: 14px 0; }
       .guide-rule-card { background: #16181c; border: 1px solid #2f3336; border-radius: 10px; padding: 14px 16px; display: flex; gap: 12px; align-items: flex-start; transition: border-color .15s; }
-      .guide-rule-card:hover { border-color: #1d9bf0; }
-      .guide-rule-num { flex-shrink: 0; width: 28px; height: 28px; border-radius: 50%; background: rgba(29,155,240,.15); color: #1d9bf0; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; }
+      .guide-rule-card:hover { border-color: #635bff; }
+      .guide-rule-num { flex-shrink: 0; width: 28px; height: 28px; border-radius: 50%; background: rgba(99, 91, 255,.15); color: #635bff; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; }
       .guide-rule-text { font-size: 13px; color: #c4cdd5; line-height: 1.55; }
       .guide-rule-text strong { color: #e7e9ea; display: block; margin-bottom: 2px; }
       .guide-checklist { list-style: none; padding: 0; margin: 10px 0 16px; }
       .guide-checklist li { display: flex; align-items: flex-start; gap: 10px; padding: 5px 0; font-size: 14px; color: #c4cdd5; line-height: 1.5; }
-      .guide-checklist input[type=checkbox] { margin-top: 3px; flex-shrink: 0; accent-color: #1d9bf0; width: 15px; height: 15px; cursor: pointer; }
+      .guide-checklist input[type=checkbox] { margin-top: 3px; flex-shrink: 0; accent-color: #635bff; width: 15px; height: 15px; cursor: pointer; }
       .guide-checklist li.checked-item { color: #536471; }
       .guide-checklist li.checked-item label { text-decoration: line-through; }
       .guide-caption-cat { margin-bottom: 22px; }
-      .guide-caption-cat h4 { margin: 0 0 10px; font-size: 12px; font-weight: 700; color: #1d9bf0; text-transform: uppercase; letter-spacing: .08em; }
+      .guide-caption-cat h4 { margin: 0 0 10px; font-size: 12px; font-weight: 700; color: #635bff; text-transform: uppercase; letter-spacing: .08em; }
       .guide-caption-item { display: flex; align-items: center; justify-content: space-between; background: #16181c; border: 1px solid #2f3336; border-radius: 6px; padding: 8px 12px; margin-bottom: 6px; gap: 10px; transition: border-color .15s; }
-      .guide-caption-item:hover { border-color: #1d9bf0; }
+      .guide-caption-item:hover { border-color: #635bff; }
       .guide-caption-item span { font-size: 13px; color: #c4cdd5; flex: 1; font-family: 'Menlo','Monaco','Consolas',monospace; }
       .guide-caption-copy { flex-shrink: 0; background: none; border: 1px solid #2f3336; color: #536471; padding: 3px 10px; border-radius: 4px; font-size: 11px; cursor: pointer; transition: all .15s; }
-      .guide-caption-copy:hover { border-color: #1d9bf0; color: #1d9bf0; }
-      .guide-phase { border-left: 3px solid #1d9bf0; padding-left: 16px; margin-bottom: 18px; }
-      .guide-phase-title { font-size: 14px; font-weight: 600; color: #1d9bf0; margin-bottom: 6px; }
-      .guide-highlight { background: rgba(29,155,240,.25); border-radius: 2px; padding: 0 1px; }
+      .guide-caption-copy:hover { border-color: #635bff; color: #635bff; }
+      .guide-phase { border-left: 3px solid #635bff; padding-left: 16px; margin-bottom: 18px; }
+      .guide-phase-title { font-size: 14px; font-weight: 600; color: #635bff; margin-bottom: 6px; }
+      .guide-highlight { background: rgba(99, 91, 255,.25); border-radius: 2px; padding: 0 1px; }
       .guide-section.search-hidden { display: none; }
     `;
     document.head.appendChild(style);
@@ -1952,20 +1952,20 @@ function initLazyImages() {
 
 // ─── AVATAR COLOR HELPERS ────────────────────────────────────────────
 function stringToColor(str) {
-  if (!str) return 'rgba(29,155,240,0.3)';
+  if (!str) return 'rgba(99, 91, 255,0.3)';
   let hash = 0;
   for (let i = 0; i < str.length; i++) hash = str.charCodeAt(i) + ((hash << 5) - hash);
-  const colors = ['rgba(29,155,240,0.4)', 'rgba(120,86,255,0.4)', 'rgba(249,24,128,0.4)',
+  const colors = ['rgba(99, 91, 255,0.4)', 'rgba(34, 211, 238,0.4)', 'rgba(255, 107, 138,0.4)',
                   'rgba(0,186,124,0.4)', 'rgba(255,122,0,0.4)', 'rgba(0,212,255,0.4)'];
   return colors[Math.abs(hash) % colors.length];
 }
 
 function stringToColor2(str) {
-  if (!str) return 'rgba(120,86,255,0.3)';
+  if (!str) return 'rgba(34, 211, 238,0.3)';
   let hash = 0;
   for (let i = 0; i < str.length; i++) hash = (str.charCodeAt(i) * 31 + hash) | 0;
-  const colors = ['rgba(120,86,255,0.4)', 'rgba(0,186,124,0.4)', 'rgba(29,155,240,0.4)',
-                  'rgba(249,24,128,0.4)', 'rgba(0,212,255,0.4)', 'rgba(255,122,0,0.4)'];
+  const colors = ['rgba(34, 211, 238,0.4)', 'rgba(0,186,124,0.4)', 'rgba(99, 91, 255,0.4)',
+                  'rgba(255, 107, 138,0.4)', 'rgba(0,212,255,0.4)', 'rgba(255,122,0,0.4)'];
   return colors[Math.abs(hash) % colors.length];
 }
 

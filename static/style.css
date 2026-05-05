@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════════════════
-   Twitter Intel Dashboard — style.css v1
+   SA Pulse Forge — style.css v1
    Dark theme, glassmorphism, Inter font, Twitter blue accent
 ═══════════════════════════════════════════════════════════════════ */
 
@@ -18,8 +18,8 @@
   --card-hover:   rgba(255,255,255,0.07);
   --border:       rgba(255,255,255,0.08);
   --border-hover: rgba(255,255,255,0.16);
-  --accent:       #1d9bf0;
-  --accent-dim:   rgba(29,155,240,0.15);
+  --accent:       #635bff;
+  --accent-dim:   rgba(99, 91, 255,0.15);
   --accent-hover: #1a8cd8;
   --text:         #e7e9ea;
   --text2:        #71767b;
@@ -30,10 +30,10 @@
   --success-dim:  rgba(0,186,124,0.15);
   --warning:      #ffad1f;
   --warning-dim:  rgba(255,173,31,0.15);
-  --purple:       #7856ff;
-  --purple-dim:   rgba(120,86,255,0.15);
-  --pink:         #f91880;
-  --pink-dim:     rgba(249,24,128,0.15);
+  --purple:       #22d3ee;
+  --purple-dim:   rgba(34, 211, 238,0.15);
+  --pink:         #ff6b8a;
+  --pink-dim:     rgba(255, 107, 138,0.15);
   --cyan:         #00d4ff;
   --cyan-dim:     rgba(0,212,255,0.15);
   --orange:       #ff7a00;
@@ -171,7 +171,7 @@ select {
 
 input:focus, textarea:focus, select:focus {
   border-color: var(--accent);
-  background: rgba(29,155,240,0.06);
+  background: rgba(99, 91, 255,0.06);
 }
 
 input::placeholder, textarea::placeholder {
@@ -261,7 +261,7 @@ select option {
   transition: color var(--transition), background var(--transition);
 }
 .tab-btn:hover { color: var(--text); background: rgba(255,255,255,0.06); }
-.tab-btn.active { color: var(--text); background: rgba(29,155,240,0.12); }
+.tab-btn.active { color: var(--text); background: rgba(99, 91, 255,0.12); }
 
 .topnav-right {
   display: flex;
@@ -279,7 +279,7 @@ select option {
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
-.role-badge.admin { background: var(--accent-dim); color: var(--accent); border: 1px solid rgba(29,155,240,0.3); }
+.role-badge.admin { background: var(--accent-dim); color: var(--accent); border: 1px solid rgba(99, 91, 255,0.3); }
 .role-badge.worker { background: var(--green-dim); color: var(--success); border: 1px solid rgba(0,186,124,0.3); }
 
 /* ── Tab Content & Layout ────────────────────────────────────────── */
@@ -299,12 +299,12 @@ select option {
   padding: 4px 0 20px 16px;
   border-bottom: 1px solid var(--border);
   border-left: 3px solid var(--accent);
-  background: linear-gradient(90deg, rgba(29,155,240,0.05), transparent 40%);
+  background: linear-gradient(90deg, rgba(99, 91, 255,0.05), transparent 40%);
   border-radius: 0 var(--radius) var(--radius) 0;
 }
 .page-header h1 {
   margin-bottom: 4px;
-  background: linear-gradient(90deg, var(--text) 30%, #1d9bf0 130%);
+  background: linear-gradient(90deg, var(--text) 30%, #635bff 130%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -346,17 +346,17 @@ select option {
 
 .stat-card:hover {
   transform: translateY(-3px);
-  box-shadow: 0 8px 24px rgba(0,0,0,0.45), 0 0 0 1px rgba(29,155,240,0.18);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.45), 0 0 0 1px rgba(99, 91, 255,0.18);
   background: var(--card-hover);
-  border-color: rgba(29,155,240,0.25);
+  border-color: rgba(99, 91, 255,0.25);
 }
 .stat-card:hover::before { height: 4px; opacity: 1; }
 
-.gradient-blue::before  { background: linear-gradient(90deg, var(--accent), #7856ff); }
-.gradient-purple::before { background: linear-gradient(90deg, #7856ff, #f91880); }
+.gradient-blue::before  { background: linear-gradient(90deg, var(--accent), #22d3ee); }
+.gradient-purple::before { background: linear-gradient(90deg, #22d3ee, #ff6b8a); }
 .gradient-green::before  { background: linear-gradient(90deg, var(--success), #00d4ff); }
 .gradient-orange::before { background: linear-gradient(90deg, var(--orange), #ffad1f); }
-.gradient-pink::before   { background: linear-gradient(90deg, var(--pink), #7856ff); }
+.gradient-pink::before   { background: linear-gradient(90deg, var(--pink), #22d3ee); }
 .gradient-cyan::before   { background: linear-gradient(90deg, var(--cyan), var(--success)); }
 
 .stat-icon { font-size: 26px; flex-shrink: 0; }
@@ -423,8 +423,8 @@ select option {
   gap: 14px;
   margin-top: 18px;
   padding: 14px 16px;
-  background: rgba(29,155,240,0.05);
-  border: 1px solid rgba(29,155,240,0.18);
+  background: rgba(99, 91, 255,0.05);
+  border: 1px solid rgba(99, 91, 255,0.18);
   border-radius: 12px;
 }
 .auto-refresh-info { display: flex; flex-direction: column; gap: 2px; }
@@ -450,7 +450,7 @@ select option {
 }
 .switch input:checked + .slider { background: var(--accent); border-color: var(--accent); }
 .switch input:checked + .slider::before { transform: translateX(20px); }
-.switch input:focus + .slider { box-shadow: 0 0 0 3px rgba(29,155,240,0.25); }
+.switch input:focus + .slider { box-shadow: 0 0 0 3px rgba(99, 91, 255,0.25); }
 
 .status-badge {
   font-size: 12px;
@@ -461,7 +461,7 @@ select option {
   letter-spacing: 0.5px;
 }
 .status-badge.idle     { background: rgba(255,255,255,0.06); color: var(--text2); border: 1px solid var(--border); }
-.status-badge.running  { background: var(--accent-dim); color: var(--accent); border: 1px solid rgba(29,155,240,0.3); animation: pulse 2s infinite; }
+.status-badge.running  { background: var(--accent-dim); color: var(--accent); border: 1px solid rgba(99, 91, 255,0.3); animation: pulse 2s infinite; }
 .status-badge.done     { background: var(--success-dim); color: var(--success); border: 1px solid rgba(0,186,124,0.3); }
 .status-badge.failed   { background: var(--danger-dim); color: var(--danger); border: 1px solid rgba(244,33,46,0.3); }
 .status-badge.stopped  { background: var(--warning-dim); color: var(--warning); border: 1px solid rgba(255,173,31,0.3); }
@@ -485,7 +485,7 @@ select option {
 
 .progress-bar-fill {
   height: 100%;
-  background: linear-gradient(90deg, var(--accent), #7856ff);
+  background: linear-gradient(90deg, var(--accent), #22d3ee);
   border-radius: 3px;
   width: 0%;
   transition: width 0.5s ease;
@@ -1161,7 +1161,7 @@ select option {
 .creator-tab-btn.active {
   background: var(--accent-dim);
   color: var(--accent);
-  border-color: rgba(29,155,240,0.3);
+  border-color: rgba(99, 91, 255,0.3);
 }
 
 .creator-tab-btn:hover:not(.active) {
@@ -1328,10 +1328,10 @@ select option {
 .time-slot:hover { transform: scale(1.1); z-index: 1; }
 
 .time-slot.heat-0  { background: rgba(255,255,255,0.03); }
-.time-slot.heat-1  { background: rgba(29,155,240,0.15); color: rgba(29,155,240,0.7); }
-.time-slot.heat-2  { background: rgba(29,155,240,0.3); color: rgba(29,155,240,0.9); }
-.time-slot.heat-3  { background: rgba(29,155,240,0.5); color: #fff; }
-.time-slot.heat-4  { background: rgba(29,155,240,0.75); color: #fff; }
+.time-slot.heat-1  { background: rgba(99, 91, 255,0.15); color: rgba(99, 91, 255,0.7); }
+.time-slot.heat-2  { background: rgba(99, 91, 255,0.3); color: rgba(99, 91, 255,0.9); }
+.time-slot.heat-3  { background: rgba(99, 91, 255,0.5); color: #fff; }
+.time-slot.heat-4  { background: rgba(99, 91, 255,0.75); color: #fff; }
 .time-slot.heat-5  { background: var(--accent); color: #fff; font-weight: 700; }
 
 /* ── Guide Tab ───────────────────────────────────────────────────── */
@@ -1680,9 +1680,9 @@ select option {
   background: rgba(255, 255, 255, 0.04);
 }
 .period-btn.active {
-  background: rgba(29, 155, 240, 0.12);
+  background: rgba(99, 91, 255, 0.12);
   color: #fff;
-  border-color: rgba(29, 155, 240, 0.25);
+  border-color: rgba(99, 91, 255, 0.25);
   font-weight: 600;
 }
 .toolbar {
