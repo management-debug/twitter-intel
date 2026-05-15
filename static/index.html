@@ -14,7 +14,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/static/style.css?v=31" />
+  <link rel="stylesheet" href="/static/style.css?v=32" />
 </head>
 <body>
 
@@ -53,14 +53,14 @@
         <span>SA Pulse Forge</span>
       </div>
       <div class="topnav-tabs" id="tab-bar">
-        <button class="tab-btn active" data-tab="dashboard">Dashboard</button>
-        <button class="tab-btn" data-tab="creators">Creators</button>
+        <button class="tab-btn admin-only active" data-tab="dashboard">Dashboard</button>
+        <button class="tab-btn admin-only" data-tab="creators">Creators</button>
+        <button class="tab-btn" data-tab="guide">Guide</button>
         <button class="tab-btn" data-tab="photos">Viral Photos</button>
         <button class="tab-btn" data-tab="videos">Viral Videos</button>
         <button class="tab-btn" data-tab="text">Viral Text</button>
         <button class="tab-btn" data-tab="bios">Bios</button>
         <button class="tab-btn" data-tab="strategy">Strategy</button>
-        <button class="tab-btn" data-tab="guide">Guide</button>
         <button class="tab-btn admin-only" data-tab="add">+ Add</button>
       </div>
       <div class="topnav-right">
@@ -70,7 +70,7 @@
     </nav>
 
     <!-- ─── TAB: DASHBOARD ─── -->
-    <div id="tab-dashboard" class="tab-content active">
+    <div id="tab-dashboard" class="tab-content active admin-only">
       <div class="page-header">
         <h1>Dashboard</h1>
         <p>Overview of your Twitter intelligence pipeline</p>
@@ -196,7 +196,7 @@
     </div>
 
     <!-- ─── TAB: CREATORS ─── -->
-    <div id="tab-creators" class="tab-content hidden">
+    <div id="tab-creators" class="tab-content hidden admin-only">
       <div class="page-header">
         <h1>Creators</h1>
         <p>All tracked Twitter/X creator accounts</p>
@@ -240,6 +240,13 @@
       <div class="page-header">
         <h1>Bio Inspiration</h1>
         <p>Browse creator bios and locations for copywriting ideas</p>
+      </div>
+      <div class="info-banner">
+        <span class="info-banner-icon">💡</span>
+        <div class="info-banner-body">
+          <strong>For inspiration only — do not copy.</strong>
+          These bios are real examples from top creators in our niche, shown so you can study the patterns (length, emoji use, arrow ↓, soft hints). Use them as ideas to write <em>your own</em> bio that matches your creator's persona. Never copy a bio word-for-word — Twitter flags duplicate bios across accounts.
+        </div>
       </div>
       <div class="toolbar">
         <div class="search-wrap">
@@ -521,6 +528,6 @@
   <!-- ════════════════════════════════════════════════════ TOAST -->
   <div id="toast-container"></div>
 
-  <script src="/static/app.js?v=31"></script>
+  <script src="/static/app.js?v=32"></script>
 </body>
 </html>

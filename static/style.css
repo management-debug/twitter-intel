@@ -1443,8 +1443,14 @@ select option {
 .time-slot.heat-5  { background: var(--accent); color: #fff; font-weight: 700; }
 
 /* ── Guide Tab ───────────────────────────────────────────────────── */
+/* #guide-content owns its own layout via .gd-wrap (max-width: 920px,
+   margin: 0 auto). The .guide-content class used to clamp this to 800px
+   with no auto-margin, which pushed the whole guide to the left of the
+   tab area on wider screens. Let it fill the tab container. */
 .guide-content {
-  max-width: 800px;
+  max-width: none;
+  margin: 0 auto;
+  width: 100%;
 }
 
 .guide-content h2 {
@@ -1956,6 +1962,29 @@ button, a, [role="button"], input, select, textarea, label, .tab-btn, .period-bt
   .tab-content { padding: 0 max(12px, env(safe-area-inset-left)) 40px max(12px, env(safe-area-inset-right)); }
   h1 { font-size: 22px; }
   h2 { font-size: 16px; }
+}
+
+/* Info banner — sits at the top of a tab to explain how to use it */
+.info-banner {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  background: linear-gradient(135deg, rgba(99,91,255,.10), rgba(34,211,238,.05));
+  border: 1px solid rgba(99,91,255,.32);
+  border-radius: 12px;
+  padding: 14px 18px;
+  margin: 0 0 18px;
+  color: #c4cdd5;
+  line-height: 1.6;
+  font-size: 13.5px;
+}
+.info-banner-icon { font-size: 20px; flex-shrink: 0; line-height: 1.2; }
+.info-banner-body { flex: 1; }
+.info-banner-body strong { color: #fff; display: inline; margin-right: 4px; }
+.info-banner-body em { color: #22d3ee; font-style: normal; }
+@media (max-width: 600px) {
+  .info-banner { padding: 12px 14px; font-size: 13px; gap: 10px; }
+  .info-banner-icon { font-size: 18px; }
 }
 
 /* Reduce motion if requested */

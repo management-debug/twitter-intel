@@ -240,20 +240,29 @@ function initApp() {
     $('#nav-role-badge').className = 'role-badge admin';
   } else {
     document.body.classList.remove('is-admin');
+    document.body.classList.add('is-worker');
     $('#nav-role-badge').textContent = 'Worker';
     $('#nav-role-badge').className = 'role-badge worker';
   }
 
-  // Navigate to active tab
+  // Navigate to active tab. Workers default to the Guide tab regardless
+  // of any stale localStorage entry pointing at a dashboard/creators URL.
   const hash = location.hash.replace('#', '') || state.activeTab;
   navigateTo(hash, false);
 }
 
 // ─── Tab Navigation ──────────────────────────────────────────────────
+// Tabs workers may NOT access — dashboard analytics and the creators list
+// are admin-only. Workers get the guide-centric experience: viral content,
+// bios for inspiration, strategy, and the playbook.
+const WORKER_BLOCKED_TABS = new Set(['dashboard', 'creators', 'add']);
+const WORKER_DEFAULT_TAB  = 'guide';
+
 function navigateTo(tab, pushState = true) {
   const validTabs = ['dashboard', 'creators', 'photos', 'videos', 'text', 'bios', 'strategy', 'guide', 'add'];
-  if (!validTabs.includes(tab)) tab = 'dashboard';
-  if (tab === 'add' && state.role !== 'admin') tab = 'dashboard';
+  if (!validTabs.includes(tab)) tab = state.role === 'admin' ? 'dashboard' : WORKER_DEFAULT_TAB;
+  if (tab === 'add' && state.role !== 'admin') tab = WORKER_DEFAULT_TAB;
+  if (state.role !== 'admin' && WORKER_BLOCKED_TABS.has(tab)) tab = WORKER_DEFAULT_TAB;
 
   state.activeTab = tab;
   localStorage.setItem('twi_tab', tab);
@@ -1821,7 +1830,7 @@ function renderGuide() {
     ${step(2, 'Confirm email + phone <strong>immediately</strong> so the account isn&apos;t flagged as suspicious.')}
     ${step(3, '<strong>Pick a username.</strong> Memorable, persona-based, lowercase only.')}
     ${step(4, '<strong>Complete the profile</strong> right away (avatar, banner, bio). Twitter treats completeness as trust.')}
-    ${step(5, 'Send account details to <strong>Justin (@SunnyAngels_Admin)</strong> so we have them on file.')}
+    ${step(5, 'Send account details to your <strong>supervisor</strong> so the team has them on file.')}
 
     ${alert_('yellow', '<strong>USERNAME RULE</strong>Avoid spam-y names like <code>sexybaby9747</code> or <code>hotgirl2024</code> — those are flagged before the account even posts. Good patterns: <code>@bellacosplay</code>, <code>@lavendergloss</code>, <code>@iamruby</code>.')}
 
@@ -1893,7 +1902,7 @@ function renderGuide() {
     <h3>📍 Profile Details</h3>
     <ul>
       <li><strong>Location:</strong> a US city that fits the persona (LA, Miami, Austin, Tampa, Phoenix). Skip "United States" — too vague.</li>
-      <li><strong>Website:</strong> blank until Justin gives you a link.</li>
+      <li><strong>Website:</strong> blank until your supervisor sends you the link at 100 followers (see Section 11).</li>
       <li><strong>Birthday:</strong> persona age 22–28. Year and date hidden.</li>
     </ul>
   `;
@@ -1928,7 +1937,7 @@ function renderGuide() {
     ${step(2, 'Like 50–100 tweets per day')}
     ${step(3, '20–30 replies per day, half as image-replies on viral posts')}
     ${step(4, '5–10 follower steals per day (Section 13)')}
-    ${step(5, 'Once you cross <strong>100 followers</strong>: message Justin → he creates your link → add to bio')}
+    ${step(5, 'Once you cross <strong>100 followers</strong>: DM Justin (@SunnyAngels_Admin) → he creates your link → add to bio')}
 
     <h3>📋 Quick Reference</h3>
     ${tbl(['Action','Day 1–3','Day 4–10','Day 11 +'],[
@@ -2278,7 +2287,7 @@ function renderGuide() {
     ${scen('yellow', '💬 Day 4–5: Light replies only', 'Short, genuine replies on other creators&apos; tweets. No links, no photos.')}
     ${scen('blue', '📸 Day 6–7: Resume photos', '1 photo tweet per day, no link, short captions.')}
     ${scen('green', '✅ Day 8 +', 'Back to normal schedule.')}
-    ${alert_('red', '<strong>STILL BANNED AFTER 7 DAYS?</strong>Message Justin (@SunnyAngels_Admin). We may need to retire the account.')}
+    ${alert_('red', '<strong>STILL BANNED AFTER 7 DAYS?</strong>Message your supervisor (or @erdo_ka). We may need to retire the account.')}
   `;
 
   const sec16 = `
@@ -2297,7 +2306,7 @@ function renderGuide() {
     ${step(2, '<strong>Reply to as many comments as you can — at least the first 20.</strong> Every reply you write feeds the algorithm. Even a "🥺" reply counts.')}
     ${step(3, '<strong>Follow-up tweet 1–2 hours later.</strong> Different photo, caption that references the viral one. Captures the new visitors.')}
     ${step(4, '<strong>Check bio + pinned tweet.</strong> A flood of new visitors is going to look at both.')}
-    ${step(5, '<strong>Screenshot to Justin.</strong> So he knows the account is performing — we can unlock the link / Premium if it&apos;s time.')}
+    ${step(5, '<strong>Screenshot to your supervisor.</strong> So the team knows the account is performing — we can unlock the link / Premium if it&apos;s time.')}
 
     ${alert_('yellow', '<strong>DO NOT FORCE A SECOND VIRAL</strong>The instinct after a hit is "post the same thing again". <strong>Wait at least 7 days</strong> before reposting the same photo with a different caption (Section 9). Same-day or next-day repost looks obvious — the second post flops.')}
   `;
@@ -2319,7 +2328,7 @@ function renderGuide() {
     ${step(3, '<strong>Cut posting to 2 / day for 3 days.</strong> Less volume, higher quality. Use your best photos.')}
     ${step(4, '<strong>Shift to interaction mode for those 3 days.</strong> Heavy on image replies (Section 12) and follower stealing (Section 13). The algorithm rewards activity from <em>you</em>.')}
     ${step(5, '<strong>Still slow after a week?</strong> Change the avatar and refresh the bio. Sometimes the look is the problem.')}
-    ${step(6, '<strong>Still slow after two weeks?</strong> Message Justin. We review the account together.')}
+    ${step(6, '<strong>Still slow after two weeks?</strong> Message your supervisor (or @erdo_ka). We review the account together.')}
   `;
 
   const sec18 = `
@@ -2338,7 +2347,7 @@ function renderGuide() {
       'Review the week: which post performed best and why?',
       'Update the pinned tweet if a new post beat the current pin (100+ likes)',
       'Refresh caption ideas from the Viral Text tab',
-      'Send Justin a quick update if anything broke or hit big',
+      'Send your supervisor a quick update if anything broke or hit big',
     ], 'w')}
 
     ${checklist('📆 Monthly Tasks', [
@@ -2366,15 +2375,16 @@ function renderGuide() {
     <p>Premium costs ~$8 / month per account. On a fresh account it&apos;s wasted — the audience isn&apos;t big enough for the boost to compound. At 1,000 followers, the boost starts producing measurable extra growth, and cost-per-new-follower drops sharply.</p>
 
     <h3>📞 How to Activate</h3>
-    <p>You don&apos;t pay — we do. Just message Justin once the account hits 1,000.</p>
+    <p>You don&apos;t pay — we do. Just message your supervisor once the account hits 1,000.</p>
 
-    ${contact('CONTACT TO ACTIVATE PREMIUM', '@SunnyAngels_Admin (Justin)', 'DM: "[account] just hit 1,000 followers — ready for Premium". He activates it on the billing side and confirms.')}
+    ${contact('CONTACT TO ACTIVATE PREMIUM', 'Your supervisor (or @erdo_ka)', 'When your account hits 1,000 followers, message your supervisor: "[account] just hit 1,000 followers — ready for Premium". They handle billing and confirm once it&apos;s active.')}
   `;
 
   const sec20 = `
     <h3>📞 Who to Contact</h3>
-    ${contact('MAIN CONTACT', '@SunnyAngels_Admin (Justin)', 'Link creation at 100 followers · Premium activation at 1,000 followers · shadowban / suspension issues · viral post moments · anything you are unsure about.')}
-    ${alert_('yellow', '<strong>GENERAL RULE</strong>If you are ever in doubt — <strong>message Justin first</strong>. Better to ask before doing something risky than to fix the damage after.')}
+    ${contact('FOR YOUR LINK ONLY — once you hit 100 followers', '@SunnyAngels_Admin (Justin)', 'DM Justin <strong>only</strong> when your account reaches 100 followers and you need the link created. He does not handle anything else.')}
+    ${contact('EVERYTHING ELSE', 'Your supervisor · or @erdo_ka', 'For shadowban / suspension issues, viral post moments, weird account behaviour, account banned, or anything you are unsure about — message your supervisor first. If they are unavailable, DM <strong>@erdo_ka</strong> on X.')}
+    ${alert_('yellow', '<strong>GENERAL RULE</strong>If you are ever in doubt — ask your <strong>supervisor</strong> first. Only contact Justin (@SunnyAngels_Admin) for the link request at 100 followers. Premium activation, account problems, anything weird — supervisor or @erdo_ka.')}
 
     <h3>❓ FAQ</h3>
 
@@ -2384,9 +2394,9 @@ function renderGuide() {
     ${faq('How many accounts can I run at once?', 'Five is the practical max. Past that, you cannot run image replies properly for each one and they all start to suffer.')}
     ${faq('A creator I look up to broke half these rules — why?', 'Large accounts (100K+) have organic momentum and can break some rules safely. Small accounts cannot. Stick to the playbook until 5,000 followers — then we revisit.')}
     ${faq('Can I use any auto-scheduler or bot app?', 'No. Twitter detects 3rd-party automation and penalizes accounts. All posts go out manually from the X app.')}
-    ${faq('What if Twitter prompts me to verify with a phone or selfie?', 'Stop and message Justin immediately. Do not answer the prompt yourself.')}
+    ${faq('What if Twitter prompts me to verify with a phone or selfie?', 'Stop and message your supervisor immediately. Do not answer the prompt yourself.')}
     ${faq('What if a follower DMs explicit questions?', 'If polite → reply softly and casually. If aggressive or weird → ignore. Never send explicit content yourself, regardless of what they offer.')}
-    ${faq('Can I do giveaways or contests?', 'Not without checking with Justin first. Twitter has rules around giveaways that can suspend the account if you do it wrong.')}
+    ${faq('Can I do giveaways or contests?', 'Not without checking with your supervisor first. Twitter has rules around giveaways that can suspend the account if you do it wrong.')}
     ${faq('How do I tell which posting time is best for my account?', 'Try all three windows (morning, lunch, evening) over a week. The one with highest average engagement is the sweet spot. Stick to it, but check again monthly — audience habits drift.')}
   `;
 
@@ -2471,7 +2481,7 @@ function renderGuide() {
 
       <div class="gd-info" style="background: linear-gradient(135deg, rgba(245,158,11,.12), rgba(245,158,11,.04)); border-color: rgba(245,158,11,.30);">
         <div class="gd-info-eyebrow" style="color: #fbbf24;"><span class="gd-emoji">⚠️</span>IMPORTANT — Read Before You Work</div>
-        <p>If you&apos;re unsure about <strong>anything</strong> — ask Justin (<strong>@SunnyAngels_Admin</strong>) before doing it. This guide covers both how to use this dashboard AND how to run the account. The dashboard tabs (Viral Photos / Videos / Text / Creators / Bios / Strategy) are your daily tools — open them every shift.</p>
+        <p>If you&apos;re unsure about <strong>anything</strong> — ask your <strong>supervisor</strong> before doing it (or DM <strong>@erdo_ka</strong>). Justin (<strong>@SunnyAngels_Admin</strong>) is only for the link request once you reach 100 followers — everything else goes through your supervisor. The dashboard tabs (Viral Photos / Videos / Text / Bios / Strategy) are your daily tools — open them every shift.</p>
       </div>
 
       <div class="gd-chnav">${pillsHtml}</div>
