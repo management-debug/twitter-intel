@@ -1423,19 +1423,23 @@ function renderGuide() {
 
       /* Chapter pill nav */
       .gd-chnav {
-        position: sticky; top: 0; z-index: 20;
+        position: -webkit-sticky; position: sticky; top: 0; z-index: 20;
         display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px;
         padding: 14px 0; margin: 24px 0 8px;
-        background: linear-gradient(180deg, var(--gbg) 0%, var(--gbg) 70%, rgba(5,5,8,0) 100%);
-        backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+        background: rgba(5,5,8,.96);
+        -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
       }
       .gd-chtab {
         position: relative; background: var(--gsurface); border: 1px solid var(--gborder);
         border-radius: 12px; padding: 14px 16px; text-align: left; cursor: pointer;
-        transition: all .25s cubic-bezier(.4,0,.2,1); display: flex; align-items: center;
-        gap: 12px; color: var(--gtext2); font-family: inherit; overflow: hidden; text-decoration: none;
+        transition: border-color .2s ease, transform .2s ease, box-shadow .2s ease, background .2s ease;
+        display: flex; align-items: center; gap: 12px; color: var(--gtext2);
+        font-family: inherit; overflow: hidden; text-decoration: none;
+        -webkit-tap-highlight-color: transparent; touch-action: manipulation;
       }
-      .gd-chtab:hover { border-color: rgba(99,91,255,.35); transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,.25); text-decoration: none; }
+      @media (hover: hover) {
+        .gd-chtab:hover { border-color: rgba(99,91,255,.35); transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,.25); text-decoration: none; }
+      }
       .gd-chtab.active {
         border-color: var(--gaccent);
         background: linear-gradient(135deg, rgba(99,91,255,.08), rgba(34,211,238,.04));
@@ -1658,7 +1662,36 @@ function renderGuide() {
         .gd-info { padding: 18px 20px; }
         .gd-info p { font-size: 13.5px; }
         .gd-contact-handle { font-size: 18px; }
-        .gd-ci input { width: 20px; height: 20px; }
+        .gd-ci input { width: 22px; height: 22px; }
+      }
+
+      /* iOS / touch — bigger taps, no flash, no zoom on focus */
+      .gd-btn, .gd-sec-head, .gd-sec-check, .gd-chtab, .gd-faq-q, .gd-code-copy {
+        -webkit-tap-highlight-color: transparent;
+        touch-action: manipulation;
+      }
+      .gd-search { font-size: 16px; }
+      .gd-search::-webkit-search-decoration,
+      .gd-search::-webkit-search-cancel-button { -webkit-appearance: none; }
+
+      @media (max-width: 720px) {
+        .gd-chtab { min-height: 52px; }
+        .gd-sec-head { min-height: 56px; padding: 14px 14px; }
+        .gd-sec-check { width: 32px; height: 32px; }
+        .gd-ci { min-height: 44px; }
+        .gd-btn { min-height: 40px; padding: 9px 14px; font-size: 13px; }
+        .gd-faq-q { min-height: 56px; padding: 16px 18px; }
+        .gd-code-copy { padding: 8px 14px; font-size: 12px; }
+      }
+
+      /* Native iOS momentum scroll wins over JS smooth-scroll */
+      @media (hover: none) and (pointer: coarse) {
+        html { scroll-behavior: auto; }
+      }
+
+      /* Respect reduced motion */
+      @media (prefers-reduced-motion: reduce) {
+        .gd-sec-body, .gd-chtab, .gd-sec-head, .gd-faq, .gd-sec-chev, .gd-faq-q svg { transition: none; }
       }
     `;
     document.head.appendChild(style);

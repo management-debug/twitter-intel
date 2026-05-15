@@ -1791,3 +1791,144 @@ select option {
 }
 .post-card-media:hover .video-sound-btn { opacity: 1; }
 .video-sound-btn:hover { background: rgba(0,0,0,0.85); }
+
+/* ═══════════════════════════════════════════════════════════════════
+   Performance & Mobile / iOS Optimization
+═══════════════════════════════════════════════════════════════════ */
+
+/* Tap highlight + 300ms delay removal — applies to all interactive elements */
+button, a, [role="button"], input, select, textarea, label, .tab-btn, .period-btn, .btn {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+/* Prevent iOS form-zoom by ensuring inputs are at least 16px on mobile */
+@media (max-width: 768px) {
+  input[type="text"],
+  input[type="search"],
+  input[type="email"],
+  input[type="password"],
+  input[type="number"],
+  input[type="tel"],
+  input[type="url"],
+  select,
+  textarea,
+  .text-input,
+  .text-area,
+  .select-input,
+  .search-input {
+    font-size: 16px !important;
+  }
+}
+
+/* iOS safe-area: keep topnav out of the notch / dynamic island,
+   and keep content out of the home-indicator area */
+.topnav {
+  padding-left: max(20px, env(safe-area-inset-left));
+  padding-right: max(20px, env(safe-area-inset-right));
+  padding-top: env(safe-area-inset-top);
+  height: calc(var(--nav-h) + env(safe-area-inset-top));
+}
+#app {
+  padding-top: calc(var(--nav-h) + 20px + env(safe-area-inset-top));
+  padding-bottom: env(safe-area-inset-bottom);
+}
+.tab-content {
+  padding-left: max(20px, env(safe-area-inset-left));
+  padding-right: max(20px, env(safe-area-inset-right));
+}
+
+/* Bigger tap targets on touch — Apple HIG says min 44x44 */
+@media (hover: none) and (pointer: coarse) {
+  .tab-btn { padding: 9px 14px; min-height: 40px; }
+  .btn { min-height: 40px; padding: 10px 18px; }
+  .btn-sm { min-height: 36px; }
+  .period-btn { padding: 9px 14px; min-height: 36px; }
+  .watchlist-btn { padding: 9px 14px; min-height: 36px; }
+  .post-card { -webkit-tap-highlight-color: transparent; }
+  .modal-close { width: 36px; height: 36px; }
+  .video-sound-btn { width: 36px; height: 36px; font-size: 16px; opacity: 1; bottom: 8px; }
+}
+
+/* Smooth momentum scrolling on iOS for scrollable regions */
+.topnav-tabs,
+.tab-content,
+.table-wrap,
+.bios-grid,
+.posts-grid,
+.creator-posts-grid,
+.modal-overlay,
+.import-log,
+.guide-content { -webkit-overflow-scrolling: touch; }
+
+/* Hover-only rules that don't get stuck on touch.
+   The existing :hover rules above this block still apply on PC because
+   most touch devices match (hover: none) and fall through gracefully —
+   this group below disables ALL stuck hover effects on touch. */
+@media (hover: none) and (pointer: coarse) {
+  .post-card:hover,
+  .creator-card:hover,
+  .bio-chip:hover,
+  .tab-btn:hover,
+  .stat-card:hover,
+  .strategy-card:hover { transform: none; }
+  .post-card-media:hover .video-sound-btn { opacity: 1; }
+}
+
+/* Reduce backdrop-filter cost on iOS for the topnav.
+   blur(20px) on a fixed bar with scrolling content underneath is a
+   known iPhone hot path — drop it to blur(8px) on touch devices. */
+@media (hover: none) and (pointer: coarse) {
+  .topnav {
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    background: rgba(10,10,15,0.97);
+  }
+}
+
+/* GPU compositing hint for scrolling-heavy parents so iOS doesn't
+   re-rasterize cards mid-scroll. transform: translateZ(0) is the
+   classic kick. */
+.posts-grid .post-card,
+.creator-posts-grid .post-card,
+.bios-grid .bio-card { will-change: auto; }
+
+/* Content-visibility lets the browser skip layout for offscreen
+   sections — a big win when one tab has lots of cards. */
+.tab-content.hidden { content-visibility: hidden; }
+
+/* On mobile, html { scroll-behavior: smooth } can fight iOS native
+   inertia and cause jank — only enable smooth scroll on desktop. */
+@media (hover: none) and (pointer: coarse) {
+  html { scroll-behavior: auto; }
+}
+
+/* Stop iOS double-tap-to-zoom on the whole app shell */
+#app { touch-action: manipulation; }
+
+/* Sticky helpers — Safari needs the -webkit- prefix to be FIRST */
+.sticky-safari { position: -webkit-sticky; position: sticky; }
+
+/* Improve readability of overflow-x scroll bars on touch */
+.topnav-tabs { padding-bottom: 4px; }
+
+/* iPhone landscape / smaller breakpoint — keep one-handed reach */
+@media (max-width: 480px) {
+  .topnav-brand { min-width: 0; }
+  .topnav-right { min-width: 0; gap: 6px; }
+  .topnav-right .role-badge { display: none; }
+  .topnav { gap: 8px; padding-left: max(12px, env(safe-area-inset-left)); padding-right: max(12px, env(safe-area-inset-right)); }
+  .tab-content { padding: 0 max(12px, env(safe-area-inset-left)) 40px max(12px, env(safe-area-inset-right)); }
+  h1 { font-size: 22px; }
+  h2 { font-size: 16px; }
+}
+
+/* Reduce motion if requested */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
