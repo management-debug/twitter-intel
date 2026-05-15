@@ -1371,479 +1371,561 @@ function renderGuide() {
   if (!el) return;
   if (el.dataset.rendered === '1') return;
 
-  // ── Inject CSS once ────────────────────────────────────────────────
+  // ── CSS — mirrored 1:1 from sa-trendforge guide v3 ───────────────────
   if (!document.getElementById('guide-styles')) {
     const style = document.createElement('style');
     style.id = 'guide-styles';
     style.textContent = `
-      #guide-content { padding: 0; background: #181820; min-height: 100vh; }
-      .gd-layout { max-width: 1280px; margin: 0 auto; display: grid; grid-template-columns: 260px 1fr; gap: 28px; padding: 28px 32px 80px; }
-      .gd-sidebar { position: sticky; top: 16px; align-self: start; max-height: calc(100vh - 32px); overflow-y: auto; background: #20202c; border: 1px solid #3a3a4c; border-radius: 12px; padding: 22px 0; }
-      .gd-sidebar-brand { padding: 0 22px 18px; font-weight: 800; font-size: 16px; color: #82aaff; border-bottom: 1px solid #3a3a4c; margin-bottom: 14px; }
-      .gd-nav { display: flex; flex-direction: column; }
-      .gd-nav-link { display: flex; align-items: flex-start; gap: 12px; padding: 9px 22px; font-size: 13px; font-weight: 500; color: #9898a8; text-decoration: none; border-left: 3px solid transparent; transition: all .15s; line-height: 1.45; }
-      .gd-nav-link:hover, .gd-nav-link.active { color: #e0e0e8; background: rgba(130,170,255,.07); border-left-color: #82aaff; text-decoration: none; }
-      .gd-nav-num { color: #82aaff; font-weight: 700; font-size: 11px; min-width: 22px; margin-top: 2px; letter-spacing: .04em; }
-      .gd-main { min-width: 0; }
-      .gd-hero { text-align: center; padding: 36px 0 18px; }
-      .gd-hero h1 { font-size: 30px; font-weight: 800; background: linear-gradient(135deg, #82aaff, #c084fc); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 10px; line-height: 1.2; }
-      .gd-hero p { color: #9898a8; font-size: 14px; max-width: 560px; margin: 0 auto; }
-      .gd-hero .gd-updated { margin-top: 10px; font-size: 12px; color: #6c6c80; }
-      .gd-search-wrap { position: sticky; top: 0; z-index: 5; background: #181820; padding: 16px 0 12px; margin-bottom: 8px; }
-      .gd-search-input { width: 100%; padding: 11px 16px; border-radius: 10px; background: #20202c; border: 1px solid #3a3a4c; color: #e0e0e8; font-size: 14px; outline: none; box-sizing: border-box; font-family: inherit; }
-      .gd-search-input:focus { border-color: #82aaff; box-shadow: 0 0 0 3px rgba(130,170,255,.15); }
-      .gd-search-input::placeholder { color: #6c6c80; }
-      .gd-no-results { color: #6c6c80; text-align: center; padding: 32px 0; font-size: 14px; }
-      .gd-quickwins { background: linear-gradient(135deg, rgba(130,170,255,.13), rgba(192,132,252,.10)); border: 1px solid rgba(130,170,255,.32); border-radius: 12px; padding: 26px 28px 22px; margin: 10px 0 30px; }
-      .gd-quickwins h2 { color: #82aaff; font-size: 19px; font-weight: 800; margin-bottom: 14px; }
-      .gd-quickwins ol { padding-left: 22px; margin: 0; }
-      .gd-quickwins li { margin-bottom: 9px; font-size: 14px; color: #e0e0e8; line-height: 1.55; }
-      .gd-quickwins li strong { color: #fff; }
-      .gd-section { background: #20202c; border: 1px solid #3a3a4c; border-radius: 12px; margin-bottom: 18px; overflow: hidden; }
-      .gd-section-header { display: flex; align-items: center; gap: 14px; padding: 18px 24px; cursor: pointer; user-select: none; transition: background .15s; }
-      .gd-section-header:hover { background: rgba(130,170,255,.05); }
-      .gd-section-header h2 { font-size: 17px; font-weight: 700; flex: 1; color: #e0e0e8; margin: 0; }
-      .gd-chevron { width: 20px; height: 20px; transition: transform .25s; color: #9898a8; flex-shrink: 0; }
-      .gd-section.open .gd-chevron { transform: rotate(180deg); }
-      .gd-section-body { max-height: 0; overflow: hidden; transition: max-height .4s ease; }
-      .gd-section.open .gd-section-body { max-height: 100000px; }
-      .gd-section-content { padding: 4px 28px 30px; }
-      .gd-section-content h3 { font-size: 16px; font-weight: 700; color: #82aaff; margin: 24px 0 10px; padding-bottom: 6px; border-bottom: 1px solid #3a3a4c; }
-      .gd-section-content h3:first-child { margin-top: 0; }
-      .gd-section-content h4 { font-size: 14.5px; font-weight: 700; color: #fff; margin: 18px 0 8px; }
-      .gd-section-content p { font-size: 14.5px; color: #e0e0e8; margin-bottom: 10px; line-height: 1.65; }
-      .gd-section-content ul, .gd-section-content ol { padding-left: 22px; margin: 0 0 14px; }
-      .gd-section-content li { font-size: 14.5px; color: #e0e0e8; margin-bottom: 5px; line-height: 1.65; }
-      .gd-section-content strong { color: #fff; font-weight: 600; }
-      .gd-section-content em { color: #c4cdd5; font-style: normal; background: rgba(130,170,255,.08); padding: 1px 5px; border-radius: 3px; font-size: 13.5px; }
-      .gd-section-content code { background: rgba(130,170,255,.12); color: #fff; padding: 2px 6px; border-radius: 4px; font-family: 'SF Mono','Monaco','Consolas',monospace; font-size: 13px; border: 1px solid rgba(130,170,255,.18); }
-      .gd-alert { background: rgba(255,100,100,.10); border: 2px solid #ff6464; border-radius: 10px; padding: 16px 20px; font-size: 14.5px; font-weight: 600; color: #ff6464; margin: 14px 0; line-height: 1.55; display: flex; gap: 10px; align-items: flex-start; }
-      .gd-alert .gd-alert-icon { font-size: 18px; flex-shrink: 0; }
-      .gd-alert .gd-alert-body { flex: 1; color: #e0e0e8; font-weight: 500; }
-      .gd-alert .gd-alert-body strong { color: #ff6464; font-weight: 700; }
-      .gd-alert.warn { border-color: #ffd250; background: rgba(255,210,80,.10); }
-      .gd-alert.warn .gd-alert-body strong { color: #ffd250; }
-      .gd-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; margin: 14px 0; border-radius: 10px; border: 1px solid #3a3a4c; }
-      .gd-table { width: 100%; border-collapse: collapse; font-size: 13.5px; min-width: 380px; }
-      .gd-table thead { background: rgba(130,170,255,.08); }
-      .gd-table th { text-align: left; padding: 11px 14px; font-weight: 700; color: #82aaff; font-size: 12.5px; text-transform: uppercase; letter-spacing: .04em; white-space: nowrap; }
-      .gd-table td { padding: 10px 14px; border-top: 1px solid #3a3a4c; color: #e0e0e8; vertical-align: top; }
-      .gd-table tbody tr:nth-child(even) td { background: rgba(130,170,255,.03); }
-      .gd-table tr:hover td { background: rgba(130,170,255,.06); }
-      .gd-table strong { color: #fff; }
-      .gd-card { background: #2c2c3c; border: 1px solid #3a3a4c; border-radius: 10px; padding: 16px 18px; margin: 12px 0; }
-      .gd-card .gd-card-title { font-size: 15px; font-weight: 700; margin-bottom: 8px; color: #fff; }
-      .gd-card-green { background: rgba(100,220,160,.07); border-color: rgba(100,220,160,.45); }
-      .gd-card-green .gd-card-title { color: #64dca0; }
-      .gd-card-red { background: rgba(255,100,100,.07); border-color: rgba(255,100,100,.45); }
-      .gd-card-red .gd-card-title { color: #ff6464; }
-      .gd-card-yellow { background: rgba(255,210,80,.07); border-color: rgba(255,210,80,.45); }
-      .gd-card-yellow .gd-card-title { color: #ffd250; }
-      .gd-card-blue { background: rgba(130,170,255,.07); border-color: rgba(130,170,255,.45); }
-      .gd-card-blue .gd-card-title { color: #82aaff; }
-      .gd-card-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 12px 0; }
-      .gd-cta { background: linear-gradient(135deg, rgba(100,220,160,.14), rgba(100,220,160,.06)); border: 2px solid #64dca0; border-radius: 12px; padding: 22px 24px; margin: 16px 0; }
-      .gd-cta .gd-cta-title { font-size: 17px; font-weight: 800; color: #64dca0; margin-bottom: 10px; }
-      .gd-cta .gd-cta-item { padding: 4px 0; font-size: 14.5px; font-weight: 600; color: #fff; }
-      .gd-cta .gd-cta-note { margin-top: 11px; font-weight: 600; color: #ffd250; font-size: 13.5px; }
-      .gd-stat { background: rgba(130,170,255,.08); border: 1px solid rgba(130,170,255,.32); border-radius: 8px; padding: 14px 18px; margin: 12px 0; font-size: 14px; font-weight: 600; color: #82aaff; }
-      .gd-stat strong { color: #fff; }
-      .gd-scenario { display: flex; align-items: flex-start; gap: 14px; background: #2c2c3c; border-radius: 10px; padding: 14px 16px; margin: 10px 0; border-left: 3px solid #82aaff; }
-      .gd-scenario-icon { font-size: 22px; flex-shrink: 0; line-height: 1; }
-      .gd-scenario-body { flex: 1; }
-      .gd-scenario-body strong { display: block; margin-bottom: 5px; font-size: 14px; color: #fff; }
-      .gd-scenario-body p { font-size: 13.5px; color: #c4cdd5; margin: 0; line-height: 1.55; }
-      .gd-scenario.green { border-left-color: #64dca0; }
-      .gd-scenario.yellow { border-left-color: #ffd250; }
-      .gd-scenario.red { border-left-color: #ff6464; }
-      .gd-scenario.blue { border-left-color: #82aaff; }
-      .gd-step { background: #2c2c3c; border: 1px solid #3a3a4c; border-radius: 10px; padding: 16px 18px; margin: 12px 0; border-left: 4px solid #82aaff; }
-      .gd-step-label { font-size: 12px; font-weight: 800; color: #82aaff; text-transform: uppercase; letter-spacing: .08em; margin-bottom: 6px; }
-      .gd-step h4 { margin-top: 0 !important; }
-      .gd-step p { margin-bottom: 0; }
-      .gd-contact { background: linear-gradient(135deg, rgba(130,170,255,.16), rgba(130,170,255,.05)); border: 1px solid rgba(130,170,255,.45); border-radius: 12px; padding: 18px 22px; margin: 16px 0; }
-      .gd-contact-label { font-size: 11px; font-weight: 700; color: #82aaff; text-transform: uppercase; letter-spacing: .08em; margin-bottom: 4px; }
-      .gd-contact-handle { font-size: 18px; font-weight: 700; color: #fff; margin-bottom: 6px; word-break: break-word; }
-      .gd-contact-desc { font-size: 13.5px; color: #c4cdd5; line-height: 1.55; margin: 0; }
-      .gd-code { background: #181820; border: 1px solid #3a3a4c; border-radius: 10px; overflow: hidden; margin: 14px 0; }
-      .gd-code-header { background: #20202c; padding: 7px 16px; font-size: 11px; color: #9898a8; text-transform: uppercase; letter-spacing: .08em; font-weight: 600; }
-      .gd-code-line { display: flex; align-items: center; justify-content: space-between; padding: 8px 16px; border-top: 1px solid #2c2c3c; gap: 10px; }
+      #guide-content {
+        --gbg: #050508;
+        --gbg2: #09090f;
+        --gsurface: rgba(18, 18, 32, 0.9);
+        --gsurface2: rgba(28, 28, 48, 0.65);
+        --gborder: rgba(255, 255, 255, 0.07);
+        --gborder-hover: rgba(255, 255, 255, 0.13);
+        --gtext: #eaeaf2;
+        --gtext2: #7e7e9a;
+        --gtext3: #4a4a66;
+        --gaccent: #635bff;
+        --gaccent2: #22d3ee;
+        background: var(--gbg);
+        background-image:
+          radial-gradient(ellipse 90% 60% at 50% -30%, rgba(99, 91, 255, 0.07), transparent),
+          radial-gradient(ellipse 70% 50% at 85% -10%, rgba(34, 211, 238, 0.04), transparent);
+        background-attachment: fixed;
+        min-height: 100vh;
+        padding: 0;
+      }
+      .gd-wrap { max-width: 920px; margin: 0 auto; padding: 28px 24px 80px; }
+
+      /* Hero */
+      .gd-hero { text-align: center; padding: 16px 0 26px; }
+      .gd-hero h1 {
+        font-size: 36px; font-weight: 800; line-height: 1.15; margin: 0 0 14px; letter-spacing: -0.5px;
+        background: linear-gradient(135deg, #ff6b8a 0%, #635bff 45%, #22d3ee 100%);
+        -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+      }
+      .gd-hero p { color: var(--gtext2); font-size: 14px; line-height: 1.65; max-width: 620px; margin: 0 auto; }
+
+      /* Welcome / Important info blocks */
+      .gd-info {
+        background: linear-gradient(135deg, rgba(99,91,255,.08) 0%, rgba(34,211,238,.04) 100%);
+        border: 1px solid var(--gborder);
+        border-radius: 18px;
+        padding: 22px 26px;
+        margin: 18px 0;
+      }
+      .gd-info-eyebrow { font-size: 11px; font-weight: 700; letter-spacing: 2px; color: var(--gaccent2); text-transform: uppercase; margin-bottom: 8px; display: flex; align-items: center; gap: 9px; }
+      .gd-info-eyebrow .gd-emoji { font-size: 16px; letter-spacing: 0; }
+      .gd-info p { color: #bbb; font-size: 14px; line-height: 1.7; margin: 6px 0; }
+      .gd-info p strong { color: #fff; }
+      .gd-info .gd-hl { color: var(--gaccent2); font-weight: 700; }
+
+      /* Chapter pill nav */
+      .gd-chnav {
+        position: sticky; top: 0; z-index: 20;
+        display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px;
+        padding: 14px 0; margin: 24px 0 8px;
+        background: linear-gradient(180deg, var(--gbg) 0%, var(--gbg) 70%, rgba(5,5,8,0) 100%);
+        backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+      }
+      .gd-chtab {
+        position: relative; background: var(--gsurface); border: 1px solid var(--gborder);
+        border-radius: 12px; padding: 14px 16px; text-align: left; cursor: pointer;
+        transition: all .25s cubic-bezier(.4,0,.2,1); display: flex; align-items: center;
+        gap: 12px; color: var(--gtext2); font-family: inherit; overflow: hidden; text-decoration: none;
+      }
+      .gd-chtab:hover { border-color: rgba(99,91,255,.35); transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,.25); text-decoration: none; }
+      .gd-chtab.active {
+        border-color: var(--gaccent);
+        background: linear-gradient(135deg, rgba(99,91,255,.08), rgba(34,211,238,.04));
+        color: var(--gtext);
+      }
+      .gd-chtab-icon { font-size: 22px; line-height: 1; flex-shrink: 0; }
+      .gd-chtab-txt { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+      .gd-chtab-title { font-size: 14px; font-weight: 700; color: var(--gtext); line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+      .gd-chtab-sub { font-size: 11px; color: var(--gtext3); line-height: 1.3; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+      /* Action bar */
+      .gd-ctrl { display: flex; gap: 8px; margin: 6px 0 18px; flex-wrap: wrap; }
+      .gd-btn { background: var(--gsurface); border: 1px solid var(--gborder); color: var(--gtext2); padding: 7px 13px; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; font-family: inherit; transition: all .15s; }
+      .gd-btn:hover { border-color: var(--gaccent); color: var(--gtext); }
+
+      /* Search */
+      .gd-search { width: 100%; padding: 12px 16px; border-radius: 10px; background: var(--gsurface); border: 1px solid var(--gborder); color: var(--gtext); font-size: 14px; outline: none; box-sizing: border-box; font-family: inherit; margin: 8px 0 14px; }
+      .gd-search:focus { border-color: var(--gaccent); }
+      .gd-search::placeholder { color: var(--gtext3); }
+
+      /* Chapter container */
+      .gd-chapter { margin-bottom: 40px; scroll-margin-top: 110px; }
+      .gd-chapter-head {
+        display: flex; align-items: center; gap: 18px;
+        padding: 24px 28px; margin-bottom: 16px;
+        background: linear-gradient(135deg, rgba(99,91,255,.08) 0%, rgba(34,211,238,.04) 100%);
+        border: 1px solid var(--gborder); border-radius: 18px;
+        position: relative; overflow: hidden;
+      }
+      .gd-chapter-head::before {
+        content: ''; position: absolute; inset: 0;
+        background: radial-gradient(ellipse 60% 80% at 100% 0%, rgba(99,91,255,.12), transparent);
+        pointer-events: none;
+      }
+      .gd-chapter-icon { font-size: 44px; line-height: 1; flex-shrink: 0; filter: drop-shadow(0 4px 12px rgba(0,0,0,.4)); }
+      .gd-chapter-eyebrow { font-size: 11px; font-weight: 700; letter-spacing: 2px; color: var(--gaccent2); text-transform: uppercase; margin-bottom: 2px; }
+      .gd-chapter-title { font-size: 26px; font-weight: 800; color: var(--gtext); margin: 0; letter-spacing: -0.5px; line-height: 1.2; }
+      .gd-chapter-subtitle { font-size: 13px; color: var(--gtext3); margin-top: 4px; }
+
+      /* Section card */
+      .gd-sec { background: transparent; border: none; padding: 0; margin-bottom: 12px; scroll-margin-top: 110px; }
+      .gd-sec-head {
+        cursor: pointer; user-select: none;
+        padding: 14px 18px; background: var(--gsurface);
+        border: 1px solid var(--gborder); border-radius: 12px;
+        display: flex; align-items: center; gap: 12px;
+        transition: all .15s; position: relative;
+      }
+      .gd-sec-head:hover { border-color: rgba(99,91,255,.35); }
+      .gd-sec-check {
+        width: 24px; height: 24px; border-radius: 50%;
+        border: 2px solid var(--gborder); background: transparent;
+        color: #4caf50; font-size: 13px; font-weight: 700;
+        cursor: pointer; display: flex; align-items: center; justify-content: center;
+        padding: 0; flex-shrink: 0; transition: all .15s;
+      }
+      .gd-sec-check:hover { border-color: #4caf50; }
+      .gd-sec-check.done { background: #4caf50; border-color: #4caf50; color: #fff; }
+      .gd-sec-num {
+        background: linear-gradient(135deg, var(--gaccent) 0%, var(--gaccent2) 100%);
+        color: white; width: 48px; height: 48px; border-radius: 14px;
+        display: flex; align-items: center; justify-content: center;
+        font-weight: 800; font-size: 19px; flex-shrink: 0;
+      }
+      .gd-sec-title { font-size: 17px; font-weight: 700; margin: 0; flex: 1; color: #fff; }
+      .gd-sec-chev { font-size: 18px; color: var(--gtext3); transition: transform .25s; margin-left: auto; flex-shrink: 0; }
+      .gd-sec.collapsed .gd-sec-chev { transform: rotate(-90deg); }
+      .gd-sec-body {
+        overflow: hidden; max-height: 20000px;
+        transition: max-height .35s ease, opacity .2s ease, padding .25s ease;
+        opacity: 1; padding: 20px 4px 8px;
+      }
+      .gd-sec.collapsed .gd-sec-body { max-height: 0; opacity: 0; padding-top: 0; padding-bottom: 0; }
+
+      /* Section body typography */
+      .gd-sec-body h3 { font-size: 17px; font-weight: 700; margin: 22px 0 14px; color: var(--gaccent2); display: flex; align-items: center; gap: 10px; }
+      .gd-sec-body h4 { margin: 16px 0 8px; font-size: 15px; color: #fff; }
+      .gd-sec-body p { color: #bbb; line-height: 1.7; margin: 0 0 14px; font-size: 14.5px; }
+      .gd-sec-body p strong, .gd-sec-body li strong { color: #fff; }
+      .gd-sec-body ul, .gd-sec-body ol { margin: 14px 0; padding-left: 24px; }
+      .gd-sec-body li { color: #bbb; line-height: 1.65; margin-bottom: 8px; font-size: 14.5px; }
+      .gd-sec-body em { color: #eaeaf2; background: rgba(99,91,255,.10); padding: 2px 6px; border-radius: 5px; font-style: normal; font-size: 13.5px; }
+      .gd-sec-body code { background: rgba(99,91,255,.12); color: #fff; padding: 2px 7px; border-radius: 5px; font-family: 'SF Mono','Monaco','Consolas',monospace; font-size: 12.5px; border: 1px solid rgba(99,91,255,.22); }
+
+      /* Alerts */
+      .gd-alert { padding: 18px 22px; border-radius: 14px; margin: 20px 0; display: flex; gap: 14px; align-items: flex-start; line-height: 1.6; }
+      .gd-alert-icon { font-size: 22px; flex-shrink: 0; }
+      .gd-alert-body { flex: 1; font-size: 14px; color: #c4c4d6; }
+      .gd-alert-body strong { display: block; margin-bottom: 5px; font-size: 14.5px; }
+      .gd-alert.red { background: rgba(99,91,255,.10); border: 1px solid rgba(99,91,255,.30); }
+      .gd-alert.red .gd-alert-body strong { color: #ff6b8a; }
+      .gd-alert.green { background: rgba(34,197,94,.12); border: 1px solid rgba(34,197,94,.30); }
+      .gd-alert.green .gd-alert-body strong { color: #4ade80; }
+      .gd-alert.blue { background: rgba(34,211,238,.10); border: 1px solid rgba(34,211,238,.25); }
+      .gd-alert.blue .gd-alert-body strong { color: #22d3ee; }
+      .gd-alert.yellow { background: rgba(245,158,11,.12); border: 1px solid rgba(245,158,11,.30); }
+      .gd-alert.yellow .gd-alert-body strong { color: #fbbf24; }
+
+      /* Numbered steps */
+      .gd-step { display: flex; gap: 15px; margin: 12px 0; padding: 16px 18px; background: rgba(26,26,34,.8); border-radius: 12px; align-items: flex-start; }
+      .gd-step-num {
+        background: linear-gradient(135deg, var(--gaccent) 0%, var(--gaccent2) 100%);
+        color: white; min-width: 30px; height: 30px; border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        font-weight: 700; font-size: 13px; flex-shrink: 0;
+      }
+      .gd-step-body { flex: 1; color: #bbb; line-height: 1.65; font-size: 14px; }
+      .gd-step-body strong { color: #fff; }
+
+      /* DO / DON'T grid */
+      .gd-dodont { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin: 24px 0; }
+      .gd-do, .gd-dont { padding: 22px; border-radius: 14px; }
+      .gd-do { background: rgba(34,197,94,.08); border: 1px solid rgba(34,197,94,.30); }
+      .gd-do h4 { color: #4ade80; margin-bottom: 14px; font-size: 16px; }
+      .gd-dont { background: rgba(99,91,255,.08); border: 1px solid rgba(99,91,255,.30); }
+      .gd-dont h4 { color: #ff6b8a; margin-bottom: 14px; font-size: 16px; }
+      .gd-do ul, .gd-dont ul { padding-left: 20px; margin: 0; }
+      .gd-do li, .gd-dont li { color: #ccc; margin-bottom: 10px; line-height: 1.55; font-size: 14px; }
+
+      /* Checklist */
+      .gd-checklist { background: rgba(26,26,34,.8); border-radius: 14px; padding: 20px 24px; margin: 20px 0; }
+      .gd-checklist h4 { color: var(--gaccent2); font-weight: 700; margin-bottom: 12px; display: flex; align-items: center; gap: 10px; font-size: 15px; }
+      .gd-ci { display: flex; gap: 12px; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,.06); color: #ccc; align-items: center; line-height: 1.5; font-size: 14px; }
+      .gd-ci:last-child { border-bottom: none; }
+      .gd-ci input { width: 18px; height: 18px; accent-color: var(--gaccent); cursor: pointer; flex-shrink: 0; }
+      .gd-ci.done label { color: #6a6a85; text-decoration: line-through; }
+      .gd-ci label { flex: 1; cursor: pointer; }
+
+      /* Tables */
+      .gd-tbl-wrap { overflow-x: auto; margin: 16px 0; border-radius: 12px; border: 1px solid var(--gborder); }
+      .gd-tbl { width: 100%; border-collapse: collapse; font-size: 13.5px; min-width: 380px; }
+      .gd-tbl thead { background: linear-gradient(90deg, rgba(99,91,255,.10), rgba(34,211,238,.06)); }
+      .gd-tbl th { text-align: left; padding: 12px 14px; color: var(--gaccent2); font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: .06em; }
+      .gd-tbl td { padding: 11px 14px; color: #c4c4d6; border-top: 1px solid var(--gborder); }
+      .gd-tbl td strong { color: #fff; }
+      .gd-tbl tr:hover td { background: rgba(99,91,255,.04); }
+
+      /* Code blocks */
+      .gd-code { background: rgba(10,10,16,.6); border: 1px solid var(--gborder); border-radius: 12px; overflow: hidden; margin: 16px 0; }
+      .gd-code-hdr { display: flex; justify-content: space-between; align-items: center; padding: 9px 14px; background: rgba(0,0,0,.3); border-bottom: 1px solid var(--gborder); }
+      .gd-code-hdr-label { font-size: 11px; color: var(--gtext2); text-transform: uppercase; letter-spacing: .08em; font-weight: 700; }
+      .gd-code-copy { background: transparent; border: 1px solid var(--gborder); color: var(--gtext2); padding: 4px 12px; border-radius: 6px; font-size: 11px; cursor: pointer; transition: all .15s; font-family: inherit; }
+      .gd-code-copy:hover { border-color: var(--gaccent); color: var(--gtext); }
+      .gd-code-line { display: flex; justify-content: space-between; align-items: center; padding: 9px 14px; border-top: 1px solid rgba(255,255,255,.04); gap: 10px; }
       .gd-code-line:first-of-type { border-top: none; }
-      .gd-code-line span { font-family: 'SF Mono','Monaco','Consolas',monospace; font-size: 13px; color: #e0e0e8; flex: 1; word-break: break-word; }
-      .gd-code-copy { flex-shrink: 0; background: none; border: 1px solid #3a3a4c; color: #9898a8; padding: 4px 10px; border-radius: 5px; font-size: 11px; cursor: pointer; transition: all .15s; font-family: inherit; }
-      .gd-code-copy:hover { border-color: #82aaff; color: #82aaff; }
-      .gd-caption-cat { margin-bottom: 22px; }
-      .gd-caption-cat h4 { margin: 0 0 10px !important; font-size: 12px !important; font-weight: 700; color: #82aaff !important; text-transform: uppercase; letter-spacing: .08em; }
-      .gd-caption-item { display: flex; align-items: center; justify-content: space-between; background: #2c2c3c; border: 1px solid #3a3a4c; border-radius: 7px; padding: 9px 13px; margin-bottom: 7px; gap: 10px; transition: border-color .15s; }
-      .gd-caption-item:hover { border-color: #82aaff; }
-      .gd-caption-item span { font-size: 13.5px; color: #e0e0e8; flex: 1; }
-      .gd-caption-copy { flex-shrink: 0; background: none; border: 1px solid #3a3a4c; color: #9898a8; padding: 4px 11px; border-radius: 5px; font-size: 11px; cursor: pointer; transition: all .15s; font-family: inherit; }
-      .gd-caption-copy:hover { border-color: #82aaff; color: #82aaff; }
-      .gd-checklist { list-style: none; padding-left: 0 !important; margin: 10px 0 16px; }
-      .gd-checklist li { padding: 7px 0 7px 32px; position: relative; font-size: 14px; color: #e0e0e8; line-height: 1.5; display: flex; align-items: flex-start; gap: 10px; }
-      .gd-checklist input[type=checkbox] { margin-top: 3px; flex-shrink: 0; accent-color: #82aaff; width: 16px; height: 16px; cursor: pointer; }
-      .gd-checklist li { padding-left: 0; }
-      .gd-checklist li.checked label { color: #6c6c80; text-decoration: line-through; }
-      .gd-faq-item { background: #2c2c3c; border: 1px solid #3a3a4c; border-radius: 10px; margin: 8px 0; overflow: hidden; }
-      .gd-faq-q { padding: 14px 18px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-weight: 700; font-size: 14.5px; color: #e0e0e8; user-select: none; transition: background .15s; }
-      .gd-faq-q:hover { background: rgba(130,170,255,.05); }
-      .gd-faq-q .gd-faq-icon { width: 18px; height: 18px; color: #9898a8; transition: transform .25s; flex-shrink: 0; margin-left: 12px; }
-      .gd-faq-item.open .gd-faq-q .gd-faq-icon { transform: rotate(180deg); }
+      .gd-code-line span { font-family: 'SF Mono','Monaco','Consolas',monospace; font-size: 13px; color: #c4c4d6; flex: 1; word-break: break-word; }
+
+      /* Caption items */
+      .gd-cap-cat { margin-bottom: 22px; }
+      .gd-cap-cat h4 { color: var(--gaccent2) !important; text-transform: uppercase; letter-spacing: .08em; font-size: 12.5px !important; margin-bottom: 12px !important; display: flex; align-items: center; gap: 8px; }
+      .gd-cap-item { display: flex; justify-content: space-between; align-items: center; background: rgba(26,26,34,.7); border: 1px solid var(--gborder); border-radius: 10px; padding: 11px 15px; margin-bottom: 7px; gap: 10px; transition: all .15s; }
+      .gd-cap-item:hover { border-color: var(--gaccent); transform: translateX(2px); }
+      .gd-cap-item span { font-size: 13.5px; color: #c4c4d6; flex: 1; }
+
+      /* Scenario chips */
+      .gd-scen { display: flex; gap: 14px; align-items: flex-start; background: rgba(26,26,34,.7); border: 1px solid var(--gborder); border-radius: 12px; padding: 14px 18px; margin: 10px 0; }
+      .gd-scen-dot { width: 14px; height: 14px; border-radius: 50%; flex-shrink: 0; margin-top: 5px; }
+      .gd-scen-body { flex: 1; font-size: 14px; color: #bbb; line-height: 1.6; }
+      .gd-scen-body strong { display: block; color: #fff; font-size: 14.5px; margin-bottom: 3px; }
+      .gd-scen.green .gd-scen-dot { background: #4ade80; box-shadow: 0 0 14px rgba(74,222,128,.5); }
+      .gd-scen.yellow .gd-scen-dot { background: #fbbf24; box-shadow: 0 0 14px rgba(251,191,36,.5); }
+      .gd-scen.blue .gd-scen-dot { background: #22d3ee; box-shadow: 0 0 14px rgba(34,211,238,.5); }
+      .gd-scen.red .gd-scen-dot { background: #ff6b8a; box-shadow: 0 0 14px rgba(255,107,138,.5); }
+
+      /* Contact card */
+      .gd-contact {
+        background: linear-gradient(135deg, rgba(99,91,255,.18) 0%, rgba(34,211,238,.10) 100%);
+        border: 1px solid rgba(99,91,255,.45);
+        border-radius: 14px; padding: 20px 24px; margin: 18px 0;
+        position: relative; overflow: hidden;
+      }
+      .gd-contact::before {
+        content: ''; position: absolute; inset: 0;
+        background: radial-gradient(ellipse 60% 100% at 100% 0%, rgba(34,211,238,.14), transparent);
+        pointer-events: none;
+      }
+      .gd-contact-label { font-size: 11px; font-weight: 700; letter-spacing: 1.5px; color: var(--gaccent2); text-transform: uppercase; margin-bottom: 6px; position: relative; }
+      .gd-contact-handle { font-size: 22px; font-weight: 800; color: #fff; margin-bottom: 8px; word-break: break-word; position: relative; }
+      .gd-contact-desc { font-size: 14px; color: #c4c4d6; line-height: 1.6; margin: 0; position: relative; }
+
+      /* FAQ */
+      .gd-faq { background: rgba(26,26,34,.7); border: 1px solid var(--gborder); border-radius: 12px; margin: 8px 0; overflow: hidden; }
+      .gd-faq-q { padding: 16px 20px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-weight: 600; font-size: 14.5px; color: var(--gtext); user-select: none; transition: background .15s; gap: 14px; }
+      .gd-faq-q:hover { background: rgba(99,91,255,.05); }
+      .gd-faq-q svg { width: 18px; height: 18px; color: var(--gtext3); transition: transform .25s; flex-shrink: 0; }
+      .gd-faq.open .gd-faq-q svg { transform: rotate(180deg); color: var(--gaccent2); }
       .gd-faq-a { max-height: 0; overflow: hidden; transition: max-height .3s ease; }
-      .gd-faq-a-inner { padding: 0 18px 16px; font-size: 14px; color: #c4cdd5; line-height: 1.65; }
-      .gd-footer { text-align: center; padding: 30px 0 20px; color: #6c6c80; font-size: 12.5px; border-top: 1px solid #3a3a4c; margin-top: 36px; }
-      .gd-section.search-hidden { display: none; }
-      .gd-highlight { background: rgba(130,170,255,.25); border-radius: 2px; padding: 0 2px; }
-      @media (max-width: 980px) {
-        .gd-layout { grid-template-columns: 1fr; padding: 18px 14px 60px; gap: 18px; }
-        .gd-sidebar { position: relative; top: 0; max-height: none; overflow: hidden; padding: 16px 0; }
-        .gd-sidebar-brand { padding: 0 18px 14px; font-size: 14px; }
-        .gd-nav { flex-direction: row; flex-wrap: wrap; gap: 4px; padding: 0 14px; }
-        .gd-nav-link { padding: 7px 11px; font-size: 12.5px; border-left: none; border-radius: 6px; flex: 0 0 auto; background: #181820; border: 1px solid #3a3a4c; }
-        .gd-nav-link:hover, .gd-nav-link.active { background: rgba(130,170,255,.12); border-left: 1px solid #82aaff; border-color: #82aaff; }
-        .gd-nav-num { min-width: 0; font-size: 11px; }
-        .gd-hero { padding: 16px 0 12px; }
-        .gd-hero h1 { font-size: 22px; }
-        .gd-section-header { padding: 14px 16px; gap: 10px; }
-        .gd-section-header h2 { font-size: 15px; }
-        .gd-section-content { padding: 4px 16px 22px; }
-        .gd-section-content h3 { font-size: 14.5px; }
-        .gd-section-content p, .gd-section-content li { font-size: 14px; }
-        .gd-card-grid { grid-template-columns: 1fr; }
-        .gd-quickwins { padding: 20px 18px 16px; }
-        .gd-quickwins h2 { font-size: 17px; }
-        .gd-step { padding: 14px 16px; }
-        .gd-cta { padding: 18px 20px; }
-        .gd-table { font-size: 12.5px; }
-        .gd-table th, .gd-table td { padding: 8px 10px; }
-        .gd-caption-copy, .gd-code-copy { padding: 6px 12px; font-size: 12px; }
-        .gd-checklist input[type=checkbox] { width: 18px; height: 18px; }
+      .gd-faq-a-inner { padding: 0 20px 18px; font-size: 14px; color: #b5b5c8; line-height: 1.7; }
+
+      /* Footer */
+      .gd-footer { text-align: center; padding: 40px 0 20px; color: var(--gtext3); font-size: 12px; margin-top: 40px; }
+
+      /* Hidden during search */
+      .gd-sec.hidden { display: none; }
+
+      /* Mobile */
+      @media (max-width: 720px) {
+        .gd-wrap { padding: 18px 14px 60px; }
+        .gd-hero h1 { font-size: 26px; }
+        .gd-hero p { font-size: 13.5px; }
+        .gd-chnav { grid-template-columns: repeat(2, 1fr); padding: 10px 0; gap: 7px; overflow-x: visible; }
+        .gd-chtab { padding: 10px 12px; }
+        .gd-chtab-icon { font-size: 18px; }
+        .gd-chtab-title { font-size: 12.5px; }
+        .gd-chtab-sub { font-size: 10.5px; }
+        .gd-chapter-head { padding: 18px 20px; gap: 14px; border-radius: 14px; }
+        .gd-chapter-icon { font-size: 32px; }
+        .gd-chapter-title { font-size: 19px; }
+        .gd-chapter-subtitle { font-size: 12px; }
+        .gd-sec-head { padding: 12px 14px; gap: 10px; }
+        .gd-sec-num { width: 40px; height: 40px; font-size: 16px; border-radius: 12px; }
+        .gd-sec-title { font-size: 15px; }
+        .gd-sec-body { padding: 16px 4px 4px; }
+        .gd-sec-body p, .gd-sec-body li { font-size: 14px; }
+        .gd-dodont { grid-template-columns: 1fr; gap: 14px; }
+        .gd-do, .gd-dont { padding: 16px 18px; }
+        .gd-tbl { font-size: 12.5px; }
+        .gd-tbl th, .gd-tbl td { padding: 9px 11px; }
+        .gd-step { padding: 13px 15px; gap: 12px; }
+        .gd-info { padding: 18px 20px; }
+        .gd-info p { font-size: 13.5px; }
+        .gd-contact-handle { font-size: 18px; }
+        .gd-ci input { width: 20px; height: 20px; }
       }
     `;
     document.head.appendChild(style);
   }
 
-  // ── Helpers ────────────────────────────────────────────────────────
-  function alertBanner(html, critical) {
-    const cls = critical ? 'gd-alert' : 'gd-alert warn';
-    const icon = critical ? '🚨' : '⚠️';
-    return `<div class="${cls}"><span class="gd-alert-icon">${icon}</span><div class="gd-alert-body">${html}</div></div>`;
+  // ── Helpers ──────────────────────────────────────────────────────────
+  function alert_(color, body) {
+    const icon = { red: '🚨', green: '✅', blue: '💡', yellow: '⚠️' }[color] || '💡';
+    return `<div class="gd-alert ${color}"><span class="gd-alert-icon">${icon}</span><div class="gd-alert-body">${body}</div></div>`;
   }
-
-  function card(color, title, body) {
-    const colorCls = color ? ` gd-card-${color}` : '';
-    const titleHtml = title ? `<div class="gd-card-title">${title}</div>` : '';
-    return `<div class="gd-card${colorCls}">${titleHtml}${body}</div>`;
+  function step(num, body) {
+    return `<div class="gd-step"><div class="gd-step-num">${num}</div><div class="gd-step-body">${body}</div></div>`;
   }
-
-  function cardGrid(cards) {
-    return `<div class="gd-card-grid">${cards.join('')}</div>`;
+  function doDont(doTitle, doItems, dontTitle, dontItems) {
+    return `<div class="gd-dodont">
+      <div class="gd-do"><h4>✅ ${doTitle}</h4><ul>${doItems.map(i => `<li>${i}</li>`).join('')}</ul></div>
+      <div class="gd-dont"><h4>❌ ${dontTitle}</h4><ul>${dontItems.map(i => `<li>${i}</li>`).join('')}</ul></div>
+    </div>`;
   }
-
-  function ctaBox(title, items, note) {
-    const itemsHtml = items.map(i => `<div class="gd-cta-item">→ ${i}</div>`).join('');
-    const noteHtml = note ? `<div class="gd-cta-note">${note}</div>` : '';
-    return `<div class="gd-cta"><div class="gd-cta-title">${title}</div>${itemsHtml}${noteHtml}</div>`;
+  function scen(color, label, body) {
+    return `<div class="gd-scen ${color}"><div class="gd-scen-dot"></div><div class="gd-scen-body"><strong>${label}</strong>${body}</div></div>`;
   }
-
-  function scenario(color, icon, title, body) {
-    return `<div class="gd-scenario ${color}"><div class="gd-scenario-icon">${icon}</div><div class="gd-scenario-body"><strong>${title}</strong><p>${body}</p></div></div>`;
-  }
-
-  function fixStep(label, title, body) {
-    const titleHtml = title ? `<h4>${title}</h4>` : '';
-    const bodyHtml = typeof body === 'string' ? `<p>${body}</p>` : body;
-    return `<div class="gd-step"><div class="gd-step-label">${label}</div>${titleHtml}${bodyHtml}</div>`;
-  }
-
-  function statHighlight(html) {
-    return `<div class="gd-stat">${html}</div>`;
-  }
-
-  function contactCard(label, handle, desc) {
-    return `<div class="gd-contact"><div class="gd-contact-label">${label}</div><div class="gd-contact-handle">${handle}</div><p class="gd-contact-desc">${desc}</p></div>`;
-  }
-
   function tbl(headers, rows) {
     const th = headers.map(h => `<th>${h}</th>`).join('');
     const tr = rows.map(r => `<tr>${r.map(c => `<td>${c}</td>`).join('')}</tr>`).join('');
-    return `<div class="gd-table-wrap"><table class="gd-table"><thead><tr>${th}</tr></thead><tbody>${tr}</tbody></table></div>`;
+    return `<div class="gd-tbl-wrap"><table class="gd-tbl"><thead><tr>${th}</tr></thead><tbody>${tr}</tbody></table></div>`;
   }
-
   function codeBlock(lines, header) {
-    const hdr = header ? `<div class="gd-code-header">${escHtml(header)}</div>` : '';
-    const body = lines.filter(l => l.trim()).map(l =>
-      `<div class="gd-code-line"><span>${escHtml(l.trim())}</span><button class="gd-code-copy" onclick="copyToClipboard(this.previousElementSibling.textContent.trim());this.textContent='Copied!';setTimeout(()=>this.textContent='Copy',1500)">Copy</button></div>`
-    ).join('');
+    const safe = JSON.stringify(lines.join('\\n')).replace(/"/g, '&quot;');
+    const hdr = `<div class="gd-code-hdr"><span class="gd-code-hdr-label">${escHtml(header || 'Snippet')}</span><button class="gd-code-copy" onclick="copyToClipboard(${safe});this.textContent='Copied!';setTimeout(()=>this.textContent='Copy all',1500)">Copy all</button></div>`;
+    const body = lines.filter(l => l.trim()).map(l => `<div class="gd-code-line"><span>${escHtml(l.trim())}</span></div>`).join('');
     return `<div class="gd-code">${hdr}${body}</div>`;
   }
-
   function captionItems(lines) {
-    return lines.filter(l => l.trim()).map(l =>
-      `<div class="gd-caption-item"><span>${escHtml(l.trim())}</span><button class="gd-caption-copy" onclick="copyToClipboard(this.previousElementSibling.textContent.trim());this.textContent='Copied!';setTimeout(()=>this.textContent='Copy',1500)">Copy</button></div>`
-    ).join('');
+    return lines.filter(l => l.trim()).map(l => {
+      const safe = JSON.stringify(l.trim()).replace(/"/g, '&quot;');
+      return `<div class="gd-cap-item"><span>${escHtml(l.trim())}</span><button class="gd-code-copy" onclick="copyToClipboard(${safe});this.textContent='Copied!';setTimeout(()=>this.textContent='Copy',1500)">Copy</button></div>`;
+    }).join('');
   }
-
   let clIdx = 0;
-  function checklist(items, pfx) {
-    return `<ul class="gd-checklist">${items.map(item => {
+  function checklist(title, items, pfx) {
+    return `<div class="gd-checklist"><h4>${title}</h4>${items.map(item => {
       const id = `gcl_${pfx}_${clIdx++}`;
       const chk = localStorage.getItem(id) === '1';
-      return `<li class="${chk ? 'checked' : ''}" id="li_${id}"><input type="checkbox" id="${id}" ${chk ? 'checked' : ''} onchange="localStorage.setItem('${id}',this.checked?'1':'0');document.getElementById('li_${id}').classList.toggle('checked',this.checked);"><label for="${id}">${escHtml(item)}</label></li>`;
-    }).join('')}</ul>`;
+      return `<div class="gd-ci ${chk ? 'done' : ''}" id="li_${id}"><input type="checkbox" id="${id}" ${chk ? 'checked' : ''} onchange="localStorage.setItem('${id}',this.checked?'1':'0');document.getElementById('li_${id}').classList.toggle('done',this.checked);"><label for="${id}">${escHtml(item)}</label></div>`;
+    }).join('')}</div>`;
   }
-
-  function faqItem(q, a) {
-    return `<div class="gd-faq-item">
-      <div class="gd-faq-q" onclick="(function(item){var wasOpen=item.classList.contains('open');document.querySelectorAll('.gd-faq-item').forEach(function(i){i.classList.remove('open');i.querySelector('.gd-faq-a').style.maxHeight=null;});if(!wasOpen){item.classList.add('open');var ans=item.querySelector('.gd-faq-a');ans.style.maxHeight=ans.scrollHeight+'px';}})(this.closest('.gd-faq-item'))">
+  function contact(label, handle, desc) {
+    return `<div class="gd-contact"><div class="gd-contact-label">${label}</div><div class="gd-contact-handle">${handle}</div><p class="gd-contact-desc">${desc}</p></div>`;
+  }
+  function faq(q, a) {
+    return `<div class="gd-faq">
+      <div class="gd-faq-q" onclick="(function(item){var w=item.classList.contains('open');document.querySelectorAll('.gd-faq').forEach(function(i){i.classList.remove('open');i.querySelector('.gd-faq-a').style.maxHeight=null;});if(!w){item.classList.add('open');var ans=item.querySelector('.gd-faq-a');ans.style.maxHeight=ans.scrollHeight+'px';}})(this.closest('.gd-faq'))">
         <span>${escHtml(q)}</span>
-        <svg class="gd-faq-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
       </div>
       <div class="gd-faq-a"><div class="gd-faq-a-inner">${a}</div></div>
     </div>`;
   }
-
-  function sec(num, id, title, body, open) {
-    return `<div class="gd-section${open ? ' open' : ''}" id="sec-${id}" data-section-title="${escHtml(num + '. ' + title)}">
-      <div class="gd-section-header" onclick="this.closest('.gd-section').classList.toggle('open')">
-        <h2>${num}. ${escHtml(title)}</h2>
-        <svg class="gd-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+  function section(num, id, title, body) {
+    const dk = `gsec_done_${id}`;
+    const done = localStorage.getItem(dk) === '1';
+    return `<div class="gd-sec collapsed" id="sec-${id}" data-title="${escHtml(num + '. ' + title)}">
+      <div class="gd-sec-head" onclick="this.closest('.gd-sec').classList.toggle('collapsed')">
+        <button class="gd-sec-check ${done ? 'done' : ''}" onclick="event.stopPropagation();var b=this;var s=b.closest('.gd-sec');var d=b.classList.toggle('done');b.innerHTML=d?'✓':'';localStorage.setItem('${dk}',d?'1':'0');">${done ? '✓' : ''}</button>
+        <div class="gd-sec-num">${num}</div>
+        <h2 class="gd-sec-title">${escHtml(title)}</h2>
+        <span class="gd-sec-chev">▾</span>
       </div>
-      <div class="gd-section-body"><div class="gd-section-content">${body}</div></div>
+      <div class="gd-sec-body">${body}</div>
     </div>`;
   }
 
-  // ══════════════════════════════════════════════════════════════════
-  // SECTION CONTENT
-  // ══════════════════════════════════════════════════════════════════
+  // ── Section content ──────────────────────────────────────────────────
 
   const sec01 = `
-    <p>Welcome. This is the complete guide for running a Twitter / X account for one of our creators.</p>
-    <p>Your job is simple at heart: <strong>build a following</strong> by posting interesting personality content and engaging with people. Over time, those followers become people who click the link in the bio — and that is where the revenue happens.</p>
+    <p>Welcome. This is the playbook for running a Twitter / X account for one of our creators.</p>
+    <p>Your job at the highest level: <strong>build a following</strong> by posting fun personality content and engaging with people. Followers become people who click the bio link — that&apos;s where the revenue happens.</p>
 
-    <h3>The Big Picture</h3>
-    <p>Twitter is the front door. Your tweets attract attention. People click the profile, see the bio, follow the link. The whole funnel rests on tweets that look fun and personal — not salesy.</p>
+    <h3>🎯 The Three Levers That Run Everything</h3>
+    ${step(1, '<strong>Replies are king.</strong> A reply chain is 150× more valuable than a like.')}
+    ${step(2, '<strong>The first 30 minutes decide.</strong> If a tweet gets traction fast, it spreads. If not, it dies.')}
+    ${step(3, '<strong>Consistency beats bursts.</strong> Steady daily activity grows accounts. 10 posts one day and 0 the next gets you flagged.')}
 
-    <h3>The 90 / 10 Rule</h3>
-    <p>About <strong>90 % of your tweets</strong> are personality, humor, engagement bait. Only <strong>10 %</strong> are promotional. Push the link too hard and the algorithm hides you. Push personality and the algorithm grows you.</p>
+    <h3>📊 The 90 / 10 Rule</h3>
+    <p>About <strong>90 %</strong> of your tweets are personality, humor, engagement bait. Only <strong>10 %</strong> are promotional. Push the link too hard and the algorithm hides you.</p>
 
-    <h3>Three Things That Run Everything</h3>
-    ${card('blue', 'The Core Levers', `
-      <ul>
-        <li><strong>Replies are king.</strong> Getting people to reply to your tweet is 150× more valuable than getting a like.</li>
-        <li><strong>The first 30 minutes decide.</strong> If a tweet gets traction fast, it spreads. If not, it dies.</li>
-        <li><strong>Consistency beats bursts.</strong> Steady daily activity grows accounts. Ten posts one day and zero the next gets you flagged.</li>
-      </ul>
-    `)}
+    <h3>🛠️ How to Use This Dashboard Daily</h3>
+    ${doDont(
+      'DO',
+      ['Open <strong>Viral Photos / Videos / Text</strong> at the start of every shift', 'Use the <strong>Creators</strong> tab to find accounts to comment under', 'Use the <strong>Bios</strong> tab for bio inspiration', 'Check <strong>Strategy</strong> for what is working this week'],
+      "DON'T",
+      ['Don&apos;t skip this — the patterns shift weekly', 'Don&apos;t copy captions word-for-word across accounts', 'Don&apos;t comment on dead tweets — only fresh ones', 'Don&apos;t rely on memory — open the dashboard']
+    )}
 
-    <h3>How to Use This Dashboard</h3>
-    <p>This site is not just for the guide — it is your daily research tool. Open it at the start of every shift.</p>
-    <ul>
-      <li><strong>Viral Photos</strong> — see which photo tweets are winning right now</li>
-      <li><strong>Viral Videos</strong> — same for video tweets</li>
-      <li><strong>Viral Text</strong> — top-performing captions sorted by likes (steal ideas from here)</li>
-      <li><strong>Creators</strong> — accounts to study, comment under, and find followers to steal</li>
-      <li><strong>Bios</strong> — inspiration for writing your own bio</li>
-      <li><strong>Strategy</strong> — live data on what is working this week</li>
-    </ul>
-
-    ${alertBanner('The single biggest mistake new accounts make: putting a link in a tweet too early, or putting a link in the main tweet at all. <strong>Read Section 11 (The Link Rule) carefully before you post anything with a link.</strong>', true)}
+    ${alert_('red', '<strong>THE ONE RULE TO REMEMBER</strong>Never put a link in any tweet. Ever. The link lives in the bio only. Read <strong>Section 11</strong> before you post anything with a link.')}
   `;
 
   const sec02 = `
-    <p>The first hour after creating the account decides a lot. Skip the wrong setting now and you will fight an uphill battle for weeks.</p>
+    <p>The first hour after creating the account decides a lot. Skip one wrong setting and you fight an uphill battle for weeks.</p>
 
-    <h3>Step 1 — Sign Up</h3>
-    <p>Use the email and phone number provided by the team. <strong>Never use your personal email or phone.</strong> Confirm the email and phone immediately so the account is not flagged as suspicious.</p>
+    <h3>📱 Creating the Account</h3>
+    ${step(1, '<strong>Use the email and phone provided by the team.</strong> Never your personal contacts.')}
+    ${step(2, 'Confirm email + phone <strong>immediately</strong> so the account isn&apos;t flagged as suspicious.')}
+    ${step(3, '<strong>Pick a username.</strong> Memorable, persona-based, lowercase only.')}
+    ${step(4, '<strong>Complete the profile</strong> right away (avatar, banner, bio). Twitter treats completeness as trust.')}
+    ${step(5, 'Send account details to <strong>Justin (@SunnyAngels_Admin)</strong> so we have them on file.')}
 
-    <h3>Step 2 — Pick a Username</h3>
-    ${cardGrid([
-      card('green', '✓ Good usernames', `<ul><li>Persona name + something soft: <code>@bellacosplay</code></li><li>Aesthetic word: <code>@lavendergloss</code></li><li>Short and clean: <code>@iamruby</code></li><li>Lowercase only — looks authentic</li></ul>`),
-      card('red', '✗ Avoid these', `<ul><li><code>sexybaby9747</code></li><li><code>hotgirl2024</code></li><li><code>onlyfangirl</code></li><li>Anything with numbers + sexual words</li></ul>`),
-    ])}
+    ${alert_('yellow', '<strong>USERNAME RULE</strong>Avoid spam-y names like <code>sexybaby9747</code> or <code>hotgirl2024</code> — those are flagged before the account even posts. Good patterns: <code>@bellacosplay</code>, <code>@lavendergloss</code>, <code>@iamruby</code>.')}
 
-    <h3>Step 3 — Settings (Do These Right After Creating the Account)</h3>
-    <p>Open the X app. Go to <em>Settings &amp; Privacy</em>. Walk through every item below — these all matter.</p>
+    <h3>⚙️ Settings to Configure Right Now</h3>
+    <p>Open the X app → <em>Settings &amp; Privacy</em>. Walk through every item below.</p>
 
-    ${fixStep('SETTING 1', 'Sensitive content — ON', `<p><em>Settings &amp; Privacy → Privacy and safety → Your posts → Mark media as sensitive</em></p>${alertBanner('<strong>Turn this ON.</strong> Without it, X silently reduces your reach. Even if your photos look soft, leave it ON.', false)}`)}
+    ${step(1, '<strong>Sensitive content — ON.</strong> <em>Privacy and safety → Your posts → Mark media as sensitive.</em> Without this, X silently reduces reach.')}
+    ${step(2, '<strong>Precise location — OFF.</strong> <em>Privacy and safety → Location information.</em> Precise location filters reach geographically; we want the whole US.')}
+    ${step(3, '<strong>Display sensitive content — ON.</strong> <em>Content you see → Display media that may contain sensitive content.</em> So you can see and comment under competing accounts.')}
+    ${step(4, '<strong>Discoverability — both ON.</strong> Let people find you by email and phone.')}
+    ${step(5, '<strong>Direct messages — Allow from everyone.</strong> We want DMs flowing in.')}
+    ${step(6, '<strong>Professional / Twitter Pro — LEAVE OFF.</strong> Tags the account as a business and kills personal reach.')}
+    ${step(7, '<strong>Language: English (US). Phone region: United States.</strong>')}
+    ${step(8, '<strong>Birthday — hide both year and date.</strong> Edit Profile → "Who can see this" → Only you.')}
 
-    ${fixStep('SETTING 2', 'Precise location — OFF', `<p><em>Settings &amp; Privacy → Privacy and safety → Location information → Precise location</em> → OFF</p><p>Your audience should be the entire US, not people near you. Precise location filters your reach geographically.</p>`)}
-
-    ${fixStep('SETTING 3', 'Display sensitive content — ON', `<p><em>Settings &amp; Privacy → Privacy and safety → Content you see → Display media that may contain sensitive content</em></p><p>If this is OFF, you cannot see the kind of accounts you will be competing with — and cannot comment under them.</p>`)}
-
-    ${fixStep('SETTING 4', 'Discoverability — ON (both options)', `<p><em>Discoverability and contacts</em> → both "find by email" and "find by phone number" → ON.</p>`)}
-
-    ${fixStep('SETTING 5', 'Direct Messages — Allow from everyone', `<p><em>Privacy and safety → Direct messages</em> → "Allow message requests from" → <strong>Everyone</strong>. We want DMs flowing in.</p>`)}
-
-    ${fixStep('SETTING 6', 'Professional Account / Twitter Pro — LEAVE OFF', `<p>Twitter offers a "Professional Profile" mode that tags the account as a business / public figure.</p>${alertBanner('<strong>Do NOT switch this on.</strong> It flags the account as commercial and reduces personal reach. Our accounts are personal personas — they need to look like a regular person, not a business.', true)}`)}
-
-    ${fixStep('SETTING 7', 'Language &amp; Region', `<ul><li>Display language: <strong>English (US)</strong></li><li>Phone region (in your phone settings): <strong>United States</strong></li></ul>`)}
-
-    ${fixStep('SETTING 8', 'Birthday — Hide both year and date', `<p>Profile → Edit Profile → set "Who can see this" to <strong>Only you</strong> for both year and date.</p>`)}
-
-    <h3>Step 4 — Stop. Do NOT Follow Anyone Yet.</h3>
-    ${card('yellow', 'Hands off the follow button', `<p>The temptation right after signup is to follow 50 creators. <strong>Do not do this.</strong> Twitter watches new accounts very closely in the first 24 hours. Mass-following = instant flag.</p><p>For the first day: just set up the profile, scroll the For You page for 10 minutes, like 5–10 tweets. That is enough.</p>`)}
+    ${alert_('red', '<strong>DAY 1 RULES</strong>For the <strong>first 24 hours after signup</strong>: just set up the profile, scroll the For You page for 10 minutes, like 5–10 tweets. Do NOT follow anyone. Do NOT post. Twitter watches new accounts very closely in the first day.')}
   `;
 
   const sec03 = `
-    <p>The profile is your storefront. Almost everyone who clicks your name decides to follow or not within five seconds of looking. Make those five seconds count.</p>
+    <p>The profile is your storefront. Most people decide whether to follow within 5 seconds of opening it. Make those 5 seconds count.</p>
 
-    <h3>Profile Picture (Avatar)</h3>
-    ${cardGrid([
-      card('green', '✓ Avatar that works', `<ul><li>Clear face shot — humans recognize faces fastest</li><li>Bright daylight lighting</li><li>Beach, pool, bed in daylight, cozy room with a window</li><li>Eye contact with the camera converts best</li></ul>`),
-      card('red', '✗ Avatar that fails', `<ul><li>Dark or blurry photos</li><li>Bedroom mirror at night</li><li>Back-lit silhouettes</li><li>Explicit nudity (X restricts the account)</li><li>Cartoon avatars or stock images</li></ul>`),
-    ])}
+    <h3>🪞 Profile Picture (Avatar)</h3>
+    ${doDont(
+      'GOOD AVATAR',
+      ['Clear face shot — humans recognize faces fastest', 'Bright, daylight lighting', 'Beach, pool, bed in daylight, cozy room with a window', 'Eye contact with the camera'],
+      'BAD AVATAR',
+      ['Dark or blurry photos', 'Bedroom mirror at night', 'Explicit nudity (X restricts the account)', 'Cartoon avatars or stock images']
+    )}
 
-    <h3>Header / Banner</h3>
-    <p>Use the banner for personality and vibe. Options that work:</p>
+    <h3>🖼️ Header / Banner</h3>
     <ul>
       <li>A second photo of the creator (different from the avatar)</li>
       <li>A cosplay or themed shot</li>
-      <li>An aesthetic background (pink gradient, beach view, neon room) with the username overlaid</li>
+      <li>An aesthetic background (pink gradient, beach, neon) with the username overlaid</li>
       <li>A clean meme that fits the persona</li>
     </ul>
-    ${alertBanner('<strong>Check the banner on a phone after you upload it.</strong> Almost all followers see Twitter on mobile, so this is the only view that matters. If the face is cut off on mobile — re-crop and re-upload.', false)}
+    ${alert_('yellow', '<strong>ALWAYS CHECK ON MOBILE</strong>After uploading the banner, open the profile on a phone. Almost all followers see Twitter on mobile and the banner crops differently. If the face is cut off — re-crop and re-upload.')}
 
-    <h3>Display Name</h3>
+    <h3>🏷️ Display Name &amp; Username</h3>
     <ul>
-      <li>Persona first name + a soft emoji: <code>bella ♡</code>, <code>ruby 🌸</code></li>
+      <li>Display name: persona first name + soft emoji: <code>bella ♡</code>, <code>ruby 🌸</code></li>
       <li>Keep it short — long display names get truncated</li>
       <li>No "18+", "NSFW", or anything explicit in the display name</li>
     </ul>
 
-    <h3>Bio</h3>
-    <p>The bio has 160 characters. Use a formula:</p>
-    ${statHighlight('<strong>[Personality / niche]</strong> + <strong>[soft hint]</strong> + <strong>[arrow ↓]</strong>')}
-    <p>The arrow points to the link spot — even without a link yet, it primes people to look there later.</p>
-
+    <h3>✍️ Bio Formula</h3>
+    <p><strong>[Personality / niche]</strong> + <strong>[soft hint]</strong> + <strong>[arrow ↓]</strong>. The arrow points to the link spot — even with no link yet, it primes people to look there.</p>
     ${codeBlock([
       '"your online addiction ♡"',
       '"most viral girl on X for a reason 👇"',
       '"full time internet gf 🤍"',
       '"bad decisions only"',
-      '"hai im angelicat lol i cosplay kinda 🪽 see more me :D ↓"',
+      '"hai i cosplay kinda 🪽 see more me :D ↓"',
       '"Cosplayer ♡ UR Goth GF"',
-    ], 'Working Bio Examples')}
+    ], 'Working bio examples')}
 
-    ${card('blue', 'Bio Rules', `<ul><li>Maximum 1–2 emojis</li><li>No <strong>"18+"</strong>, no <strong>"NSFW"</strong>, no <strong>"subscribe"</strong>, no <strong>"DM for"</strong> — silent reach reductions</li><li>No link until 100 followers — see Section 11</li><li>The arrow ↓ at the end is psychological — tells people to look down for the link</li></ul>`)}
+    ${doDont(
+      'BIO DO',
+      ['Maximum 1–2 emojis', 'Arrow (↓ / 👇) at the end of the bio text', 'Short and witty', 'Match the persona&apos;s vibe'],
+      "BIO DON'T",
+      ['No "18+" / "NSFW"', 'No "subscribe" or "DM for" wording', 'No link yet — Section 11', 'No long descriptions']
+    )}
 
-    <h3>Pinned Tweet</h3>
-    ${alertBanner('<strong>Don&apos;t pin anything yet.</strong> The pinned tweet only matters when a post hits 100+ likes. Pinning a weak tweet sends a worse signal than no pin at all. See Section 10.', false)}
+    <h3>📌 Pinned Tweet</h3>
+    ${alert_('yellow', '<strong>WAIT — DO NOT PIN YET</strong>Leave the pin empty until a post hits <strong>100 likes</strong>. Pinning a weak tweet makes the account look dead. See Section 10.')}
 
-    <h3>Location, Website, Birthday</h3>
+    <h3>📍 Profile Details</h3>
     <ul>
-      <li><strong>Location:</strong> a US city that fits the persona — Los Angeles, Miami, Austin, Tampa, Phoenix. Skip "United States" (too vague).</li>
-      <li><strong>Website:</strong> leave blank until Justin gives you a link.</li>
-      <li><strong>Birthday:</strong> set a date that makes the persona age 22–28. Keep year and date hidden (Section 2).</li>
+      <li><strong>Location:</strong> a US city that fits the persona (LA, Miami, Austin, Tampa, Phoenix). Skip "United States" — too vague.</li>
+      <li><strong>Website:</strong> blank until Justin gives you a link.</li>
+      <li><strong>Birthday:</strong> persona age 22–28. Year and date hidden.</li>
     </ul>
   `;
 
   const sec04 = `
-    <p>Twitter watches new accounts closely. The first three weeks are about <em>looking like a real person</em> before you act like a creator. Rush it and you get shadowbanned within the first month.</p>
+    <p>Twitter watches new accounts closely. The first three weeks are about looking like a real person <em>before</em> you act like a creator. Rush it and you get shadowbanned in the first month.</p>
 
-    ${alertBanner('Posting starts on Day 1 with light volume and ramps up over three weeks. The numbers below are the safe path — do not exceed them.', false)}
+    ${alert_('yellow', '<strong>THE WARM-UP RULE</strong>Posting starts on Day 1 but at very low volume. The schedule below is the safe path — never exceed these numbers.')}
 
-    ${card('blue', 'Phase 1 — Day 1 to Day 3 (Light start)', `
-      <h4>What to do</h4>
-      <ul>
-        <li><strong>1 post per day</strong> — one good photo + short caption</li>
-        <li>Follow 5–10 creators in our niche (spread across the day)</li>
-        <li>Like 10–20 tweets per day</li>
-        <li>Write 5 short, friendly replies on other creators' tweets</li>
-        <li>Scroll the For You page 10 minutes</li>
-      </ul>
-      <h4>What NOT to do</h4>
-      <ul><li>No link in the bio yet</li><li>No link in any tweet</li><li>No mass follow / unfollow</li></ul>
-    `)}
+    <h3>🌱 Phase 1 — Day 1 to Day 3 (Light start)</h3>
+    ${step(1, '<strong>1 post per day</strong> — one good photo + short caption')}
+    ${step(2, 'Follow 5–10 creators in our niche (spread across the day)')}
+    ${step(3, 'Like 10–20 tweets per day')}
+    ${step(4, 'Write 5 short, friendly replies on other creators&apos; tweets')}
+    ${step(5, 'Scroll the For You page 10 minutes')}
+    ${doDont(
+      'PHASE 1 DO',
+      ['1 post / day', 'Light interaction', 'Use the Viral tabs to study patterns'],
+      "PHASE 1 DON'T",
+      ['No link in bio yet', 'No link in any tweet', 'No mass follow / unfollow']
+    )}
 
-    ${card('yellow', 'Phase 2 — Day 4 to Day 10 (Engagement build)', `
-      <h4>What to do</h4>
-      <ul>
-        <li><strong>2 posts per day</strong>, 4–6 hours apart</li>
-        <li>Follow 10–15 more creators (total ~30–40)</li>
-        <li>Like 30–50 tweets per day</li>
-        <li>15 thoughtful replies per day</li>
-        <li>Start using <strong>Image Comments</strong> (Section 12) — 3–5 per day</li>
-      </ul>
-      <h4>What NOT to do</h4>
-      <ul><li>Still no link anywhere</li><li>No 3rd-party scheduling apps connected to the account</li></ul>
-    `)}
+    <h3>🌿 Phase 2 — Day 4 to Day 10 (Engagement build)</h3>
+    ${step(1, '<strong>2 posts per day</strong>, 4–6 hours apart')}
+    ${step(2, 'Follow 10–15 more creators (total ~30–40)')}
+    ${step(3, 'Like 30–50 tweets per day')}
+    ${step(4, '15 thoughtful replies per day')}
+    ${step(5, 'Start <strong>Image Comments</strong> (Section 12) — 3–5 per day')}
 
-    ${card('green', 'Phase 3 — Day 11 onward (Full operation)', `
-      <h4>What to do</h4>
-      <ul>
-        <li><strong>3 posts per day</strong>, spread across active hours</li>
-        <li>Like 50–100 tweets per day</li>
-        <li>20–30 replies per day, half as image-replies on viral posts</li>
-        <li>5–10 follower steals per day (Section 13)</li>
-        <li>Once you cross <strong>100 followers</strong>: message Justin → he creates your link → add to bio</li>
-      </ul>
-      <h4>What NOT to do</h4>
-      <ul><li>Never exceed 50 replies per hour</li><li>Never exceed 100 likes per hour</li><li>Never post more than 5 tweets in a day, even on a great day</li></ul>
-    `)}
+    <h3>🌳 Phase 3 — Day 11 onward (Full operation)</h3>
+    ${step(1, '<strong>3 posts per day</strong>, spread across active hours')}
+    ${step(2, 'Like 50–100 tweets per day')}
+    ${step(3, '20–30 replies per day, half as image-replies on viral posts')}
+    ${step(4, '5–10 follower steals per day (Section 13)')}
+    ${step(5, 'Once you cross <strong>100 followers</strong>: message Justin → he creates your link → add to bio')}
 
-    <h3>Quick Reference</h3>
+    <h3>📋 Quick Reference</h3>
     ${tbl(['Action','Day 1–3','Day 4–10','Day 11 +'],[
       ['Posts','1 / day','2 / day','3 / day'],
-      ['Follows','5–10 / day','10–15 / day','max 30 / day'],
-      ['Likes','10–20 / day','30–50 / day','50–100 / day'],
-      ['Replies','5 / day','15 / day','20–30 / day'],
-      ['Link in bio','No','No','Only after 100 followers'],
+      ['Follows','5–10','10–15','max 30'],
+      ['Likes','10–20','30–50','50–100'],
+      ['Replies','5','15','20–30'],
+      ['Link in bio','No','No','After 100 followers'],
     ])}
   `;
 
   const sec05 = `
-    <p>You do not need to know everything about the algorithm. You need to know the seven rules below and what they look like in real life. Every rule has a real-world scenario.</p>
+    <p>You don&apos;t need to know everything about the algorithm. You need the seven rules below and what they look like in real life.</p>
 
-    <h3>1. Replies are the strongest signal — 150× more valuable than likes</h3>
-    <p>Twitter measures how much your tweet starts conversations. A reply chain (someone replies, you reply, they reply back) tells the algorithm "this is interesting people, push it harder."</p>
-    ${scenario('blue', '💬', 'Scenario', 'You post a tweet and it gets 50 likes but zero replies. The algorithm reads this as "popular but not interesting" and stops pushing it. <strong>What to do:</strong> always end captions with a question. Adding "(be honest)" doubles reply chances because it reads as a challenge.')}
+    <h3>1️⃣ Replies are the strongest signal — 150× a like</h3>
+    <p>Twitter measures how much your tweet starts conversations. A reply chain tells the algorithm "push this harder."</p>
+    ${scen('blue', '💬 Scenario', 'You post and get 50 likes but 0 replies. The algorithm reads "popular but not interesting" and stops pushing. <strong>Fix:</strong> always end captions with a question. "(be honest)" doubles reply chances — it reads as a challenge.')}
 
-    <h3>2. The first 30 minutes decide everything</h3>
+    <h3>2️⃣ The first 30 minutes decide everything</h3>
     <p>Twitter tests every tweet on a small audience first. If engagement is strong in the first 30 minutes, it gets pushed wider. If not, it dies.</p>
-    ${scenario('yellow', '⏱️', 'Scenario', 'You post and then go check the kitchen for 20 minutes. Nobody in your follower list happens to see it pop up. The tweet dies. <strong>What to do:</strong> right after posting — like 3 tweets on the For You page, reply to 2 creators, scroll for 5 minutes. This signals to the algorithm that <em>you</em> are active, which makes it show your tweet to more people.')}
+    ${scen('yellow', '⏱️ Scenario', 'You post and go check the kitchen for 20 minutes. Nobody happens to see it. <strong>Fix:</strong> right after posting — like 3 tweets on For You, reply to 2 creators, scroll for 5 minutes. This tells the algorithm <em>you</em> are active, so it shows your tweet wider.')}
 
-    <h3>3. Bookmarks are gold — 20× more valuable than likes</h3>
-    <p>Most creators ignore bookmarks. Saving a tweet tells Twitter "I want to come back to this later" — a much stronger signal than a tap of the heart.</p>
-    ${scenario('green', '🔖', 'Scenario', 'A photo with caption "this is what 180lbs looks like :D" gets bookmarked because viewers want to look at it later. That bookmark counts 20× a like. <strong>What to do:</strong> "save-worthy" photos (full body, well-composed) collect bookmarks even if likes look quiet.')}
+    <h3>3️⃣ Bookmarks are gold — 20× a like</h3>
+    <p>Most creators ignore bookmarks. Saving a tweet tells Twitter "I want to come back to this" — much stronger than a like.</p>
+    ${scen('green', '🔖 Scenario', 'A photo with caption "this is what 180lbs looks like :D" gets bookmarked because viewers want to look at it later. That bookmark counts 20× a like. <strong>Fix:</strong> save-worthy photos (full body, well-composed) collect bookmarks even if likes look quiet.')}
 
-    <h3>4. Short captions outperform long ones — by 3×</h3>
-    <p>The faster a viewer reads your caption, the more likely they click the photo, like, or reply.</p>
-    ${scenario('blue', '✂️', 'Scenario', '"am i your type? (be honest)" → 36,116 likes. "Hey guys, hope youre having a great day, just wanted to say hi and ask if you think Im your type, please let me know honestly" → would have died at 200 likes. <strong>Rule of thumb:</strong> if your caption is longer than the tweet box width on mobile, cut it.')}
+    <h3>4️⃣ Short captions outperform long — by 3×</h3>
+    ${scen('blue', '✂️ Scenario', '"am i your type? (be honest)" → 36,116 likes. The same idea written as a paragraph would die at 200 likes. <strong>Rule of thumb:</strong> if your caption is longer than the tweet box width on mobile, cut it.')}
 
-    <h3>5. Questions beat statements — by 50 %</h3>
-    <p>A question is an invitation. A statement is a wall.</p>
-    ${scenario('blue', '❓', 'Scenario', '"I love my new outfit" vs "do you like my new outfit?" — same photo, the question gets twice the replies. Adding "(be honest)" doubles it again. <strong>Why it works:</strong> "be honest" reads as a challenge, and people on Twitter cannot resist a challenge.')}
+    <h3>5️⃣ Questions beat statements — by 50 %</h3>
+    ${scen('blue', '❓ Scenario', '"I love my new outfit" vs "do you like my new outfit?" — same photo, the question gets twice the replies. Adding "(be honest)" doubles it again.')}
 
-    <h3>6. Links in the main tweet kill reach — by 30 to 50 %</h3>
-    <p>Twitter does not want users leaving the platform. Any tweet with a link gets throttled. The workaround is Section 11 — link goes only in the bio, never in a tweet.</p>
-    ${scenario('red', '🔗', 'Scenario', 'You post a photo with caption "more here ↓ link.me/yourname". Reach drops by half compared to the same photo with caption "good morning ♡". <strong>What to do:</strong> never put a URL in the main tweet. Even writing the words "link in bio" hurts reach a little — let the bio arrow ↓ do the work silently.')}
+    <h3>6️⃣ Links in the main tweet kill reach — by 30–50 %</h3>
+    ${scen('red', '🔗 Scenario', 'You post a photo with caption "more here ↓ link.me/yourname". Reach drops by half compared to the same photo with caption "good morning ♡". <strong>Fix:</strong> never put a URL in the main tweet. Even writing "link in bio" hurts reach a little — let the bio arrow ↓ do it silently.')}
 
-    <h3>7. Grok AI reads everything you post (since Jan 2026)</h3>
-    <p>Grok is X&apos;s built-in AI. It reads every tweet&apos;s meaning and decides whether to push or quiet it. Specifically: Grok pushes positive, fun, playful content and silently kills negative, aggressive, or political content. Even your <em>tone</em> matters.</p>
-    ${scenario('yellow', '🤖', 'Scenario', 'A tweet like "I hate when men ghost me 🙄" might get high engagement from the audience — but Grok reads it as "negative emotion" and quietly reduces reach for the next 24 hours on the whole account. A tweet like "boys are so cute when they get nervous 😭" hits the same emotional angle but reads as positive. <strong>What to do:</strong> rewrite anything that sounds bitter, angry, or political. Keep the tone playful.')}
+    <h3>7️⃣ Grok AI reads everything (since Jan 2026)</h3>
+    <p>Grok is X&apos;s built-in AI. It reads every tweet semantically and pushes positive / fun content while quietly killing negative or political content.</p>
+    ${scen('yellow', '🤖 Scenario', '"I hate when men ghost me 🙄" might get high engagement — but Grok reads it as negative emotion and reduces reach for the next 24 hours on the whole account. "boys are so cute when they get nervous 😭" hits the same angle but reads as positive. <strong>Fix:</strong> rewrite anything bitter, angry, or political. Stay playful.')}
 
-    <h3>Two Minor Rules That Still Matter</h3>
-    ${cardGrid([
-      card('yellow', 'Hashtags', '<ul><li>1–2 is fine</li><li>3 or more kills reach by 40 %</li><li>Most tweets do not need any hashtags at all</li></ul>'),
-      card('red', 'ALL CAPS', '<ul><li>Flagged as shouting / spam</li><li>Lowercase is the default look</li><li>Capitalize only proper nouns and brand names</li></ul>'),
-    ])}
+    ${alert_('red', '<strong>TWO MORE THINGS THAT MATTER</strong>Hashtags: 1–2 is fine, 3 or more kills reach by 40 %. Most tweets need none.<br><br>ALL CAPS: flagged as shouting / spam. Lowercase is the default look.')}
   `;
 
   const sec06 = `
-    <h3>How Many Posts Per Day</h3>
-    ${tbl(['Account Age','Posts / day','Why'],[
-      ['Day 1–3','1','Twitter watches new accounts; one post tests the waters'],
-      ['Day 4–10','2','Account looks active without spamming'],
-      ['Day 11 onward','3','Full operating volume — three solid posts per day is the sweet spot'],
+    <h3>📅 How Many Posts Per Day</h3>
+    ${tbl(['Account Age','Posts','Why'],[
+      ['Day 1–3','1','Twitter watches new accounts — one post tests the waters'],
+      ['Day 4–10','2','Active without spamming'],
+      ['Day 11 +','3','Full operating volume — three is the sweet spot'],
     ])}
-    <p>Space the posts <strong>3 to 5 hours apart</strong>. Posting twice within an hour gets the second one buried by the algorithm.</p>
+    ${alert_('yellow', '<strong>SPACE THEM OUT</strong>Posts should be <strong>3 to 5 hours apart</strong>. Posting twice within an hour gets the second one buried by the algorithm.')}
 
-    <h3>The 90 / 10 Rule</h3>
-    ${card('blue', 'How much should be promo?', `<ul><li>If you post 3 times a day: most days zero promotional tweets. Occasional 1 promo tweet on a day when an organic post is performing especially well.</li><li>Never more than <strong>2 promotional tweets in a single day</strong>, account-wide.</li></ul>`)}
+    <h3>📊 The 90 / 10 Rule</h3>
+    <p>Of your 3 daily posts, <strong>most days zero are promotional</strong>. Only occasionally 1 promo tweet on a day when an organic post is hot. Never more than 2 promotional tweets in a single day.</p>
 
-    <h3>When to Post (US Eastern Time)</h3>
-    <p>Our audience is mostly in the United States.</p>
+    <h3>🕐 When to Post (US Eastern Time)</h3>
     ${tbl(['Window (EST)','What this slot is for'],[
       ['09:00 – 11:00','Morning crowd, "good morning" energy'],
       ['13:00 – 15:00','Lunch break scrollers — strongest engagement slot'],
@@ -1851,337 +1933,298 @@ function renderGuide() {
     ])}
     <p>Best days: <strong>Tuesday through Thursday</strong>. Saturday late night is the deadest window — avoid.</p>
 
-    <h3>The Before / After Post Routine</h3>
-    <p>This is the routine that wins the first 30 minutes. Do it on every post, especially while the account is under 2,000 followers.</p>
-
-    ${ctaBox('Before / After Routine', [
-      '2–3 min BEFORE: reply to comments on your previous post, scroll For You, like 3–5 tweets',
-      'POST your tweet',
-      '3–5 min AFTER: stay in the app, scroll For You for 2 min, image-comment on 2 viral posts, do 3–5 follower steals, like 5–10 tweets',
-    ], 'Why this matters: Twitter rewards active users. Post-and-disappear = penalty. Post-and-stay = boost.')}
-
-    ${scenario('blue', '💡', 'Why this works', 'If you post and disappear, the algorithm reads you as a low-quality account. If you post and stay engaged for 5 minutes, the algorithm reads you as a real, active person and pushes your tweet wider.')}
+    <h3>🔄 The Before / After Post Routine</h3>
+    <p>This routine wins the first 30 minutes. Do it on every post — especially under 2,000 followers.</p>
+    ${step('A', '<strong>2–3 min BEFORE:</strong> Reply to comments on your previous post. Scroll For You, like 3–5 tweets. Warms up the algorithm.')}
+    ${step('B', '<strong>POST your tweet.</strong>')}
+    ${step('C', '<strong>3–5 min AFTER:</strong> Stay in the app. Scroll For You for 2 min. Image-comment on 2 viral posts. Do 3–5 follower steals. Like 5–10 tweets.')}
+    ${alert_('blue', '<strong>WHY THIS WORKS</strong>If you post and disappear, the algorithm reads you as low-quality. If you post and stay engaged for 5 minutes, the algorithm reads you as a real active person and pushes your tweet wider.')}
   `;
 
   const sec07 = `
-    <p>This section is the most important one in the guide. Captions decide whether a tweet lives or dies. The patterns below come from analyzing <strong>4,996 tweets from 226 top creators.</strong></p>
+    <p>This section is the most important one in the guide. Captions decide whether a tweet lives or dies. The patterns below come from <strong>4,996 tweets from 226 top creators</strong>.</p>
 
-    <h3>The Four Universal Caption Rules</h3>
-
-    <h4>1. Short wins.</h4>
-    <p>Captions under 25 characters get <strong>3× more engagement</strong> than captions over 60. The data:</p>
+    <h3>📏 Rule 1 — Short Wins (by 3×)</h3>
     ${tbl(['Caption length','Avg likes','Engagement rate'],[
-      ['<strong>Short (≤ 25 chars)</strong>','<strong>2,336</strong>','<strong>4.5 %</strong>'],
-      ['Medium (26–60)','1,489','3.2 %'],
-      ['Long (60 +)','777','1.3 %'],
+      ['<strong>≤ 25 chars</strong>','<strong>2,336</strong>','<strong>4.5 %</strong>'],
+      ['26–60','1,489','3.2 %'],
+      ['60 +','777','1.3 %'],
     ])}
-    <p><strong>Why this works:</strong> people scroll fast. A short caption is read in half a second. A long one feels like work and gets skipped.</p>
+    <p>People scroll fast. A short caption is read in half a second. A long one feels like work.</p>
 
-    <h4>2. Questions beat statements by 50 %.</h4>
-    <p>Question tweets average <strong>2,449 likes</strong> vs <strong>1,627</strong> for statements. Questions invite replies — and replies are 150× a like in the algorithm&apos;s eyes.</p>
+    <h3>❓ Rule 2 — Questions Beat Statements (by 50 %)</h3>
+    <p>Question tweets average <strong>2,449</strong> likes vs <strong>1,627</strong> for statements. Questions invite replies — and replies are 150× a like.</p>
 
-    <h4>3. Adding "be honest" amplifies engagement.</h4>
-    <p>Across the dataset, the top caption category is "be honest / tell me" tweets — average <strong>4,413 likes, 6.7 % engagement rate</strong>. "be honest" reads as a challenge and people on Twitter cannot resist.</p>
+    <h3>🎯 Rule 3 — "be honest" Amplifies Engagement</h3>
+    <p>Across the dataset, "be honest / tell me" captions average <strong>4,413 likes, 6.7 %</strong> engagement — the top category. "be honest" reads as a challenge and people on Twitter cannot resist a challenge.</p>
 
-    <h4>4. Lowercase looks more authentic.</h4>
-    <p>"am i your type" outperforms "Am I Your Type" or "AM I YOUR TYPE". Lowercase reads as casual, friend-talk. Capitalized reads as marketing. ALL CAPS reads as shouting and gets flagged.</p>
+    <h3>🔡 Rule 4 — Lowercase Looks Authentic</h3>
+    <p>"am i your type" outperforms "Am I Your Type". Lowercase reads as casual friend-talk. Capitalized reads as marketing. ALL CAPS reads as shouting.</p>
 
-    <h3>Top All-Time Captions From the Dataset</h3>
+    <h3>🏆 Top All-Time Captions From the Dataset</h3>
     ${codeBlock([
       '"am i your type? (be honest)"  →  36,116 likes',
       '"taking bf applications rn"  →  35,019 likes',
       '"smash or pass (be honest) 🤭"  →  avg 13,806 likes',
       '"good morning 🫶"  →  avg 11,736 likes',
       '"eyes up here pretty boy"  →  avg 7,626 likes',
-      '"Rate my arch 1-10"  →  6.5 % engagement (highest in category)',
-    ], 'Top Performers')}
+      '"Rate my arch 1-10"  →  6.5 % engagement',
+    ], 'Top performers')}
 
-    <h3>Why These Worked — Real Analysis</h3>
+    <h3>🔍 Why These Worked — Real Analysis</h3>
+    ${alert_('green', '<strong>"am i your type? (be honest)" → 36,116 likes</strong><strong>Setup:</strong> photo of the creator looking directly into camera.<br><strong>Why it exploded:</strong> "am i your type" is already a question. "(be honest)" is the unlock — it turns a soft compliment-seek into a challenge. Replies flooded in: "100 %", "absolutely", "you are literally my dream girl" — reply storm pushes it to millions.')}
+    ${alert_('green', '<strong>"taking bf applications rn" → 35,019 likes</strong><strong>Why it worked:</strong> "applications" is playful framing — turns "I am single" (boring) into a game (engaging). Replies: "putting my application in", "interview when", "where do I apply" — a thread of replies, the most valuable signal.')}
+    ${alert_('green', '<strong>"good morning 🫶" → avg 11,736 likes</strong><strong>Why it worked:</strong> universal greeting + waking-up photo triggers a parasocial reaction — followers feel like the creator is greeting <em>them</em>. Easiest reply to write: "good morning beautiful".')}
+    ${alert_('green', '<strong>"this is what 180lbs looks like :D" → 21,818 likes</strong><strong>Why it worked:</strong> body positivity + a specific number. "180lbs" makes the tweet feel real and personal, not generic. ":D" softens it — turns a complaint into a flex. Grok pushes positive tone (Section 5.7).')}
 
-    ${card('green', '"am i your type? (be honest)" → 36,116 likes', `
-      <ul>
-        <li><strong>Setup:</strong> photo of the creator looking directly into camera</li>
-        <li><strong>Why it exploded:</strong> "am i your type" is already a question — invites a reply. The "(be honest)" is the unlock — it transforms a soft compliment-seek into a challenge.</li>
-        <li><strong>Reply storm:</strong> "100 %", "absolutely", "you are literally my dream girl" → algorithm pushes the tweet to millions.</li>
-      </ul>
-    `)}
+    <h3>🔄 Where to Find Fresh Ideas Daily</h3>
+    <p>The <strong>Viral Text</strong> tab in this dashboard shows the highest-performing tweets sorted by likes — what is working <em>right now</em>. Patterns shift, so check it twice a week.</p>
+    ${alert_('red', '<strong>NEVER COPY WORD-FOR-WORD</strong>Twitter detects duplicate captions across accounts and penalizes everyone involved. Adapt: swap a word, change an emoji, mix two ideas.')}
 
-    ${card('green', '"taking bf applications rn" → 35,019 likes', `
-      <ul>
-        <li><strong>Setup:</strong> attractive photo + a fantasy people want to engage with</li>
-        <li><strong>Why it worked:</strong> "applications" is playful framing — turns "I am single" (boring) into a game (engaging). Guys reply "putting my application in", "interview when", "where do I apply" — a thread of replies, which is the most valuable signal.</li>
-      </ul>
-    `)}
-
-    ${card('green', '"good morning 🫶" → avg 11,736 likes', `
-      <ul>
-        <li><strong>Setup:</strong> waking-up photo (in bed, soft natural light)</li>
-        <li><strong>Why it worked:</strong> universal greeting that opens conversations. Combined with the photo, it triggers a parasocial reaction — followers feel like the creator is greeting <em>them</em>. Easiest reply to write.</li>
-      </ul>
-    `)}
-
-    ${card('green', '"this is what 180lbs looks like :D" → 21,818 likes', `
-      <ul>
-        <li><strong>Setup:</strong> full body photo</li>
-        <li><strong>Why it worked:</strong> body positivity + a specific number. The specific number (180lbs) makes the tweet feel real and personal, not generic. The ":D" softens it — turns what could read as a complaint into a flex. Grok pushes it (Section 5.7).</li>
-      </ul>
-    `)}
-
-    <h3>Where to Find Fresh Caption Ideas Daily</h3>
-    ${card('blue', 'Use this dashboard', `<p>The <strong>Viral Text</strong> tab shows the highest-performing tweets sorted by likes — those are the patterns working <em>right now</em>. The patterns shift over time, so check this tab at least twice a week.</p><p>Don&apos;t copy captions word-for-word across accounts (Twitter detects duplicates and penalizes everyone involved). Adapt: swap a word, change an emoji, mix two ideas.</p>`)}
-
-    ${alertBanner('Section 8 has 60+ ready-to-use captions sorted by category. Use them as a starting point, then rotate.', false)}
-
-    <h3>Caption Don&apos;ts</h3>
-    ${card('red', 'Never do these', `<ul><li>No paragraphs — keep it one line</li><li>No more than 2 emojis</li><li>No <strong>"link in bio"</strong> in the caption — it hurts reach (the bio arrow ↓ does this silently)</li><li>No prices, no "subscribe", no "DM me for"</li><li>No hashtag lists</li><li>No exact-same caption twice in the same week on the same account</li></ul>`)}
+    <h3>📐 Caption Rules</h3>
+    ${doDont(
+      'CAPTION DO',
+      ['Keep it short (≤ 25 chars wins)', 'End with a question', 'Use "be honest" / "1 word"', 'Lowercase only', '0–2 emojis max'],
+      "CAPTION DON'T",
+      ['No paragraphs', 'No "link in bio" in caption', 'No prices, no "subscribe"', 'No hashtag lists', 'No exact-same caption twice in a week']
+    )}
   `;
 
   const sec08 = `
-    <p>Around 60 tested captions sorted by category. Copy with the button on the right. <strong>Rotate</strong> — never use the same caption twice in one week.</p>
+    <p>Around 60 tested captions sorted by category. Copy any of them with the button on the right. <strong>Rotate</strong> — never use the same caption twice in one week.</p>
 
-    <div class="gd-caption-cat">
-      <h4>"Be honest" — Strongest tier</h4>
+    <div class="gd-cap-cat">
+      <h4>🥇 "Be honest" — Strongest tier</h4>
       ${captionItems(['am i your type? (be honest)','smash or pass (be honest)','yes or no to my body type? (be honest)','rate my arch 1-10','rate my waist 1-10','do you like tattooed girls?','do you like redhead girls?','describe me in 1 word','me or your wife?','what would you do?','one word — go','too small or just right?'])}
     </div>
 
-    <div class="gd-caption-cat">
-      <h4>Short &amp; sweet</h4>
+    <div class="gd-cap-cat">
+      <h4>🌸 Short &amp; sweet</h4>
       ${captionItems(['hey cutie','hi ♡','good morning 🫶','good night 🌙','bouncy','lord have mercy…','enjoy :)','WHOA','watch again','hey x ♡','lace 🤍'])}
     </div>
 
-    <div class="gd-caption-cat">
-      <h4>Boyfriend / girlfriend energy</h4>
+    <div class="gd-cap-cat">
+      <h4>💕 Boyfriend / girlfriend energy</h4>
       ${captionItems(['taking bf applications rn','taking boyfriend applications ↓','still single btw','i need a hug','i am ur e-girlfriend now, no takebacks','first date — where are we going?','need a winter cuddle buddy'])}
     </div>
 
-    <div class="gd-caption-cat">
-      <h4>Personality / humor</h4>
+    <div class="gd-cap-cat">
+      <h4>😅 Personality / humor</h4>
       ${captionItems(['my kink is complete devotion and obsession','this is frying me','where did my car seat go?','giggle maxing','this is what 180lbs looks like :D','imagine hating tummy!?','heard u like abs','pspspsps come here loser'])}
     </div>
 
-    <div class="gd-caption-cat">
-      <h4>Tease / suggestive</h4>
+    <div class="gd-cap-cat">
+      <h4>🖤 Tease / suggestive</h4>
       ${captionItems(['eyes up here pretty boy','i know what you are looking at 🖤','your knees hurt yet?','a little motivation ♡','sound on for this one','just studying 📚','is pink my color?','what kind of day does this remind you of?'])}
     </div>
 
-    <div class="gd-caption-cat">
-      <h4>FOMO / DM bait — max 1× per day</h4>
+    <div class="gd-cap-cat">
+      <h4>💌 FOMO / DM bait — max 1× per day</h4>
       ${captionItems(['deleting in 6 hours, say "me" for a special dm','say hi for a surprise in dms','reply "yes" for a surprise dm (i am serious)','if you are not a bot, say hi. i will follow back','do not open the comments','i dare you to open the comments'])}
     </div>
 
-    <div class="gd-caption-cat">
-      <h4>Cosplay / character (if persona fits)</h4>
+    <div class="gd-cap-cat">
+      <h4>🎭 Cosplay / character (if persona fits)</h4>
       ${captionItems(['nico robin 🤲','mother makima','who wants this character?','2B from NieR'])}
     </div>
 
-    ${alertBanner('<strong>DM bait rule:</strong> if you write "say me for a dm" — you actually have to follow through. Send a "hey ❤" with the bio link. Otherwise people stop engaging and the tactic stops working.', false)}
+    ${alert_('yellow', '<strong>DM BAIT RULE</strong>If you write "say me for a dm" — you actually have to follow through. Send a "hey ❤" with the bio link. Otherwise people stop engaging and the tactic dies.')}
   `;
 
   const sec09 = `
-    <p>The photos and videos you post need to be <strong>SFW (safe for work)</strong> — Twitter is fine with suggestive, but explicit content gets the account restricted within hours.</p>
+    <p>Photos and videos must be <strong>SFW (safe for work)</strong>. Twitter is fine with suggestive — explicit content gets the account restricted within hours.</p>
 
-    <h3>What to Post</h3>
-    ${card('green', 'Photo &amp; video ideas that work', `<ul><li>Bikini / lingerie / matching sets (suggestive, not explicit)</li><li>Cosplay shoots</li><li>Lifestyle photos with good lighting (cafe, beach, bed, room)</li><li>Mirror selfies in bright rooms</li><li>Workout / fitness content</li><li>"Get ready with me" short videos (5–15 seconds)</li><li>Behind-the-scenes / candid moments</li><li>Walking / dancing short videos</li></ul>`)}
+    <h3>📸 What to Post</h3>
+    ${doDont(
+      'GREAT CONTENT',
+      ['Bikini / lingerie / matching sets', 'Cosplay shoots', 'Lifestyle photos with good lighting', 'Mirror selfies in bright rooms', 'Workout / fitness content', 'GRWM videos (5–15 sec)', 'Behind-the-scenes moments', 'Walking / dancing short videos'],
+      'NEVER POST',
+      ['Explicit nudity (account restricted)', 'Minors / weapons / drugs / gore', 'Politics / religion / drama', 'Same photo posted within 7 days', 'Photos with other-platform watermarks (TikTok, IG)']
+    )}
 
-    <h3>Video Rules</h3>
+    <h3>🎥 Video Rules</h3>
     <ul>
-      <li>Keep videos <strong>under 2 minutes 20 seconds</strong> — anything longer gets less reach</li>
-      <li>Best length: <strong>5–15 seconds</strong> (matches the Twitter scroll pattern)</li>
-      <li>Vertical (9:16) and square (1:1) both work — landscape feels old and gets ignored</li>
-      <li>Always check the first frame looks good — it is the thumbnail</li>
+      <li>Under <strong>2 minutes 20 seconds</strong> — longer gets less reach</li>
+      <li>Best length: <strong>5–15 seconds</strong> — matches the scroll pattern</li>
+      <li>Vertical (9:16) and square (1:1) both work — landscape feels old</li>
+      <li>Check the first frame looks good — it&apos;s the thumbnail</li>
     </ul>
 
-    <h3>The Cropping &amp; Editing Tip (Optional but Recommended)</h3>
-    <p>Twitter is getting better at detecting duplicate content. If you take a photo straight from the source and post it as-is, the system might flag it — especially if the same photo has appeared elsewhere before.</p>
-    <p>This is an <strong>optional safety layer</strong>. You don&apos;t have to do it — but it protects the account.</p>
+    <h3>✂️ The Cropping &amp; Editing Tip (Optional but Recommended)</h3>
+    <p>Twitter is getting better at detecting duplicate content. Modify each photo slightly before posting — optional safety layer that protects the account.</p>
+    ${step(1, '<strong>Crop slightly</strong> — even 5–10 % off the edges changes the file fingerprint.')}
+    ${step(2, '<strong>Adjust brightness or contrast</strong> by +5 / −5. Subtle enough to still look natural, different enough that the file is now unique.')}
+    ${step(3, '<strong>For videos:</strong> trim 0.5 sec off the start or end, or apply a subtle filter. Same effect.')}
 
-    ${fixStep('TIP 1', 'Crop the photo slightly', '<p>Even 5–10 % off the edges changes the file fingerprint. Use the phone&apos;s built-in photo editor.</p>')}
-    ${fixStep('TIP 2', 'Adjust brightness or contrast a touch', '<p>Push it +5 / −5. Subtle enough that the photo still looks natural, different enough that the file is now unique.</p>')}
-    ${fixStep('TIP 3', 'For videos', '<p>Trim 0.5 seconds off the start or end, or apply a subtle filter. Same effect — file fingerprint changes.</p>')}
-
-    <h3>Reposting What Works</h3>
-    ${card('yellow', 'The reposting rules', `<ul><li>Wait at least <strong>one full week</strong> between posts of the same photo / video</li><li>Use a <strong>different caption</strong> the second time</li><li>Apply the cropping / editing trick (above) so the file is technically unique</li><li>Don&apos;t repost more than twice — the third time triggers duplicate detection</li></ul>`)}
-
-    <h3>What NOT to Post</h3>
-    ${card('red', 'Hard noes', `<ul><li>Explicit nudity — the account will be restricted</li><li>Anything involving minors, weapons, drugs, gore</li><li>Politics, religion, drama, takes on current events</li><li>The same photo posted within 7 days</li><li>Photos with watermarks from other platforms still visible</li></ul>`)}
+    <h3>🔁 Reposting What Works</h3>
+    ${alert_('red', '<strong>THE REPOST RULES</strong>Wait at least <strong>one full week</strong> between posts of the same photo / video<br>Use a <strong>different caption</strong> the second time<br>Apply the cropping / editing trick so the file is technically unique<br>Don&apos;t repost more than twice — the third time triggers duplicate detection')}
   `;
 
   const sec10 = `
-    <p>The pinned tweet is the first thing anyone sees when they click on the profile. Most non-followers decide whether to follow based on the pinned tweet plus the bio — within five seconds.</p>
+    <p>The pinned tweet is the first thing anyone sees when they click on the profile. Most non-followers decide whether to follow based on the pinned tweet + bio — within five seconds.</p>
 
-    <h3>Don't Pin Anything at First</h3>
-    ${alertBanner('<strong>While the account is fresh, leave the pin empty.</strong> Pinning a tweet with 4 likes makes the account look dead. A profile with no pin actually looks more curated than one with a weak pin.', false)}
+    ${alert_('red', '<strong>DO NOT PIN YET</strong>While the account is fresh, leave the pin empty. Pinning a tweet with 4 likes makes the account look dead. A profile with no pin actually looks more curated than one with a weak pin.')}
 
-    <h3>When to Pin Your First Tweet</h3>
+    <h3>📌 When to Pin Your First Tweet</h3>
     <p>Wait until one of your tweets crosses <strong>100 likes</strong>. That is the threshold where the pin starts working in your favor.</p>
+    ${scen('green', '✅ Why 100 likes', 'A pin with 100+ likes signals to a visitor: "other people approve — safe to follow." Anything below 100 makes the account look quiet and the visitor scrolls away.')}
 
-    ${scenario('green', '📌', 'Why 100 likes', 'A pinned tweet with 100+ likes signals to a profile visitor: "other people approve of this — it is safe to follow." Anything below 100 makes the account look quiet and the visitor scrolls away.')}
-
-    <h3>What to Pin</h3>
-    <p>Pin your <strong>single best-performing tweet</strong> by likes. Photo or video tweets work better than text-only.</p>
+    <h3>🏆 What to Pin</h3>
     <ul>
-      <li>The pin should be visually striking — strong first impression matters</li>
-      <li>The caption should match the persona (don&apos;t pin something off-brand)</li>
-      <li>If the tweet has many replies, even better — visitors see the engagement instantly</li>
+      <li>Your <strong>single best-performing tweet</strong> by likes</li>
+      <li>Photo or video tweets work better than text-only</li>
+      <li>Visually striking — strong first impression</li>
+      <li>Caption matches the persona (don&apos;t pin something off-brand)</li>
+      <li>Bonus: many replies on the tweet shows engagement instantly</li>
     </ul>
 
-    <h3>When to Replace the Pin</h3>
+    <h3>🔄 When to Replace the Pin</h3>
     <p>Every time a newer tweet beats the pinned one by likes — replace it. Always be pinning your current best.</p>
-    <ul>
-      <li>Check pin candidates once a week</li>
-      <li>To replace: tap the three dots on the new tweet → "Pin to your profile". This automatically unpins the old one.</li>
-    </ul>
+    ${step(1, 'Check pin candidates once a week')}
+    ${step(2, 'On the new tweet: tap the three dots → "Pin to your profile". Old pin gets removed automatically.')}
   `;
 
   const sec11 = `
-    ${alertBanner('<strong>This is the single most important rule in the guide. Read it twice.</strong>', true)}
+    ${alert_('red', '<strong>THE SINGLE MOST IMPORTANT RULE</strong>Read this section twice. The link rule is what makes or breaks the account.')}
 
-    <h3>The Rule</h3>
-    <p>You may <strong>NEVER</strong> put a URL in the main text of a tweet. Twitter punishes external links inside tweets by reducing reach by 30 to 50 %. This has been the case since March 2025.</p>
+    <h3>🚫 The Rule</h3>
+    <p>You may <strong>NEVER</strong> put a URL in the main text of a tweet. Twitter throttles tweets with links by 30 to 50 % reach. This has been the case since March 2025.</p>
 
-    <h3>Where the Link Goes</h3>
-    <p>Once you have a link (see below), it goes <strong>only in the bio</strong>. Nothing in the tweet — just an arrow ↓ in the bio that points down to where the website field shows on the profile.</p>
+    <h3>📍 Where the Link Goes</h3>
+    <p>Once you have a link, it goes <strong>only in the bio</strong>. Nothing in any tweet — just an arrow ↓ in the bio that points to the website field on the profile.</p>
 
-    <h3>How to Get Your Link</h3>
-    <p>You do not get a link on day one. You earn it.</p>
+    <h3>🎯 How to Get Your Link</h3>
+    <p>You don&apos;t get a link on day one. You earn it.</p>
+    ${step(1, '<strong>Reach 100 followers</strong> through warm-up, posting, and the growth tactics (Sections 12 &amp; 13).')}
+    ${step(2, '<strong>DM Justin on X:</strong> "Hey, [account] just hit 100 followers — ready for a link". He creates it within a day.')}
+    ${step(3, '<strong>Add the link to the bio</strong> in the website field. Keep the arrow ↓ at the end of the bio text.')}
 
-    ${fixStep('STEP 1', 'Reach 100 followers', '<p>Through warm-up, posting, and the growth tactics (Sections 12 &amp; 13).</p>')}
-    ${fixStep('STEP 2', 'Message Justin on X', '<p>Open his profile, send a DM saying "Hey, [account] just hit 100 followers — ready for a link". He will create it and send it back within a day.</p>')}
-    ${fixStep('STEP 3', 'Add the link to the bio', '<p>In the website field. Keep the arrow ↓ at the end of the bio text.</p>')}
+    ${contact('CONTACT FOR YOUR LINK', '@SunnyAngels_Admin (Justin)', 'DM him on X once the account hits 100 followers. He sets up the link, sends it back, you add it to the bio.')}
 
-    ${contactCard('Contact for your link', '@SunnyAngels_Admin (Justin)', 'DM him on X once your account hits 100 followers. He sets up the link, sends it back, you add it to the bio.')}
+    <h3>🤔 Why We Wait Until 100 Followers</h3>
+    ${alert_('yellow', '<strong>ACCOUNT REALISM</strong>An account with a link + fewer than 100 followers looks like obvious spam → throttled. An account that grew to 100 through personality first looks like a real person who happens to have a link → treated normally.')}
 
-    <h3>Why We Wait Until 100 Followers</h3>
-    <ul>
-      <li>An account with a link and fewer than 100 followers looks like an obvious spam / promo account → Twitter throttles it</li>
-      <li>An account that grew to 100 followers through personality first looks like a <em>real person who happens to have a link</em> → Twitter treats it as a normal account</li>
-      <li>The 100-follower milestone also tells us your account is healthy enough to drive real traffic</li>
-    </ul>
+    <h3>📝 Once You Have the Link</h3>
+    ${doDont(
+      'LINK DO',
+      ['Link in the bio website field only', 'Arrow ↓ at end of bio text points to it', 'Share only when someone explicitly asks in DMs'],
+      "LINK DON'T",
+      ['No URL in any tweet — ever', 'No "link in bio" in tweet captions', 'No sharing the link in random DMs']
+    )}
 
-    <h3>Once You Have the Link</h3>
-    ${card('blue', 'Rules once linked', `<ul><li>Link lives in the bio website field — never in a tweet</li><li>Don&apos;t write "link in bio" in tweet captions — even those words hurt reach slightly</li><li>The arrow ↓ at the end of the bio points to the link silently — that is enough</li><li>Never share the link in DMs unless someone asks for it directly</li></ul>`)}
-
-    ${alertBanner('<strong>If you put a link in a tweet by accident:</strong> delete the tweet immediately, do NOT edit. Editing keeps the algorithm penalty. Deleting and re-posting clean costs you nothing.', true)}
+    ${alert_('red', '<strong>IF YOU POST A LINK BY ACCIDENT</strong>Delete the tweet immediately. Do NOT edit. Editing keeps the algorithm penalty. Deleting and re-posting clean costs you nothing.')}
   `;
 
   const sec12 = `
-    <p>This is the single most powerful growth tactic on Twitter. It outperforms posting, following, and almost everything else combined.</p>
+    <p>This is the most powerful growth tactic on Twitter. It outperforms posting, following, and almost everything else combined.</p>
 
-    <h3>The Idea</h3>
-    <p>Instead of writing a text reply on someone else&apos;s viral tweet, you reply with one of your <strong>best photos or videos</strong>. The viral tweet has thousands of eyeballs on it. Your photo gets seen by a slice of those eyeballs — and the ones who like what they see click your profile and follow.</p>
+    <h3>💡 The Idea</h3>
+    <p>Instead of writing a text reply on someone&apos;s viral tweet, you reply with one of your <strong>best photos or videos</strong>. The viral tweet has thousands of eyeballs. Your photo gets seen by a slice — and the ones who like what they see click your profile and follow.</p>
 
-    <h3>Why It Works Better Than Anything Else</h3>
-    ${card('green', 'Why image replies dominate', `<ul><li>You borrow someone else&apos;s audience without spending money</li><li>Image replies are visually loud — they stop the scroll inside the reply thread</li><li>The bigger the original tweet, the bigger the borrowed audience</li></ul>`)}
+    ${alert_('green', '<strong>WHY IT BEATS EVERYTHING ELSE</strong>You borrow someone else&apos;s audience for free. Image replies are visually loud — they stop the scroll inside the reply thread. The bigger the original tweet, the bigger the borrowed audience.')}
 
-    <h3>How to Run It — Step by Step</h3>
+    <h3>📋 How to Run It</h3>
+    ${step(1, '<strong>Open Viral Photos / Viral Videos</strong> on this dashboard. Sort by Most Recent. Find fresh tweets gaining momentum.')}
+    ${step(2, '<strong>Pick a target:</strong> a tweet with <strong>1,000+ likes</strong>, <strong>less than 20 hours old</strong>, from a creator with <strong>10K–200K followers</strong>. Bigger creators = too much competition. Smaller = not enough audience to borrow.')}
+    ${step(3, 'Open the tweet on X and tap reply.')}
+    ${step(4, 'Reply with one of your <strong>best photos</strong> + a short relevant caption that connects to the original tweet.')}
+    ${step(5, 'After posting, stay in the app. Do not follow up. Do not add a link.')}
 
-    ${fixStep('STEP 1', 'Open Viral Photos or Viral Videos on this dashboard', '<p>Sort by Most Recent. You are looking for tweets that are fresh and gaining momentum.</p>')}
-    ${fixStep('STEP 2', 'Pick a target', '<p>A tweet with <strong>1,000+ likes</strong> that is <strong>less than 20 hours old</strong>, from a creator with <strong>10K–200K followers</strong>. Bigger creators have too much competition in the replies; smaller ones do not have enough audience to borrow.</p>')}
-    ${fixStep('STEP 3', 'Open the tweet on X and tap reply', '')}
-    ${fixStep('STEP 4', 'Reply with one of your best photos', '<p>Plus a short relevant caption that connects to the original tweet. See examples below.</p>')}
-    ${fixStep('STEP 5', 'After posting', '<p>Stay on the app. Don&apos;t follow up. Don&apos;t add a link.</p>')}
-
-    <h3>Caption Examples for Image Replies</h3>
+    <h3>💬 Caption Examples for Image Replies</h3>
     ${codeBlock([
       'Original: "Do I look cute today?"  →  Your reply: [best photo] + "we could be twins 😭"',
       'Original: "rate my outfit"  →  Your reply: [fit photo] + "trade fits?"',
       'Original: "tell me i am pretty"  →  Your reply: [photo] + "you are gorgeous 🥹 (me though?)"',
       'Original: "anyone else feeling cute today?"  →  Your reply: [photo] + "🙋‍♀️"',
-    ], 'Image Reply Examples')}
+    ], 'Image reply examples')}
 
-    <h3>Rules</h3>
-    ${card('red', 'Don&apos;t', `<ul><li>Never write "follow me", "check my profile", "DM me" — that is spam, you get blocked and Twitter penalizes</li><li>Never reuse the same photo twice</li><li>Never reply on dead tweets (likes have stopped climbing)</li></ul>`)}
-    ${card('green', 'Do', `<ul><li>Maximum 10 image replies per day — more triggers spam detection</li><li>Use a different photo each time</li><li>Keep captions short, relevant, never promotional</li><li>Only target tweets gaining momentum</li></ul>`)}
+    <h3>📐 Rules</h3>
+    ${doDont(
+      'IMAGE REPLY DO',
+      ['Max 10 image replies per day', 'Use a different photo each time', 'Caption stays short, relevant, never promotional', 'Only reply on tweets gaining momentum'],
+      "IMAGE REPLY DON'T",
+      ['Never write "follow me", "check my profile"', 'Never reuse the same photo', 'Never reply on dead tweets', 'Never tag your own account in their thread']
+    )}
 
-    ${ctaBox('Daily Target', [
-      '5–10 image replies during active hours',
-      'Use the Viral tabs in this dashboard to find fresh targets',
-      'Different photo every time',
-    ], 'Done consistently, this brings 20–80 new followers per day in the early weeks.')}
+    ${alert_('green', '<strong>DAILY TARGET</strong>5–10 image replies during active hours. Done consistently, this brings 20–80 new followers per day in the early weeks.')}
   `;
 
   const sec13 = `
-    <p>"Follower stealing" sounds aggressive — it is actually polite. You are going to other creators&apos; viral tweets, finding fans who left a comment, and making a friendly connection with them. Most of them follow back because you noticed them.</p>
+    <p>"Follower stealing" sounds aggressive — it&apos;s actually polite. You find fans in other creators&apos; viral comment sections and make a friendly connection. Most of them follow back because you noticed them.</p>
 
-    <h3>How to Find Targets</h3>
+    <h3>🔎 Finding Targets</h3>
+    ${step(1, '<strong>Open Viral Photos / Viral Text</strong> on the dashboard. Pick a tweet from a creator in our niche with 500+ likes.')}
+    ${step(2, '<strong>Scroll the replies on X.</strong> Look for people whose comment has <strong>fewer than 10 likes</strong>. More than 10 = too many creators already chasing them.')}
+    ${step(3, '<strong>Filter for good targets:</strong> looks American, English comment, has a profile photo, has own tweets (not just replies), looks 25+. Skip bots, locked accounts, women.')}
 
-    ${fixStep('STEP 1', 'Open Viral Photos or Viral Text on this dashboard', '<p>Pick a tweet from a creator in our niche with 500+ likes.</p>')}
-    ${fixStep('STEP 2', 'Open the tweet on X and scroll the replies', '<p>Look for people who left a comment with <strong>fewer than 10 likes</strong> on their comment. More than 10 likes means too many other creators are already chasing them.</p>')}
-    ${fixStep('STEP 3', 'Filter for good targets', '<p>Looks American, English comment, has a profile photo, has tweets of their own (not just replies), looks 25+. Skip obvious bots, locked accounts, and women.</p>')}
+    <h3>🤝 The Interaction (~90 % follow-back rate)</h3>
+    ${step(1, 'Follow them.')}
+    ${step(2, 'Like the comment they left on the viral tweet.')}
+    ${step(3, 'Open their profile. Find one of their own tweets (not a reply).')}
+    ${step(4, 'Leave a short, genuine reply — "love this!", "great take". Nothing promotional, nothing about you.')}
 
-    <h3>The Interaction (~90 % Follow-Back Rate)</h3>
+    <p>That&apos;s it. Most notice the activity (follow + like + reply) and follow back within an hour or two. They feel seen — that&apos;s all the magic is.</p>
 
-    ${fixStep('1', 'Follow them', '')}
-    ${fixStep('2', 'Like the comment they left on the original viral tweet', '')}
-    ${fixStep('3', 'Open their profile', '<p>Find one of their own tweets (not a reply to someone else).</p>')}
-    ${fixStep('4', 'Leave a short, genuine reply', '<p>"love this!", "this is amazing", "great take". Nothing promotional, nothing about you.</p>')}
-
-    <p>That is it. Most of them notice the activity (follow + like + reply) and follow back within an hour or two. They feel seen — that is all the magic is.</p>
-
-    <h3>Limits</h3>
-    ${card('yellow', 'Stay under these', `<ul><li>Maximum <strong>5 follower steals per posting session</strong>, 10–15 per day total</li><li>Never write anything promotional in the reply on their profile</li><li>Only US-based, English-speaking, real-looking accounts</li><li>Don&apos;t do them all at once — spread across the day</li></ul>`)}
+    ${alert_('red', '<strong>STAY WITHIN THESE LIMITS</strong>Maximum <strong>5 follower steals per posting session</strong>, 10–15 / day total<br>Never write anything promotional on their profile<br>Only US-based, English-speaking, real-looking accounts<br>Spread across the day — never all at once')}
   `;
 
   const sec14 = `
-    <p>A shadowban means Twitter is silently hiding your tweets from people who don&apos;t already follow you. The account looks fine to you — but your reach drops to almost zero. It is the most common cause of an account dying.</p>
-
-    <h3>Daily Limits — Never Exceed These</h3>
-    ${tbl(['Action','During Warm-Up','After Warm-Up','Hard Limit'],[
-      ['Follows','5–10 / day','20–30 / day','Never &gt; 50 / day'],
-      ['Unfollows','0','10 / day','Never &gt; 30 / day'],
-      ['Likes','10–50 / day','50–100 / day','Never &gt; 100 / hour'],
-      ['Replies','5–15 / day','20–30 / day','Never &gt; 30 / hour'],
-      ['Posts','1–2 / day','3 / day','Never &gt; 5 / day'],
-      ['Image replies','0','5–10 / day','Never &gt; 15 / day'],
-    ])}
-
-    <h3>What Triggers a Shadowban</h3>
-    ${card('red', 'These behaviors will get you flagged', `<ul><li>A link in the main tweet (especially on a new account)</li><li>Mass follow or unfollow in a short window</li><li>Too many likes too fast (more than 100 in an hour)</li><li>The exact same reply text used 5+ times</li><li>3+ hashtags in a tweet (especially #OnlyFans, #porn, #nsfw — even one of those is enough)</li><li>ALL CAPS in tweets</li><li>Third-party apps connected to the account</li><li>Same photo + same caption across multiple accounts (network detection)</li><li>Aggressive or political tone (Grok flags — Section 5.7)</li></ul>`)}
-
-    <h3>How to Tell If You Are Shadowbanned</h3>
-
-    ${fixStep('CHECK 1', 'shadowban.eu', '<p>Open in the phone browser and enter the @handle. If any flag shows red — you are banned.</p>')}
-    ${fixStep('CHECK 2', 'Incognito search', '<p>In a private / incognito browser, go to x.com (don&apos;t sign in) and search for the exact text of a recent tweet. If the tweet does not appear in results — you are invisible to non-followers.</p>')}
-    ${fixStep('CHECK 3', 'Engagement pattern', '<p>Watch the engagement pattern. If likes drop more than 70 % overnight on the same kind of content — that is a strong signal.</p>')}
-
-    <h3>Recovery — What to Do If You Are Shadowbanned</h3>
-
-    ${fixStep('STEP 1', 'Stop. For 24 to 72 hours.', '<p>No likes, no follows, no posts, no replies. Don&apos;t even open the app on that account.</p>')}
-    ${fixStep('STEP 2', 'Day 4–5', '<p>Only short, genuine replies on other creators&apos; tweets. No links anywhere, no photos yet.</p>')}
-    ${fixStep('STEP 3', 'Day 6–7', '<p>Resume photo tweets — but only 1 per day, no link, short captions.</p>')}
-    ${fixStep('STEP 4', 'Day 8 +', '<p>Back to normal schedule.</p>')}
-    ${fixStep('STEP 5', 'Still banned after 7 days?', '<p>Message Justin (Section 20) — we may need to retire the account.</p>')}
-
-    ${alertBanner('<strong>Tell us immediately if you suspect a shadowban.</strong> We can advise quickly. Do not try to push through it — you will make it worse.', true)}
-  `;
-
-  const sec15 = `
     <p>You will get bot comments and bot followers. This is normal. Twitter is full of them.</p>
 
-    <h3>The Counterintuitive Rule</h3>
-    ${card('green', 'Bots in your comments are GOOD', `<p>Don&apos;t block them, don&apos;t delete their comments. Here is why:</p><p>When a bot comments on your tweet, it adds to the engagement count. The algorithm sees "this tweet has 30 replies" and pushes it wider — it can&apos;t tell which replies are from real people. The fact that bots showed up means your tweet hit the For You page in the first place. That is a good sign.</p>`)}
+    <h3>🤖 The Counterintuitive Rule</h3>
+    ${alert_('green', '<strong>BOTS IN YOUR COMMENTS ARE GOOD FOR THE ACCOUNT</strong>When a bot comments, it adds to the engagement count. The algorithm sees "this tweet has 30 replies" and pushes it wider — it can&apos;t tell which replies are from real people. The fact that bots showed up means your tweet hit the For You page. That is a good sign.')}
 
-    <h3>What to Do With Bot Comments</h3>
-    ${cardGrid([
-      card('green', '✓ Do', '<ul><li>Give bot comments a like (boosts engagement count)</li><li>Leave them alone</li><li>Move on with your routine</li></ul>'),
-      card('red', '✗ Don&apos;t', '<ul><li>Don&apos;t reply to them</li><li>Don&apos;t block them</li><li>Don&apos;t report them</li></ul>'),
-    ])}
+    <h3>✋ What to Do With Bot Comments</h3>
+    ${doDont(
+      'DO',
+      ['Give bot comments a like (boosts engagement)', 'Leave them alone', 'Move on with your routine'],
+      "DON'T",
+      ['Don&apos;t reply to them', 'Don&apos;t block them', 'Don&apos;t report them']
+    )}
 
-    <h3>How to Spot a Bot</h3>
+    <h3>🔍 How to Spot a Bot</h3>
     <ul>
       <li>Generic praise: "amazing!", "wow!", "❤️❤️❤️" repeated</li>
       <li>Crypto / NFT / "DM for $$$" in their own bio</li>
       <li>Profile created within the last week</li>
-      <li>No profile photo or a stock photo</li>
-      <li>Following thousands of accounts, almost no followers themselves</li>
+      <li>No profile photo or stock photo</li>
+      <li>Following thousands, almost no followers themselves</li>
     </ul>
 
-    <h3>If a Bot DMs You</h3>
-    ${alertBanner('Ignore it. Don&apos;t click any links they send. Don&apos;t reply. Their goal is to phish you or scam followers — neither serves us.', false)}
+    ${alert_('red', '<strong>IF A BOT DMs YOU</strong>Ignore. Don&apos;t click any links they send. Don&apos;t reply. Their goal is to phish you or scam — neither serves us.')}
+  `;
+
+  const sec15 = `
+    <p>A shadowban means Twitter is silently hiding your tweets from people who don&apos;t already follow you. The account looks fine to you — but reach drops to zero. Most common cause of an account dying.</p>
+
+    <h3>📊 Daily Limits — Never Exceed These</h3>
+    ${tbl(['Action','During Warm-Up','After Warm-Up','Hard Limit'],[
+      ['Follows','5–10 / day','20–30 / day','&gt; 50 / day = banned'],
+      ['Unfollows','0','10 / day','&gt; 30 / day = banned'],
+      ['Likes','10–50 / day','50–100 / day','&gt; 100 / hour = banned'],
+      ['Replies','5–15 / day','20–30 / day','&gt; 30 / hour = banned'],
+      ['Posts','1–2 / day','3 / day','&gt; 5 / day = banned'],
+      ['Image replies','0','5–10 / day','&gt; 15 / day = banned'],
+    ])}
+
+    <h3>⚠️ What Triggers a Shadowban</h3>
+    ${alert_('red', '<strong>TRIGGER LIST — KNOW THIS BY HEART</strong>Link in the main tweet (especially on new accounts)<br>Mass follow or unfollow in a short window<br>More than 100 likes in an hour<br>The exact same reply text used 5+ times<br>3+ hashtags in a tweet (#OnlyFans / #porn / #nsfw — even one of those is enough)<br>ALL CAPS in tweets<br>3rd-party apps connected to the account<br>Same photo + same caption across multiple accounts<br>Aggressive or political tone (Grok flags it)')}
+
+    <h3>🔬 How to Tell If You Are Shadowbanned</h3>
+    ${step(1, '<strong>shadowban.eu</strong> — enter the @handle. Any red flag = banned.')}
+    ${step(2, '<strong>Incognito search:</strong> private browser → x.com (don&apos;t sign in) → search for the exact text of a recent tweet. If it doesn&apos;t appear in results, you are invisible to non-followers.')}
+    ${step(3, '<strong>Engagement pattern:</strong> likes drop more than 70 % overnight on the same kind of content → strong signal.')}
+
+    <h3>🩹 Recovery</h3>
+    ${scen('red', '🛑 Day 1–3: Stop completely', 'No likes, no follows, no posts, no replies. Don&apos;t even open the app on that account.')}
+    ${scen('yellow', '💬 Day 4–5: Light replies only', 'Short, genuine replies on other creators&apos; tweets. No links, no photos.')}
+    ${scen('blue', '📸 Day 6–7: Resume photos', '1 photo tweet per day, no link, short captions.')}
+    ${scen('green', '✅ Day 8 +', 'Back to normal schedule.')}
+    ${alert_('red', '<strong>STILL BANNED AFTER 7 DAYS?</strong>Message Justin (@SunnyAngels_Admin). We may need to retire the account.')}
   `;
 
   const sec16 = `
-    <p>"Viral" is relative to the account size. Use the table below to know when you have hit it.</p>
+    <p>"Viral" is relative to account size. Use the table to know when you have hit it.</p>
 
     ${tbl(['Followers','Viral threshold (likes)'],[
       ['0 – 500','500 +'],
@@ -2191,16 +2234,14 @@ function renderGuide() {
       ['10,000 +','5,000 +'],
     ])}
 
-    <h3>What to Do When It Hits</h3>
+    <h3>🚀 What to Do When It Hits</h3>
+    ${step(1, '<strong>Don&apos;t delete. Don&apos;t edit. Don&apos;t panic.</strong> Leave it alone.')}
+    ${step(2, '<strong>Reply to as many comments as you can — at least the first 20.</strong> Every reply you write feeds the algorithm. Even a "🥺" reply counts.')}
+    ${step(3, '<strong>Follow-up tweet 1–2 hours later.</strong> Different photo, caption that references the viral one. Captures the new visitors.')}
+    ${step(4, '<strong>Check bio + pinned tweet.</strong> A flood of new visitors is going to look at both.')}
+    ${step(5, '<strong>Screenshot to Justin.</strong> So he knows the account is performing — we can unlock the link / Premium if it&apos;s time.')}
 
-    ${fixStep('STEP 1', 'Don&apos;t delete the tweet', '<p>Don&apos;t edit it. Don&apos;t panic. Leave it alone.</p>')}
-    ${fixStep('STEP 2', 'Reply to as many comments as you can — at least the first 20', '<p>Every reply you write feeds the algorithm. Even a "🥺" or "🫶" reply counts.</p>')}
-    ${fixStep('STEP 3', 'Post a follow-up tweet 1–2 hours later', '<p>Different photo, caption that references the viral one (e.g. "yall were so sweet on the last one ♡"). This captures the new visitors who just discovered the account.</p>')}
-    ${fixStep('STEP 4', 'Check that the bio is clean and the pin is your best one', '<p>A flood of new visitors is going to look at both.</p>')}
-    ${fixStep('STEP 5', 'Send a screenshot to Justin', '<p>So he knows the account is performing — we can adjust strategy, unlock the link, or activate Premium if it is the right time.</p>')}
-
-    <h3>Don&apos;t Try to Force a Second Viral</h3>
-    ${alertBanner('The instinct after a viral hit is "post the same thing again". <strong>Wait at least 7 days</strong> before reposting the same photo with a different caption (Section 9). Posting it again the same day or even the next day looks obvious — the second post will flop.', false)}
+    ${alert_('yellow', '<strong>DO NOT FORCE A SECOND VIRAL</strong>The instinct after a hit is "post the same thing again". <strong>Wait at least 7 days</strong> before reposting the same photo with a different caption (Section 9). Same-day or next-day repost looks obvious — the second post flops.')}
   `;
 
   const sec17 = `
@@ -2211,161 +2252,186 @@ function renderGuide() {
       'Tweet 3 (Wednesday):  60 likes',
       'Tweet 4 (Thursday):   20 likes',
       'Tweet 5 (Thursday):    8 likes',
-    ], 'A typical slowdown pattern')}
-    <p>If you see a drop like this — something changed. Usually it is an algorithm flag, sometimes an early shadowban.</p>
+    ], 'Typical slowdown pattern')}
+    <p>If you see a drop like this — something changed. Usually an algorithm flag, sometimes an early shadowban.</p>
 
-    <h3>Recovery Plan</h3>
-
-    ${fixStep('STEP 1', 'Check shadowban.eu first', '<p>If you are banned, follow Section 14 recovery instead.</p>')}
-    ${fixStep('STEP 2', 'Delete the worst-performing tweet from the slowdown window', '<p>Underperforming tweets drag the whole account&apos;s "score" down.</p>')}
-    ${fixStep('STEP 3', 'Cut posting down to 2 / day for 3 days', '<p>Less volume, higher quality. Use your best photos.</p>')}
-    ${fixStep('STEP 4', 'Shift to interaction mode for those 3 days', '<p>Heavy on image replies (Section 12) and follower stealing (Section 13). The algorithm rewards activity from <em>you</em>, not just on you.</p>')}
-    ${fixStep('STEP 5', 'Still slow after a week?', '<p>Change the avatar and refresh the bio. Sometimes the look is the problem.</p>')}
-    ${fixStep('STEP 6', 'Still slow after two weeks?', '<p>Message Justin (Section 20). We will review the account together and decide on a new strategy.</p>')}
+    <h3>🩹 Recovery Plan</h3>
+    ${step(1, '<strong>Check shadowban.eu first.</strong> If banned, follow Section 15 recovery instead.')}
+    ${step(2, '<strong>Delete the worst-performing tweet</strong> from the slowdown window. Underperformers drag the whole account&apos;s score down.')}
+    ${step(3, '<strong>Cut posting to 2 / day for 3 days.</strong> Less volume, higher quality. Use your best photos.')}
+    ${step(4, '<strong>Shift to interaction mode for those 3 days.</strong> Heavy on image replies (Section 12) and follower stealing (Section 13). The algorithm rewards activity from <em>you</em>.')}
+    ${step(5, '<strong>Still slow after a week?</strong> Change the avatar and refresh the bio. Sometimes the look is the problem.')}
+    ${step(6, '<strong>Still slow after two weeks?</strong> Message Justin. We review the account together.')}
   `;
 
   const sec18 = `
-    <h3>Daily Checklist</h3>
-    ${checklist([
-      'Open the dashboard, check Viral Photos / Viral Videos / Viral Text for fresh ideas',
-      'Post the planned number of tweets for today (1 / 2 / 3 depending on account age)',
-      'Run the before-and-after-post routine on every post (5 min before, 5 min after)',
+    ${checklist('☀️ Daily Tasks', [
+      'Open the dashboard — check Viral Photos / Videos / Text for fresh ideas',
+      'Post the planned tweets for today (1 / 2 / 3 depending on account age)',
+      'Before / after post routine on every post (5 min before, 5 min after)',
       'At least 5 image replies on viral tweets (Section 12)',
       'At least 5 follower steals on viral comment sections (Section 13)',
-      'Like and reply to comments on your own tweets',
+      'Reply to all comments on your own tweets',
       'Like 20–50 tweets in the For You feed',
-    ], 'daily')}
+    ], 'd')}
 
-    <h3>Weekly Checklist</h3>
-    ${checklist([
-      'Run shadowban.eu on the account — make sure no flags',
-      'Review the week: which post performed best? Why?',
+    ${checklist('📅 Weekly Tasks', [
+      'Run shadowban.eu — no flags',
+      'Review the week: which post performed best and why?',
       'Update the pinned tweet if a new post beat the current pin (100+ likes)',
       'Refresh caption ideas from the Viral Text tab',
       'Send Justin a quick update if anything broke or hit big',
-    ], 'weekly')}
+    ], 'w')}
 
-    <h3>Monthly Checklist</h3>
-    ${checklist([
-      'Look at the follower growth chart — climbing or plateauing?',
-      'Re-check the avatar and banner — still fresh, or time for a refresh?',
-      'Delete any tweets older than 30 days with fewer than 5 likes',
+    ${checklist('📆 Monthly Tasks', [
+      'Look at follower growth — climbing or plateauing?',
+      'Re-check avatar and banner — still fresh, or time for a refresh?',
+      'Delete tweets older than 30 days with fewer than 5 likes',
       'Audit the bio — still in the right tone?',
-    ], 'monthly')}
+    ], 'm')}
   `;
 
   const sec19 = `
-    <p>Once an account crosses <strong>1,000 followers</strong>, we activate X Premium for it. Until then, it is not worth the cost.</p>
+    <p>Once an account crosses <strong>1,000 followers</strong>, we activate X Premium. Until then it is not worth the cost.</p>
 
-    <h3>What X Premium Gives the Account</h3>
-    ${card('blue', 'The benefits', `<ul><li><strong>10× more reach</strong> per tweet (Twitter explicitly boosts Premium accounts)</li><li><strong>Comments appear at the top</strong> of any reply thread — even on huge tweets — which makes image replies (Section 12) much stronger</li><li><strong>Blue checkmark</strong> — instant credibility</li><li><strong>Edit button</strong> — fix typos without losing engagement</li><li><strong>4,000 character limit</strong> instead of 280</li><li><strong>TweepCred boost</strong> — a hidden trust score Twitter uses to rank accounts</li></ul>`)}
+    <h3>💎 What Premium Gives the Account</h3>
+    <ul>
+      <li><strong>10× more reach</strong> per tweet — Twitter explicitly boosts Premium accounts</li>
+      <li><strong>Comments appear at the top</strong> of any reply thread — makes Image Comments (Section 12) much stronger</li>
+      <li><strong>Blue checkmark</strong> — instant credibility</li>
+      <li><strong>Edit button</strong> — fix typos without losing engagement</li>
+      <li><strong>4,000 character limit</strong> instead of 280</li>
+      <li><strong>TweepCred boost</strong> — hidden trust score</li>
+    </ul>
 
-    <h3>Why We Wait Until 1,000 Followers</h3>
-    <p>Premium costs about $8 / month per account. On a fresh account it is wasted — the audience is not big enough yet for the boost to compound. At 1,000 followers, the boost starts producing measurable extra growth, and the cost-per-new-follower drops sharply.</p>
+    <h3>⏳ Why We Wait Until 1,000 Followers</h3>
+    <p>Premium costs ~$8 / month per account. On a fresh account it&apos;s wasted — the audience isn&apos;t big enough for the boost to compound. At 1,000 followers, the boost starts producing measurable extra growth, and cost-per-new-follower drops sharply.</p>
 
-    <h3>How to Activate It</h3>
+    <h3>📞 How to Activate</h3>
     <p>You don&apos;t pay — we do. Just message Justin once the account hits 1,000.</p>
 
-    ${contactCard('Contact to activate Premium', '@SunnyAngels_Admin (Justin)', 'Send him a DM: "[account] just hit 1,000 followers — ready for Premium". He will activate it on the billing side and confirm.')}
+    ${contact('CONTACT TO ACTIVATE PREMIUM', '@SunnyAngels_Admin (Justin)', 'DM: "[account] just hit 1,000 followers — ready for Premium". He activates it on the billing side and confirms.')}
   `;
 
   const sec20 = `
-    <h3>Who to Contact</h3>
-    ${contactCard('Main contact', '@SunnyAngels_Admin (Justin)', 'Justin handles: link creation at 100 followers · Premium activation at 1,000 followers · shadowban or suspension issues · viral post moments · anything else you are unsure about.')}
-    <p>If you are ever in doubt — message Justin. Better to ask before doing something risky than to fix the damage after.</p>
+    <h3>📞 Who to Contact</h3>
+    ${contact('MAIN CONTACT', '@SunnyAngels_Admin (Justin)', 'Link creation at 100 followers · Premium activation at 1,000 followers · shadowban / suspension issues · viral post moments · anything you are unsure about.')}
+    ${alert_('yellow', '<strong>GENERAL RULE</strong>If you are ever in doubt — <strong>message Justin first</strong>. Better to ask before doing something risky than to fix the damage after.')}
 
-    <h3>FAQ</h3>
+    <h3>❓ FAQ</h3>
 
-    ${faqItem('My account has 70 followers — can I get the link early?', 'No. The 100-follower line exists because Twitter throttles new accounts that have a link before they look real. Stay patient — the last 30 followers go faster than the first 30.')}
-
-    ${faqItem('Can I post the same photo on two of our accounts?', 'Not with the same caption. Twitter detects duplicate photo + caption combinations across accounts and penalizes both. Use the same photo with different captions, or modify the photo slightly (Section 9).')}
-
-    ${faqItem('My likes dropped overnight — what do I do?', 'Step 1: check shadowban.eu. Step 2: if shadowbanned → follow Section 14 recovery. Step 3: if not shadowbanned → follow Section 17 (Account Slowdown) recovery.')}
-
-    ${faqItem('How many accounts can I run at once?', 'Five is the practical max. Past that, you cannot run the image-reply tactic properly for each one, and they all start to suffer.')}
-
-    ${faqItem('A creator I look up to broke half these rules — why?', 'Large accounts (100K +) have organic momentum and can break some rules safely. Small accounts cannot. Stick to the playbook until the account crosses 5,000 followers — then we revisit.')}
-
-    ${faqItem('Can I use any auto-scheduler or bot app?', 'No. Twitter detects third-party automation and penalizes accounts. All posts go out manually from the X app.')}
-
-    ${faqItem('What if Twitter prompts me to verify with a phone or selfie?', 'Stop and message Justin immediately. Do not answer the prompt yourself.')}
-
-    ${faqItem('What if a follower DMs me asking explicit questions?', 'If they are polite — reply softly and casually. If they are aggressive or weird — ignore. Never send explicit content yourself, regardless of what they offer.')}
-
-    ${faqItem('Can I do giveaways or contests?', 'Not without checking with Justin first. Twitter has rules around giveaways that can suspend the account if you do it wrong.')}
-
-    ${faqItem('How do I tell which posting time is best for my account?', 'Try all three windows (morning, lunch, evening) over a week. The one with the highest average engagement is your account&apos;s sweet spot. Stick to it, but check again monthly — audience habits drift.')}
+    ${faq('My account has 70 followers — can I get the link early?', 'No. The 100-follower line exists because Twitter throttles new accounts that have a link before they look real. Stay patient — the last 30 followers go faster than the first 30.')}
+    ${faq('Can I post the same photo on two of our accounts?', 'Not with the same caption. Twitter detects duplicate photo + caption combinations across accounts and penalizes both. Use the same photo with different captions, or modify the photo slightly (Section 9).')}
+    ${faq('My likes dropped overnight — what do I do?', 'Step 1: check shadowban.eu. Step 2: if shadowbanned → Section 15 recovery. Step 3: if not shadowbanned → Section 17 (Account Slowdown) recovery.')}
+    ${faq('How many accounts can I run at once?', 'Five is the practical max. Past that, you cannot run image replies properly for each one and they all start to suffer.')}
+    ${faq('A creator I look up to broke half these rules — why?', 'Large accounts (100K+) have organic momentum and can break some rules safely. Small accounts cannot. Stick to the playbook until 5,000 followers — then we revisit.')}
+    ${faq('Can I use any auto-scheduler or bot app?', 'No. Twitter detects 3rd-party automation and penalizes accounts. All posts go out manually from the X app.')}
+    ${faq('What if Twitter prompts me to verify with a phone or selfie?', 'Stop and message Justin immediately. Do not answer the prompt yourself.')}
+    ${faq('What if a follower DMs explicit questions?', 'If polite → reply softly and casually. If aggressive or weird → ignore. Never send explicit content yourself, regardless of what they offer.')}
+    ${faq('Can I do giveaways or contests?', 'Not without checking with Justin first. Twitter has rules around giveaways that can suspend the account if you do it wrong.')}
+    ${faq('How do I tell which posting time is best for my account?', 'Try all three windows (morning, lunch, evening) over a week. The one with highest average engagement is the sweet spot. Stick to it, but check again monthly — audience habits drift.')}
   `;
 
-  // ── Build sections list ────────────────────────────────────────────
-  const sections = [
-    { num: '01', id: 'welcome',      title: 'Welcome — The Big Picture',         body: sec01, open: true },
-    { num: '02', id: 'create',       title: 'Creating the Account',              body: sec02 },
-    { num: '03', id: 'profile',      title: 'Profile Setup',                     body: sec03 },
-    { num: '04', id: 'warmup',       title: 'Account Warm-Up (Day 1–21)',        body: sec04 },
-    { num: '05', id: 'algorithm',    title: "How Twitter's Algorithm Works",     body: sec05 },
-    { num: '06', id: 'schedule',     title: 'Daily Posting Schedule',            body: sec06 },
-    { num: '07', id: 'captions',     title: 'Captions: What Works & Why',        body: sec07 },
-    { num: '08', id: 'caption-bank', title: 'Caption Bank (60+ captions)',       body: sec08 },
-    { num: '09', id: 'content',      title: 'Content Rules (Photos & Videos)',   body: sec09 },
-    { num: '10', id: 'pinned',       title: 'Pinned Tweet — Wait for 100 Likes', body: sec10 },
-    { num: '11', id: 'link-rule',    title: 'The Link Rule (CRITICAL)',          body: sec11 },
-    { num: '12', id: 'image-reply',  title: 'Growth: Image Comments',            body: sec12 },
-    { num: '13', id: 'steal',        title: 'Growth: Follower Stealing',         body: sec13 },
-    { num: '14', id: 'shadowban',    title: 'Avoiding Shadowbans',               body: sec14 },
-    { num: '15', id: 'bots',         title: 'Bots in Your Comments',             body: sec15 },
-    { num: '16', id: 'viral',        title: 'When a Post Goes Viral',            body: sec16 },
-    { num: '17', id: 'slowdown',     title: 'When Your Account Slows Down',      body: sec17 },
-    { num: '18', id: 'checklist',    title: 'Daily / Weekly Checklist',          body: sec18 },
-    { num: '19', id: 'premium',      title: 'At 1,000 Followers: X Premium',     body: sec19 },
-    { num: '20', id: 'faq',          title: 'FAQ + How to Reach Us',             body: sec20 },
+  // ── Chapters ─────────────────────────────────────────────────────────
+  const chapters = [
+    { id: 'start', icon: '🚀', title: 'Start Here', sub: 'Rules, profile, new accounts',
+      sections: [
+        { num: 1, id: 'welcome', title: 'Welcome — The Big Picture', body: sec01 },
+        { num: 2, id: 'create',  title: 'Creating the Account',      body: sec02 },
+        { num: 3, id: 'profile', title: 'Profile Setup',             body: sec03 },
+        { num: 4, id: 'warmup',  title: 'Account Warm-Up (Day 1–21)', body: sec04 },
+      ]},
+    { id: 'daily', icon: '📅', title: 'Daily Work', sub: 'Posting, captions, content',
+      sections: [
+        { num: 5, id: 'algorithm', title: "How Twitter's Algorithm Works",  body: sec05 },
+        { num: 6, id: 'schedule',  title: 'Daily Posting Schedule',         body: sec06 },
+        { num: 7, id: 'captions',  title: 'Captions: What Works & Why',     body: sec07 },
+        { num: 8, id: 'bank',      title: 'Caption Bank (60+ captions)',    body: sec08 },
+        { num: 9, id: 'content',   title: 'Content Rules (Photos & Videos)', body: sec09 },
+        { num: 10, id: 'pinned',   title: 'Pinned Tweet — Wait for 100 Likes', body: sec10 },
+      ]},
+    { id: 'tools', icon: '🛠️', title: 'Tools & Engagement', sub: 'Link rule, growth tactics',
+      sections: [
+        { num: 11, id: 'link',     title: 'The Link Rule (CRITICAL)',     body: sec11 },
+        { num: 12, id: 'imgrep',   title: 'Image Comments (Strongest Growth)', body: sec12 },
+        { num: 13, id: 'steal',    title: 'Follower Stealing',            body: sec13 },
+        { num: 14, id: 'bots',     title: 'Bots in Your Comments',        body: sec14 },
+      ]},
+    { id: 'safe', icon: '🛡️', title: 'Keep Account Safe', sub: 'Shadowbans, viral hits',
+      sections: [
+        { num: 15, id: 'shadow',   title: 'Avoiding Shadowbans',          body: sec15 },
+        { num: 16, id: 'viral',    title: 'When a Post Goes Viral',       body: sec16 },
+        { num: 17, id: 'slowdown', title: 'When Your Account Slows Down', body: sec17 },
+      ]},
+    { id: 'ref', icon: '📚', title: 'Reference', sub: 'Checklist, Premium, FAQ',
+      sections: [
+        { num: 18, id: 'chk',      title: 'Daily / Weekly Checklist',     body: sec18 },
+        { num: 19, id: 'premium',  title: 'At 1,000 Followers: X Premium', body: sec19 },
+        { num: 20, id: 'faq',      title: 'FAQ + How to Reach Us',        body: sec20 },
+      ]},
   ];
 
-  // ── Sidebar nav ────────────────────────────────────────────────────
-  const sidebarHtml = sections.map(s =>
-    `<a class="gd-nav-link" href="#sec-${s.id}" onclick="event.preventDefault();(function(){var el=document.getElementById('sec-${s.id}');if(!el)return;el.classList.add('open');el.scrollIntoView({behavior:'smooth',block:'start'});})()"><span class="gd-nav-num">${s.num}</span>${escHtml(s.title)}</a>`
-  ).join('');
+  // ── Build HTML ───────────────────────────────────────────────────────
+  const pillsHtml = chapters.map((c, i) => `
+    <a class="gd-chtab${i === 0 ? ' active' : ''}" data-chapter="ch-${c.id}" href="#ch-${c.id}" onclick="event.preventDefault();(function(){var el=document.getElementById('ch-${c.id}');if(!el)return;el.querySelectorAll('.gd-sec').forEach(function(s){s.classList.remove('collapsed');});el.scrollIntoView({behavior:'smooth',block:'start'});document.querySelectorAll('.gd-chtab').forEach(function(t){t.classList.remove('active');});event.currentTarget.classList.add('active');})()">
+      <span class="gd-chtab-icon">${c.icon}</span>
+      <span class="gd-chtab-txt">
+        <span class="gd-chtab-title">${escHtml(c.title)}</span>
+        <span class="gd-chtab-sub">${escHtml(c.sub)}</span>
+      </span>
+    </a>
+  `).join('');
 
-  // ── Sections HTML ──────────────────────────────────────────────────
-  const sectionsHtml = sections.map(s => sec(s.num, s.id, s.title, s.body, s.open)).join('');
+  const chaptersHtml = chapters.map(c => {
+    const secsHtml = c.sections.map(s => section(s.num, s.id, s.title, s.body)).join('');
+    return `<div class="gd-chapter" id="ch-${c.id}">
+      <div class="gd-chapter-head">
+        <div class="gd-chapter-icon">${c.icon}</div>
+        <div>
+          <div class="gd-chapter-eyebrow">Chapter</div>
+          <h2 class="gd-chapter-title">${escHtml(c.title)}</h2>
+          <div class="gd-chapter-subtitle">${escHtml(c.sub)}</div>
+        </div>
+      </div>
+      ${secsHtml}
+    </div>`;
+  }).join('');
 
-  // ── Quick Wins ─────────────────────────────────────────────────────
-  const quickWins = `
-    <div class="gd-quickwins">
-      <h2>5 Quick Wins — Do These Immediately!</h2>
-      <ol>
-        <li><strong>Don&apos;t put a link in any tweet — ever.</strong> The link lives in the bio only. A link in a tweet drops reach by 30–50 %.</li>
-        <li><strong>Keep captions short and ask questions.</strong> Under 25 characters performs 3× better. Questions get 50 % more engagement than statements.</li>
-        <li><strong>Engage for 5 minutes after every post.</strong> Scroll For You, reply, like — this is what wins the first 30 minutes.</li>
-        <li><strong>Wait for 100 followers before requesting a link.</strong> Then DM Justin (@SunnyAngels_Admin). At 1,000 followers — message him again for Premium.</li>
-        <li><strong>Use the Viral Photos / Videos / Text tabs daily.</strong> That is where you find what is working <em>this week</em> and which posts to image-reply on.</li>
-      </ol>
-    </div>
-  `;
-
-  // ── Final HTML ─────────────────────────────────────────────────────
   el.innerHTML = `
-    <div class="gd-layout">
-      <aside class="gd-sidebar">
-        <div class="gd-sidebar-brand">Twitter / X Ops Guide</div>
-        <nav class="gd-nav">${sidebarHtml}</nav>
-      </aside>
-      <main class="gd-main">
-        <div class="gd-hero">
-          <h1>Twitter / X Operations Guide</h1>
-          <p>US Market Targeting — Team Playbook</p>
-          <p class="gd-updated">Last updated: May 2026</p>
-        </div>
-        <div class="gd-search-wrap">
-          <input class="gd-search-input" type="text" placeholder="Search the guide..." id="guide-search-input" oninput="guideSearch(this.value)">
-        </div>
-        ${quickWins}
-        <div id="guide-sections">${sectionsHtml}</div>
-        <p id="guide-no-results" class="gd-no-results" style="display:none">No sections match your search.</p>
-        <div class="gd-footer">
-          <p>Internal Sunny Angels playbook — do not distribute. Based on 4,996 tweets from 226 top creators + 2026 X algorithm research.</p>
-        </div>
-      </main>
+    <div class="gd-wrap">
+      <div class="gd-hero">
+        <h1>Sunny Angels — Twitter / X Playbook</h1>
+        <p>Welcome to the Sunny Angels Twitter playbook. This guide shows you how to run a creator account on X — what to post, when to post it, what to avoid, and how to grow it from zero. Everything here comes from analyzing what actually works.</p>
+      </div>
+
+      <div class="gd-info">
+        <div class="gd-info-eyebrow"><span class="gd-emoji">🚩</span>THIS GUIDE WAS BUILT FROM REAL DATA</div>
+        <p>We analyzed <strong>4,996 tweets from 226 top creators</strong> in our niche, ran them through the open-source X algorithm rules, and turned every pattern into something you can follow.</p>
+        <p class="gd-hl">Your consistency matters.</p>
+        <p>This is a playbook, not a magic formula. The accounts that follow this guide every day grow. The ones that don&apos;t — don&apos;t. Read the whole thing before you post anything.</p>
+      </div>
+
+      <div class="gd-info" style="background: linear-gradient(135deg, rgba(245,158,11,.12), rgba(245,158,11,.04)); border-color: rgba(245,158,11,.30);">
+        <div class="gd-info-eyebrow" style="color: #fbbf24;"><span class="gd-emoji">⚠️</span>IMPORTANT — Read Before You Work</div>
+        <p>If you&apos;re unsure about <strong>anything</strong> — ask Justin (<strong>@SunnyAngels_Admin</strong>) before doing it. This guide covers both how to use this dashboard AND how to run the account. The dashboard tabs (Viral Photos / Videos / Text / Creators / Bios / Strategy) are your daily tools — open them every shift.</p>
+      </div>
+
+      <div class="gd-chnav">${pillsHtml}</div>
+
+      <div class="gd-ctrl">
+        <button class="gd-btn" onclick="document.querySelectorAll('.gd-sec').forEach(s=>s.classList.remove('collapsed'))">Expand all</button>
+        <button class="gd-btn" onclick="document.querySelectorAll('.gd-sec').forEach(s=>s.classList.add('collapsed'))">Collapse all</button>
+        <button class="gd-btn" onclick="if(confirm('Reset all progress?')){Object.keys(localStorage).filter(k=>k.startsWith('gsec_done_')||k.startsWith('gcl_')).forEach(k=>localStorage.removeItem(k));location.reload();}">Reset progress</button>
+      </div>
+
+      <input class="gd-search" type="text" placeholder="🔍 Search the guide..." id="guide-search-input" oninput="guideSearch(this.value)">
+
+      <div id="guide-sections">${chaptersHtml}</div>
+      <p id="guide-no-results" style="display:none;color:#7e7e9a;text-align:center;padding:32px 0;font-size:14px;">No sections match your search.</p>
+
+      <div class="gd-footer">
+        Sunny Angels — Twitter / X Playbook · Internal · Based on 4,996 tweets from 226 top creators + 2026 X algorithm research
+      </div>
     </div>
   `;
 
@@ -2375,15 +2441,15 @@ function renderGuide() {
 // ─── GUIDE SEARCH ────────────────────────────────────────────────────
 function guideSearch(query) {
   const q = query.trim().toLowerCase();
-  const sections = document.querySelectorAll('#guide-sections .gd-section');
+  const sections = document.querySelectorAll('#guide-sections .gd-sec');
   let anyVisible = false;
   sections.forEach(s => {
-    if (!q) { s.classList.remove('search-hidden'); anyVisible = true; return; }
-    const title = (s.dataset.sectionTitle || '').toLowerCase();
-    const body  = (s.querySelector('.gd-section-body') || {}).textContent || '';
+    if (!q) { s.classList.remove('hidden'); anyVisible = true; return; }
+    const title = (s.dataset.title || '').toLowerCase();
+    const body  = (s.querySelector('.gd-sec-body') || {}).textContent || '';
     const match = title.includes(q) || body.toLowerCase().includes(q);
-    s.classList.toggle('search-hidden', !match);
-    if (match) { anyVisible = true; s.classList.add('open'); }
+    s.classList.toggle('hidden', !match);
+    if (match) { anyVisible = true; s.classList.remove('collapsed'); }
   });
   const nr = document.getElementById('guide-no-results');
   if (nr) nr.style.display = (q && !anyVisible) ? 'block' : 'none';
