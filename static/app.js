@@ -1827,14 +1827,16 @@ function renderGuide() {
     <h3>⚙️ Settings to Configure Right Now</h3>
     <p>Open the X app → <em>Settings &amp; Privacy</em>. Walk through every item below.</p>
 
-    ${step(1, '<strong>Sensitive content — ON.</strong> <em>Privacy and safety → Your posts → Mark media as sensitive.</em> Without this, X silently reduces reach.')}
+    ${step(1, '<strong>Mark your own media as sensitive — ON.</strong> <em>Privacy and safety → Your posts → Mark media you Tweet as containing material that may be sensitive.</em> This is about YOUR posts. Without it, X silently reduces your reach.')}
     ${step(2, '<strong>Precise location — OFF.</strong> <em>Privacy and safety → Location information.</em> Precise location filters reach geographically; we want the whole US.')}
-    ${step(3, '<strong>Display sensitive content — ON.</strong> <em>Content you see → Display media that may contain sensitive content.</em> So you can see and comment under competing accounts.')}
+    ${step(3, '<strong>NSFW filter — ON (so you do NOT see explicit content).</strong> <em>Privacy and safety → Content you see → "Display media that may contain sensitive content" → leave UNCHECKED / OFF.</em> This blocks explicit content from showing up on your screen while you work. The dashboard already curates SFW posts from our tracked creators — you should never have to look at explicit content as part of this job.')}
     ${step(4, '<strong>Discoverability — both ON.</strong> Let people find you by email and phone.')}
     ${step(5, '<strong>Direct messages — Allow from everyone.</strong> We want DMs flowing in.')}
     ${step(6, '<strong>Professional / Twitter Pro — LEAVE OFF.</strong> Tags the account as a business and kills personal reach.')}
     ${step(7, '<strong>Language: English (US). Phone region: United States.</strong>')}
     ${step(8, '<strong>Birthday — hide both year and date.</strong> Edit Profile → "Who can see this" → Only you.')}
+
+    ${alert_('green', '<strong>WHY THE NSFW FILTER IS ON</strong>Two different settings, easy to confuse:<br><br>• <strong>Mark your media as sensitive</strong> (Step 1) — about YOUR posts. ON. Helps reach.<br>• <strong>Display sensitive media</strong> (Step 3) — about what YOU SEE. OFF. Protects you from explicit content while doing your job.<br><br>Your work is done from the <strong>dashboard</strong> — Viral Photos / Videos / Text already filter out explicit material. You do not need to expose yourself to anything you would not want to see. If you ever see something explicit on X while working, mute or block the account and move on.')}
 
     ${alert_('red', '<strong>DAY 1 RULES</strong>For the <strong>first 24 hours after signup</strong>: just set up the profile, scroll the For You page for 10 minutes, like 5–10 tweets. Do NOT follow anyone. Do NOT post. Twitter watches new accounts very closely in the first day.')}
   `;
