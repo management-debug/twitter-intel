@@ -1345,20 +1345,42 @@ function renderAlgoTable() {
   `).join('');
 }
 
+// Convert an EST hour label ("6am", "1pm", "12pm") to its Asia/Manila
+// equivalent. Manila is +13 hours from EST (year-round; we don't track
+// the EDT vs EST difference here — close enough for slot reasoning).
+function estToManila(estHour) {
+  const m = estHour.match(/^(\d+)(am|pm)$/);
+  if (!m) return estHour;
+  let h = parseInt(m[1], 10) % 12;
+  if (m[2] === 'pm') h += 12;
+  const ph24 = (h + 13) % 24;
+  const ph12 = ph24 % 12 || 12;
+  const suf = ph24 < 12 ? 'a' : 'p';
+  return `${ph12}${suf}`;
+}
+
 function renderTimeGrid() {
   const container = $('#time-grid');
   if (!container) return;
   const { days, hours, heat } = strategyData.bestTimes;
 
-  // Build column per day
-  let html = '';
+  // Left-most column: hour labels in BOTH US Eastern and Manila time
+  let html = `<div class="time-col time-col-labels">
+    <div class="time-day">·</div>
+    ${hours.map(h => `
+      <div class="time-hour-label">
+        <span class="est">${h}</span>
+        <span class="ph">${estToManila(h)}</span>
+      </div>
+    `).join('')}
+  </div>`;
+
+  // Day columns — slots no longer print the hour (left column owns labels)
   for (let d = 0; d < days.length; d++) {
     html += `<div class="time-col">
       <div class="time-day">${days[d]}</div>
       ${hours.map((h, hIdx) => `
-        <div class="time-slot heat-${heat[hIdx][d]}" title="${days[d]} ${h}: heat ${heat[hIdx][d]}/5">
-          ${heat[hIdx][d] >= 4 ? h : ''}
-        </div>
+        <div class="time-slot heat-${heat[hIdx][d]}" title="${days[d]} ${h} EST · ${estToManila(h)} Manila — heat ${heat[hIdx][d]}/5"></div>
       `).join('')}
     </div>`;
   }

@@ -390,8 +390,20 @@ def _persist_media_paths(posts_with_media, media_stats):
 
 
 def run_daily_refresh_pipeline():
-    """Refresh existing accounts (last 1 day) — for keeping data fresh."""
-    _run_refresh_window("daily_refresh", days_back=1, label="DAILY REFRESH")
+    """Refresh existing accounts — re-scrape the last 3 days of posts.
+
+    Window is 3 days (not 1) so retroactive viral detection works:
+    posts often take 24–48 hours to accumulate enough likes to cross
+    the viral threshold. With a 1-day window, those slow-burn virals
+    would be missed forever (we wouldn't re-fetch their stats again
+    until the weekly/monthly pipeline). With a 3-day window every
+    new viral hit gets picked up within 24 hours of becoming viral.
+
+    Note: bulk_upsert_posts re-calculates is_viral for every post on
+    every refresh, using the current account avg_likes/avg_views — so
+    is_viral gets corrected upward as the post accumulates likes.
+    """
+    _run_refresh_window("daily_refresh", days_back=3, label="DAILY REFRESH")
 
 
 def run_refresh_pipeline():

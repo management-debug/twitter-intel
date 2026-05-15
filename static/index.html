@@ -14,7 +14,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/static/style.css?v=28" />
+  <link rel="stylesheet" href="/static/style.css?v=29" />
 </head>
 <body>
 
@@ -271,9 +271,11 @@
         <span class="count" id="photos-count"></span>
         <div class="period-buttons" id="photos-period-buttons">
           <button class="period-btn active" data-value="all">All Time</button>
-          <button class="period-btn" data-value="month">This Month</button>
-          <button class="period-btn" data-value="week">This Week</button>
           <button class="period-btn" data-value="today">Today</button>
+          <button class="period-btn" data-value="yesterday">Yesterday</button>
+          <button class="period-btn" data-value="week">This Week</button>
+          <button class="period-btn" data-value="this_month">This Month</button>
+          <button class="period-btn" data-value="last_month">Last Month</button>
         </div>
         <div class="controls" style="display:flex;flex-wrap:wrap;gap:8px;align-items:center">
           <select id="photos-sort" class="select-input">
@@ -311,9 +313,11 @@
         <span class="count" id="videos-count"></span>
         <div class="period-buttons" id="videos-period-buttons">
           <button class="period-btn active" data-value="all">All Time</button>
-          <button class="period-btn" data-value="month">This Month</button>
-          <button class="period-btn" data-value="week">This Week</button>
           <button class="period-btn" data-value="today">Today</button>
+          <button class="period-btn" data-value="yesterday">Yesterday</button>
+          <button class="period-btn" data-value="week">This Week</button>
+          <button class="period-btn" data-value="this_month">This Month</button>
+          <button class="period-btn" data-value="last_month">Last Month</button>
         </div>
         <div class="controls" style="display:flex;flex-wrap:wrap;gap:8px;align-items:center">
           <select id="videos-sort" class="select-input">
@@ -351,9 +355,11 @@
         <span class="count" id="text-count"></span>
         <div class="period-buttons" id="text-period-buttons">
           <button class="period-btn active" data-value="all">All Time</button>
-          <button class="period-btn" data-value="month">This Month</button>
-          <button class="period-btn" data-value="week">This Week</button>
           <button class="period-btn" data-value="today">Today</button>
+          <button class="period-btn" data-value="yesterday">Yesterday</button>
+          <button class="period-btn" data-value="week">This Week</button>
+          <button class="period-btn" data-value="this_month">This Month</button>
+          <button class="period-btn" data-value="last_month">Last Month</button>
         </div>
         <div class="controls" style="display:flex;flex-wrap:wrap;gap:8px;align-items:center">
           <select id="text-sort" class="select-input">
@@ -413,7 +419,10 @@
 
         <!-- Best posting times -->
         <div class="strategy-card">
-          <h3>Best Posting Times (EST)</h3>
+          <h3>Best Posting Times — US Eastern · <span style="color:#22d3ee">Manila (PH)</span></h3>
+          <div class="time-grid-note">
+            Heat map shows US audience prime time. <strong>Grey = US Eastern</strong>, <span class="ph">cyan = Manila</span> equivalent. Manila is <strong>+13 hours</strong> from US Eastern — the prime US windows (<strong>7–10pm EST</strong>) fall in your <span class="ph">8–11am Manila morning</span>, perfect for your shift.
+          </div>
           <div class="time-grid" id="time-grid"></div>
         </div>
       </div>
@@ -512,6 +521,6 @@
   <!-- ════════════════════════════════════════════════════ TOAST -->
   <div id="toast-container"></div>
 
-  <script src="/static/app.js?v=28"></script>
+  <script src="/static/app.js?v=29"></script>
 </body>
 </html>

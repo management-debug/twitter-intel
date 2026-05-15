@@ -538,9 +538,14 @@ def get_posts(page=1, limit=50, sort="likes", media_type=None, viral_only=False,
         if search:
             params["caption"] = f"ilike.%{search}%"
         if period != "all":
-            cutoff = _period_cutoff(period)
-            if cutoff:
-                params["create_time"] = f"gte.{cutoff}"
+            start, end = _period_range(period)
+            if start:
+                # PostgREST supports multiple constraints on the same column
+                # by chaining; we use the "and=(...)" filter for clarity.
+                if end:
+                    params["and"] = f"(create_time.gte.{start},create_time.lt.{end})"
+                else:
+                    params["create_time"] = f"gte.{start}"
         return _sb_get("posts", params)
 
     conn = get_db()
@@ -562,10 +567,13 @@ def get_posts(page=1, limit=50, sort="likes", media_type=None, viral_only=False,
         q += " AND caption LIKE ?"
         args.append(f"%{search}%")
     if period != "all":
-        cutoff = _period_cutoff(period)
-        if cutoff:
+        start, end = _period_range(period)
+        if start:
             q += " AND create_time >= ?"
-            args.append(cutoff)
+            args.append(start)
+        if end:
+            q += " AND create_time < ?"
+            args.append(end)
 
     q += f" ORDER BY {sort} DESC LIMIT ? OFFSET ?"
     args.extend([limit, offset])
@@ -598,9 +606,12 @@ def get_post_count(media_type=None, viral_only=False, period="all", min_mult=0, 
         if search:
             params["caption"] = f"ilike.%{search}%"
         if period != "all":
-            cutoff = _period_cutoff(period)
-            if cutoff:
-                params["create_time"] = f"gte.{cutoff}"
+            start, end = _period_range(period)
+            if start:
+                if end:
+                    params["and"] = f"(create_time.gte.{start},create_time.lt.{end})"
+                else:
+                    params["create_time"] = f"gte.{start}"
         return _sb_count("posts", params)
 
     conn = get_db()
@@ -615,9 +626,11 @@ def get_post_count(media_type=None, viral_only=False, period="all", min_mult=0, 
     if search:
         q += " AND caption LIKE ?"; args.append(f"%{search}%")
     if period != "all":
-        cutoff = _period_cutoff(period)
-        if cutoff:
-            q += " AND create_time >= ?"; args.append(cutoff)
+        start, end = _period_range(period)
+        if start:
+            q += " AND create_time >= ?"; args.append(start)
+        if end:
+            q += " AND create_time < ?"; args.append(end)
     count = conn.execute(q, args).fetchone()[0]
     conn.close()
     return count
@@ -896,18 +909,55 @@ def is_watched(username):
 
 # ─── Helpers ───────────────────────────────────────────────────────────────
 
+def _period_range(period):
+    """Return (start_iso, end_iso) tuple for a period filter.
+    `end_iso` is None for open-ended ranges. Date boundaries use Asia/Manila
+    since the team operates from PH — "today" means "today in Manila".
+    """
+    if not period or period == "all":
+        return (None, None)
+    try:
+        import pytz
+        manila = pytz.timezone("Asia/Manila")
+    except Exception:
+        manila = timezone.utc
+    now_manila = datetime.now(manila)
+    today_start = now_manila.replace(hour=0, minute=0, second=0, microsecond=0)
+
+    if period == "today":
+        return (today_start.astimezone(timezone.utc).isoformat(), None)
+    if period == "yesterday":
+        yesterday_start = today_start - timedelta(days=1)
+        return (
+            yesterday_start.astimezone(timezone.utc).isoformat(),
+            today_start.astimezone(timezone.utc).isoformat(),
+        )
+    if period == "week":
+        return ((now_manila - timedelta(days=7)).astimezone(timezone.utc).isoformat(), None)
+    if period == "2weeks":
+        return ((now_manila - timedelta(days=14)).astimezone(timezone.utc).isoformat(), None)
+    if period == "this_month":
+        month_start = today_start.replace(day=1)
+        return (month_start.astimezone(timezone.utc).isoformat(), None)
+    if period == "last_month":
+        this_month_start = today_start.replace(day=1)
+        # First day of previous month
+        if this_month_start.month == 1:
+            last_month_start = this_month_start.replace(year=this_month_start.year - 1, month=12)
+        else:
+            last_month_start = this_month_start.replace(month=this_month_start.month - 1)
+        return (
+            last_month_start.astimezone(timezone.utc).isoformat(),
+            this_month_start.astimezone(timezone.utc).isoformat(),
+        )
+    if period == "month":  # back compat — last 30 days
+        return ((now_manila - timedelta(days=30)).astimezone(timezone.utc).isoformat(), None)
+    if period == "3months":
+        return ((now_manila - timedelta(days=90)).astimezone(timezone.utc).isoformat(), None)
+    return (None, None)
+
+
 def _period_cutoff(period):
-    """Convert period string to ISO datetime cutoff."""
-    now = datetime.now(timezone.utc)
-    deltas = {
-        "today": timedelta(days=1),
-        "yesterday": timedelta(days=2),
-        "week": timedelta(days=7),
-        "2weeks": timedelta(days=14),
-        "month": timedelta(days=30),
-        "3months": timedelta(days=90),
-    }
-    d = deltas.get(period)
-    if d:
-        return (now - d).isoformat()
-    return None
+    """Back-compat shim — returns only the start of the range."""
+    start, _ = _period_range(period)
+    return start

@@ -53,19 +53,35 @@ class _CachedStaticFiles(StaticFiles):
         return resp
 
 
-# ─── Settings (file-backed JSON) ───────────────────────────────────────────
-# Auto-refresh toggle is persisted here. On Railway the data dir is ephemeral
-# across deploys, so admin re-toggles after a redeploy if needed.
+# ─── Settings (file-backed JSON + env-var fallback) ─────────────────────────
+# data/ is ephemeral on Render — the JSON disappears across deploys. Env vars
+# survive, so we use them as a default for the auto-refresh toggle. The file
+# still wins if the admin explicitly toggled (because saving writes the file),
+# but env covers the cold-start / fresh-deploy case.
 _SETTINGS_PATH = BASE_DIR / "data" / "settings.json"
 
 
+def _env_bool(name: str, default: bool = False) -> bool:
+    raw = os.getenv(name, "")
+    return raw.lower() in ("1", "true", "yes", "on") if raw else default
+
+
 def _load_settings():
-    if not _SETTINGS_PATH.exists():
-        return {}
-    try:
-        return json.loads(_SETTINGS_PATH.read_text())
-    except Exception:
-        return {}
+    settings = {}
+    if _SETTINGS_PATH.exists():
+        try:
+            settings = json.loads(_SETTINGS_PATH.read_text())
+        except Exception:
+            settings = {}
+    # Env-var defaults — applied only when the key is missing from the file.
+    # Lets the admin set AUTO_REFRESH_ENABLED=true on Render once and have it
+    # survive every deploy that wipes data/settings.json.
+    if "auto_refresh_enabled" not in settings:
+        # Default: ON. User intent is documented as "always-on daily refresh".
+        # An admin can flip it off in the UI (writes to file) or set
+        # AUTO_REFRESH_ENABLED=false on Render to override the default.
+        settings["auto_refresh_enabled"] = _env_bool("AUTO_REFRESH_ENABLED", True)
+    return settings
 
 
 def _save_settings(data: dict):
