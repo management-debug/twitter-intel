@@ -416,6 +416,79 @@ select option {
   flex-wrap: wrap;
 }
 
+/* ── Bio Inspiration Cards ───────────────────────────────────────── */
+.bios-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 14px;
+  margin-top: 18px;
+}
+.bio-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  transition: transform var(--transition), background var(--transition), border-color var(--transition);
+  min-height: 180px;
+}
+.bio-card:hover {
+  transform: translateY(-2px);
+  background: var(--card-hover);
+  border-color: rgba(99,91,255,0.25);
+}
+.bio-card-head { display: flex; gap: 12px; align-items: center; }
+.bio-card-avatar {
+  width: 44px; height: 44px; border-radius: 50%;
+  background: linear-gradient(135deg, #635bff, #22d3ee);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px; font-weight: 700; color: #fff; flex-shrink: 0;
+  overflow: hidden;
+}
+.bio-card-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.bio-card-meta { flex: 1; min-width: 0; }
+.bio-card-name {
+  font-weight: 600; color: var(--text); font-size: 14px;
+  display: flex; align-items: center; gap: 6px;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.bio-card-name .verified-tick { color: var(--accent); flex-shrink: 0; }
+.bio-card-handle { font-size: 12px; color: var(--text2); }
+.bio-card-text {
+  font-size: 13px; color: var(--text); line-height: 1.5;
+  white-space: pre-wrap;
+  word-break: break-word;
+  flex: 1;
+}
+.bio-card-text.muted { color: var(--text3); font-style: italic; }
+.bio-card-foot {
+  display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
+  font-size: 11px; color: var(--text2);
+  padding-top: 10px;
+  border-top: 1px solid var(--border);
+}
+.bio-chip {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 3px 8px; border-radius: 10px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid var(--border);
+}
+.bio-chip.followers { color: var(--text); font-weight: 500; }
+.bio-chip.location { background: var(--accent-dim); border-color: rgba(99,91,255,0.3); color: #b6b1ff; }
+.bio-chip.link { background: var(--success-dim); border-color: rgba(0,186,124,0.3); color: var(--success); }
+.bio-chip.link a { color: inherit; text-decoration: none; max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.bio-chip-copy {
+  margin-left: auto;
+  background: none; border: 1px solid var(--border);
+  color: var(--text2); cursor: pointer;
+  padding: 3px 8px; border-radius: 10px; font-size: 11px;
+  font-family: inherit;
+  transition: color var(--transition), border-color var(--transition);
+}
+.bio-chip-copy:hover { color: var(--text); border-color: var(--border-hover); }
+
 /* Auto-refresh toggle row */
 .auto-refresh-row {
   display: flex;

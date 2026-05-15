@@ -250,7 +250,7 @@ function initApp() {
 
 // ─── Tab Navigation ──────────────────────────────────────────────────
 function navigateTo(tab, pushState = true) {
-  const validTabs = ['dashboard', 'creators', 'photos', 'videos', 'text', 'strategy', 'guide', 'add'];
+  const validTabs = ['dashboard', 'creators', 'photos', 'videos', 'text', 'bios', 'strategy', 'guide', 'add'];
   if (!validTabs.includes(tab)) tab = 'dashboard';
   if (tab === 'add' && state.role !== 'admin') tab = 'dashboard';
 
@@ -284,6 +284,7 @@ function loadTab(tab) {
     case 'photos':    loadViralTab('photos', 1, false); break;
     case 'videos':    loadViralTab('videos', 1, false); break;
     case 'text':      loadViralTab('text', 1, false); break;
+    case 'bios':      loadBios(); break;
     case 'strategy':  renderStrategy(); break;
     case 'guide':     renderGuide(); break;
     case 'add':       /* static form, no load needed */ break;
@@ -685,6 +686,114 @@ async function loadCreatorPosts(id, mediaType) {
   } catch (err) {
     grid.innerHTML = `<div style="color:var(--danger);padding:20px">Error: ${escHtml(err.message)}</div>`;
   }
+}
+
+// ─── BIOS ────────────────────────────────────────────────────────────
+let biosData = [];
+let biosSort = 'followers';
+let biosFilter = 'all';
+
+async function loadBios() {
+  const grid = $('#bios-grid');
+  if (!grid) return;
+  grid.innerHTML = '<div class="text-muted" style="padding:20px">Loading bios…</div>';
+  try {
+    // Fetch big batch — 879 creators all in memory is fine
+    const data = await apiGet('/api/creators?limit=2000&sort=followers', 'bios_data');
+    if (!data) return;
+    biosData = data;
+    renderBios();
+  } catch (err) {
+    grid.innerHTML = `<div style="color:var(--danger);padding:20px">Error: ${escHtml(err.message)}</div>`;
+  }
+}
+
+function renderBios() {
+  const grid = $('#bios-grid');
+  const countEl = $('#bios-count');
+  if (!grid) return;
+
+  const q = ($('#bios-search')?.value || '').trim().toLowerCase();
+
+  let rows = biosData.filter(c => (c.bio || '').trim() || (c.location || '').trim());
+
+  if (biosFilter === 'has_location') {
+    rows = rows.filter(c => (c.location || '').trim());
+  } else if (biosFilter === 'has_link') {
+    rows = rows.filter(c => (c.bio_link || '').trim());
+  } else if (biosFilter === 'verified') {
+    rows = rows.filter(c => c.is_verified);
+  }
+
+  if (q) {
+    rows = rows.filter(c =>
+      (c.username || '').toLowerCase().includes(q) ||
+      (c.bio || '').toLowerCase().includes(q) ||
+      (c.location || '').toLowerCase().includes(q) ||
+      (c.display_name || '').toLowerCase().includes(q)
+    );
+  }
+
+  if (biosSort === 'username') {
+    rows.sort((a, b) => (a.username || '').localeCompare(b.username || ''));
+  } else {
+    rows.sort((a, b) => (b.followers || 0) - (a.followers || 0));
+  }
+
+  if (countEl) countEl.textContent = `${rows.length} bios`;
+
+  if (!rows.length) {
+    grid.innerHTML = '<div class="text-muted" style="padding:20px;grid-column:1/-1">No bios match the current filter.</div>';
+    return;
+  }
+
+  grid.innerHTML = rows.map(renderBioCard).join('');
+  // Wire copy buttons
+  grid.querySelectorAll('.bio-chip-copy').forEach(btn => {
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      const text = btn.dataset.copy || '';
+      navigator.clipboard.writeText(text)
+        .then(() => toast('Bio copied!', 'success'))
+        .catch(() => fallbackCopy(text));
+    });
+  });
+}
+
+function renderBioCard(c) {
+  const initials = (c.display_name || c.username || '?')[0].toUpperCase();
+  const bio = (c.bio || '').trim();
+  const loc = (c.location || '').trim();
+  const link = (c.bio_link || '').trim();
+  const verified = c.is_verified
+    ? `<svg class="verified-tick" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M22.5 12.5c0-1.58-.875-2.95-2.148-3.6.154-.435.238-.905.238-1.4 0-2.21-1.71-3.998-3.818-3.998-.47 0-.92.084-1.336.25C14.818 2.415 13.51 1.5 12 1.5s-2.816.917-3.437 2.25c-.415-.165-.866-.25-1.336-.25-2.11 0-3.818 1.79-3.818 4 0 .493.083.964.237 1.4-1.272.65-2.147 2.018-2.147 3.6 0 1.495.782 2.798 1.942 3.486-.02.17-.032.34-.032.514 0 2.21 1.708 4 3.818 4 .47 0 .92-.086 1.335-.25.62 1.334 1.926 2.25 3.437 2.25 1.512 0 2.818-.916 3.437-2.25.415.163.865.248 1.336.248 2.11 0 3.818-1.79 3.818-4 0-.174-.012-.344-.033-.513 1.158-.687 1.943-1.99 1.943-3.484zm-6.616-3.334l-4.334 6.5c-.145.217-.382.334-.625.334-.143 0-.288-.04-.416-.126l-.115-.094-2.415-2.415c-.293-.293-.293-.768 0-1.06s.768-.294 1.06 0l1.77 1.767 3.825-5.74c.23-.345.696-.436 1.04-.207.346.23.44.696.21 1.04z"/></svg>`
+    : '';
+  const followers = (c.followers ?? 0) > 0 ? fmtNum(c.followers) : '—';
+
+  let footChips = `<span class="bio-chip followers">${followers} followers</span>`;
+  if (loc) footChips += `<span class="bio-chip location">📍 ${escHtml(loc)}</span>`;
+  if (link) {
+    const display = link.replace(/^https?:\/\//, '').replace(/\/$/, '');
+    footChips += `<span class="bio-chip link"><a href="${escHtml(link)}" target="_blank" rel="noopener">🔗 ${escHtml(display)}</a></span>`;
+  }
+  if (bio) footChips += `<button class="bio-chip-copy" data-copy="${escHtml(bio)}">Copy</button>`;
+
+  return `
+    <div class="bio-card">
+      <div class="bio-card-head">
+        <div class="bio-card-avatar">
+          <img src="/api/avatars/${encodeURIComponent(c.username || '')}" alt="" onerror="this.style.display='none'" />
+          <span>${initials}</span>
+        </div>
+        <div class="bio-card-meta">
+          <div class="bio-card-name">${escHtml(c.display_name || c.username || '—')} ${verified}</div>
+          <div class="bio-card-handle">@${escHtml(c.username || '')}</div>
+        </div>
+      </div>
+      ${bio ? `<div class="bio-card-text">${escHtml(bio)}</div>` : '<div class="bio-card-text muted">No bio</div>'}
+      <div class="bio-card-foot">${footChips}</div>
+    </div>
+  `;
 }
 
 // ─── VIRAL TABS ──────────────────────────────────────────────────────
@@ -2027,6 +2136,20 @@ function bindEvents() {
 
   // Creators sort dropdown
   $('#creators-sort').addEventListener('change', () => { cacheClear('creators_'); loadCreators(); });
+
+  // Bios tab — operate on in-memory list so search is instant
+  const biosSearchEl = $('#bios-search');
+  if (biosSearchEl) {
+    biosSearchEl.addEventListener('input', debounce(renderBios, 150));
+    $('#bios-sort').addEventListener('change', e => { biosSort = e.target.value; renderBios(); });
+    $('#bios-filter-buttons').addEventListener('click', e => {
+      const btn = e.target.closest('.period-btn');
+      if (!btn) return;
+      $$('#bios-filter-buttons .period-btn').forEach(b => b.classList.toggle('active', b === btn));
+      biosFilter = btn.dataset.value;
+      renderBios();
+    });
+  }
 
   // Photos tab filters
   bindViralFilters('photos');

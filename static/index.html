@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/static/style.css?v=22" />
+  <link rel="stylesheet" href="/static/style.css?v=23" />
 </head>
 <body>
 
@@ -52,6 +52,7 @@
         <button class="tab-btn" data-tab="photos">Viral Photos</button>
         <button class="tab-btn" data-tab="videos">Viral Videos</button>
         <button class="tab-btn" data-tab="text">Viral Text</button>
+        <button class="tab-btn" data-tab="bios">Bios</button>
         <button class="tab-btn" data-tab="strategy">Strategy</button>
         <button class="tab-btn" data-tab="guide">Guide</button>
         <button class="tab-btn admin-only" data-tab="add">+ Add</button>
@@ -225,6 +226,32 @@
         </table>
       </div>
       <div id="creators-count" class="result-count"></div>
+    </div>
+
+    <!-- ─── TAB: BIOS ─── -->
+    <div id="tab-bios" class="tab-content hidden">
+      <div class="page-header">
+        <h1>Bio Inspiration</h1>
+        <p>Browse creator bios and locations for copywriting ideas</p>
+      </div>
+      <div class="toolbar">
+        <div class="search-wrap">
+          <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" id="bios-search" placeholder="Search bios, usernames, locations…" class="search-input" />
+        </div>
+        <select id="bios-sort" class="select-input">
+          <option value="followers">Sort: Followers</option>
+          <option value="username">Sort: Username</option>
+        </select>
+        <div class="period-buttons" id="bios-filter-buttons">
+          <button class="period-btn active" data-value="all">All</button>
+          <button class="period-btn" data-value="has_location">With Location</button>
+          <button class="period-btn" data-value="has_link">With Link</button>
+          <button class="period-btn" data-value="verified">Verified</button>
+        </div>
+      </div>
+      <div class="bios-grid" id="bios-grid"></div>
+      <div id="bios-count" class="result-count"></div>
     </div>
 
     <!-- ─── TAB: VIRAL PHOTOS ─── -->
@@ -478,6 +505,6 @@
   <!-- ════════════════════════════════════════════════════ TOAST -->
   <div id="toast-container"></div>
 
-  <script src="/static/app.js?v=22"></script>
+  <script src="/static/app.js?v=23"></script>
 </body>
 </html>
