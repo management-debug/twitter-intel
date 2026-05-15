@@ -1538,481 +1538,1017 @@ function renderGuide() {
   // ══════════════════════════════════════════════════════════════════
 
   const secA = `
-    <p>If you're coming from Threads, Twitter works differently in several key ways.</p>
-    ${tbl(['','Threads','Twitter/X'],[
-      ['Links in posts','Allowed freely','<strong>HEAVILY PUNISHED</strong> (30–50% reach loss)'],
-      ['Subscription','Not needed','<strong>X Premium is MANDATORY</strong> ($8/month)'],
-      ['Warm-up time','2 days','<strong>7–21 days</strong>'],
-      ['Most valuable action','Likes','<strong>Replies</strong> (150x more valuable than likes!)'],
-      ['Algorithm','Follow-based','AI-powered (Grok reads every post)'],
-      ['Hashtags','Less important','1–2 niche tags help, 3+ hurts you'],
-      ['Image comments','Strong tactic','Even stronger (Premium comments show first)'],
-    ])}
-    ${warnBox('The golden rule on Twitter is: <strong>Replies are everything.</strong> The algorithm values a reply chain 150x more than a simple like. Keep this in mind at all times.')}
+    <p>Welcome. This is the complete guide for running a Twitter / X account for one of our creators.</p>
+    <p>Your job is simple at heart: <strong>build a following</strong> by posting interesting personality content and engaging with people. Over time, those followers become people who click the link in the bio — and that's where the revenue happens.</p>
+
+    <h3>The Big Picture</h3>
+    <p>Twitter is the front door. Your tweets attract attention. People click the profile, see the bio, follow the link. The whole funnel rests on tweets that look fun and personal — not salesy.</p>
+
+    <h3>The 90 / 10 Rule</h3>
+    <p>About <strong>90 % of your tweets</strong> are personality, humor, engagement bait. Only <strong>10 %</strong> are promotional. Push the link too hard and the algorithm hides you. Push personality and the algorithm grows you.</p>
+
+    <h3>Three Things That Run Everything</h3>
+    <ul>
+      <li><strong>Replies are king.</strong> Getting people to reply to your tweet is 150× more valuable than getting a like.</li>
+      <li><strong>The first 30 minutes decide.</strong> If a tweet gets traction fast, it spreads. If not, it dies.</li>
+      <li><strong>Consistency beats bursts.</strong> Steady daily activity grows accounts. Ten posts one day and zero the next gets you flagged.</li>
+    </ul>
+
+    <h3>How to Use This Dashboard</h3>
+    <p>This site is not just for the guide — it is your daily research tool. Open it at the start of every shift.</p>
+    <ul>
+      <li><strong>Viral Photos</strong> — see which photo tweets are winning right now</li>
+      <li><strong>Viral Videos</strong> — same for video tweets</li>
+      <li><strong>Viral Text</strong> — top-performing captions sorted by likes (steal ideas from here)</li>
+      <li><strong>Creators</strong> — accounts to study, comment under, and find followers to steal</li>
+      <li><strong>Bios</strong> — inspiration for writing your own bio</li>
+      <li><strong>Strategy</strong> — live data on what is working this week</li>
+    </ul>
+    ${warnBox('The single biggest mistake new accounts make: putting a link in a tweet too early, or putting a link in the main tweet at all. <strong>Read Section K (The Link Rule) carefully before you post anything with a link.</strong>')}
   `;
 
   const secB = `
-    <p>Before anything else, the account needs to be set up correctly. A bad setup will hurt you from day one.</p>
-    <h3>Step 1: X Premium</h3>
-    ${warnBox('Every account <strong>MUST</strong> have X Premium ($8/month). Without Premium, your account gets almost zero reach since March 2025. This is not optional.', true)}
-    <p>What Premium gives you:</p>
-    <ul><li>10x more reach per post</li><li>Your comments appear at the TOP (above non-Premium users)</li><li>4,000 character limit instead of 280</li><li>Edit button</li><li>Blue checkmark (builds trust)</li></ul>
-    <h3>Step 2: Profile Picture</h3>
-    <ul><li>Bright, well-lit photo</li><li>Clear face shot performs best</li><li>No dark bathroom mirror selfies</li><li>Beach, pool, or bed photos in daylight are ideal</li><li>Do NOT use explicit nudity as profile picture (against X rules)</li></ul>
-    <h3>Step 3: Banner/Header</h3>
-    <ul><li>Use it strategically: showcase the creator's vibe/niche</li><li>Options: Cosplay photo, lifestyle shot, aesthetic design</li><li>Test how it looks on both mobile AND desktop (it crops differently)</li><li>Keep it "sexually soft" — suggestive, not explicit</li></ul>
-    <h3>Step 4: Username</h3>
-    <ul><li>Memorable and niche-relevant</li><li>NO generic names like "sexybaby9747"</li><li>Use the creator persona's name or a creative variation</li><li>Example: @pinkchyu, @angelicatlol68, @ciarruh</li></ul>
-    <h3>Step 5: Bio</h3>
-    <p><strong>Formula:</strong> [Personality/Niche] + [CTA arrow to link]</p>
-    <p><strong>Good bio examples:</strong></p>
+    <p>The first hour after creating the account decides a lot. Skip the wrong setting now and you will fight an uphill battle for weeks.</p>
+
+    <h3>Step 1 — Sign Up</h3>
+    <p>Use the email and phone number provided by the team. <strong>Never use your personal email or phone.</strong> Confirm the email and phone immediately so the account isn't flagged as suspicious.</p>
+
+    <h3>Step 2 — Pick a Username</h3>
     <ul>
-      <li>"hai i'm angelicat lol i cosplay kinda see more me :D ↓" (774K followers)</li>
-      <li>"your online addiction ♡" (471K followers)</li>
-      <li>"most viral girl on X for a reason 👇" (703K followers)</li>
-      <li>"full time internet gf backup @backupname" (229K followers)</li>
-      <li>"number 1 nintendogs fan" (2.1M followers)</li>
-      <li>"bad decisions only @backupname" (34K followers)</li>
+      <li>Must be memorable and fit the creator's persona</li>
+      <li><strong>Avoid generic spam names</strong> like <code>sexybaby9747</code>, <code>hotgirl2024</code>, <code>onlyfangirl</code> — Twitter sees those and the account is doomed before it starts</li>
+      <li>Good patterns: name + something soft (<code>@bellacosplay</code>), aesthetic word (<code>@lavendergloss</code>), or short and clean (<code>@iamruby</code>)</li>
+      <li>Lowercase only looks more authentic</li>
     </ul>
-    ${warnBox('<strong>Rules:</strong> Max 1–2 emojis · Use an arrow (↓ ⬇ 👇) pointing to your link · Do NOT write "18+" or "NSFW" · Do NOT write "subscribe to my OnlyFans" · Tag your backup account · Keep it under 100 characters')}
-    <h3>Step 6: Link in Bio</h3>
-    <p>Use a link aggregator, NOT a direct Fansly/OF link. Recommended: link.me, linktr.ee, hoo.be, onlylinks.com, or a custom domain.</p>
-    <h3>Step 7: Pinned Tweet</h3>
-    <p>Your pinned tweet is your permanent sales page. Everyone who visits your profile sees it first.</p>
-    <ul><li>Use your absolute best photo or video</li><li>Caption should create curiosity (not "subscribe to my OF")</li><li>Good examples: Best photo + "am i your type? (be honest)" · Best video + "A little motivation ❤"</li></ul>
-    <h3>Step 8: Sensitive Content Setting</h3>
-    <p>Go to <em>Settings &gt; Privacy and Safety &gt; Your posts &gt; Mark media as sensitive</em></p>
-    ${warnBox('<strong>TURN THIS ON.</strong> Without it, your reach gets silently reduced.')}
-    <h3>Step 9: Location Setting</h3>
-    <p>Go to <em>Settings &gt; Privacy and Safety &gt; Precise location</em></p>
-    ${warnBox('<strong>TURN THIS OFF.</strong> This ensures your content reaches a global audience, not just people near you.')}
+
+    <h3>Step 3 — Settings (Do These Right After Creating the Account)</h3>
+    <p>Open the X app. Go to <em>Settings &amp; Privacy</em>. Walk through every item below — these all matter.</p>
+
+    <h4>Sensitive content — ON</h4>
+    <p><em>Settings &amp; Privacy → Privacy and safety → Your posts → Mark media you post as containing material that may be sensitive</em></p>
+    ${warnBox('<strong>Turn this ON.</strong> Without it, X silently reduces your reach. Even if your photos look soft, leave it ON.')}
+
+    <h4>Precise location — OFF</h4>
+    <p><em>Settings &amp; Privacy → Privacy and safety → Location information → Precise location</em> → switch OFF</p>
+    <p>Reason: your audience should be the entire US, not people near you. Precise location filters your reach geographically.</p>
+
+    <h4>Display media that may contain sensitive content — ON</h4>
+    <p><em>Settings &amp; Privacy → Privacy and safety → Content you see → Display media that may contain sensitive content</em></p>
+    <p>If this is OFF, you can't see the kind of accounts you will be competing with — and you can't comment under them.</p>
+
+    <h4>Discoverability — ON (both options)</h4>
+    <p><em>Settings &amp; Privacy → Privacy and safety → Discoverability and contacts</em> → "Let people who have your email find you" and "Let people who have your phone number find you" — both ON.</p>
+
+    <h4>Direct Messages — Allow from everyone</h4>
+    <p><em>Settings &amp; Privacy → Privacy and safety → Direct messages</em> → set "Allow message requests from" to <strong>Everyone</strong>. We want DMs flowing in.</p>
+
+    <h4>Professional Account / Twitter Pro — LEAVE OFF</h4>
+    <p>Twitter offers a "Professional Profile" option (also called Twitter Pro) that tags the account as a business / public figure and shows a category badge.</p>
+    ${warnBox('<strong>Do NOT switch this on.</strong> It flags the account as commercial and reduces personal reach. Our accounts are personal personas — they need to look like a regular person, not a business.', true)}
+
+    <h4>Language &amp; Region</h4>
+    <ul>
+      <li>Display language: <strong>English (US)</strong></li>
+      <li>Phone region (in your phone settings): <strong>United States</strong></li>
+    </ul>
+
+    <h4>Birthday — Hide both year and date</h4>
+    <p>Go to your profile, tap Edit Profile, set "Who can see this" to <strong>Only you</strong> for both year and date. No reason to expose this.</p>
+
+    <h3>Step 4 — Stop. Don't Follow Anyone Yet.</h3>
+    <p>The temptation right after signup is to follow 50 creators. Do not do this. Twitter watches new accounts very closely in the first 24 hours. Mass-following = instant flag.</p>
+    <p>For the first day: just set up the profile, scroll the For You page for 10 minutes, like 5–10 tweets. That's enough.</p>
   `;
 
   const secC = `
-    <p>The warm-up on Twitter is longer than on Threads. Twitter watches new accounts very closely in the first weeks.</p>
-    ${warnBox('<strong>The warm-up takes 7–21 days. Do NOT rush this.</strong>')}
-    <div class="guide-phase">
-      <div class="guide-phase-title">Phase 1: Days 1–3 (Profile Setup &amp; Browsing)</div>
-      <h4>What to do</h4>
-      <ul><li>Complete your profile (photo, banner, bio — no link yet)</li><li>Follow 10–15 creators in our niche (spread across the day)</li><li>Like 10–20 posts per day</li><li>Write 5–10 genuine comments on other creators' posts</li><li>Scroll the For You page for 10–15 minutes</li><li>Follow some normal accounts too (sports, memes, news) to look natural</li></ul>
-      <h4>What NOT to do</h4>
-      <ul><li>Do NOT post anything yet</li><li>Do NOT add a link to your bio</li><li>Do NOT follow more than 15 accounts per day</li><li>Do NOT like more than 20 posts per day</li></ul>
-    </div>
-    <div class="guide-phase">
-      <div class="guide-phase-title">Phase 2: Days 4–7 (Building Engagement)</div>
-      <h4>What to do</h4>
-      <ul><li>Follow 10–15 more creators (total ~30–50)</li><li>Like 30–50 posts per day</li><li>Write 10–15 genuine comments per day</li><li>Post your first 2–3 tweets (TEXT ONLY)</li><li>Examples: "twitter is so much better than threads ngl" · "i need a coffee and a hug" · "someone explain to me why mornings exist"</li><li>Start replying to comments on your own posts</li></ul>
-      <h4>What NOT to do</h4>
-      <ul><li>Do NOT post photos or videos yet</li><li>Do NOT add a link anywhere</li><li>Do NOT use hashtags</li><li>Do NOT follow more than 50 people total</li></ul>
-    </div>
-    <div class="guide-phase">
-      <div class="guide-phase-title">Phase 3: Days 8–14 (Content Start)</div>
-      <h4>What to do</h4>
-      <ul><li>Post your first photo/video tweet (use your best content)</li><li>Post 1–2 media tweets per day</li><li>Continue writing 15–20 comments per day</li><li>Like 50–100 posts per day</li><li>Reply to anyone who comments on your posts</li></ul>
-      <h4>What NOT to do</h4>
-      <ul><li>Do NOT add a link yet (wait until day 15+)</li><li>Do NOT post more than 3 times per day</li><li>Do NOT mass-follow or mass-unfollow</li></ul>
-    </div>
-    <div class="guide-phase">
-      <div class="guide-phase-title">Phase 4: Days 15–21 (Going Live)</div>
-      <ul><li>Add your link-in-bio (link.me / linktr.ee)</li><li>Set up your pinned tweet</li><li>Increase to 3–5 posts per day</li><li>Post your first link as a REPLY to your own tweet (NEVER in the main tweet)</li><li>Start follower stealing (see Section G)</li><li>Start image commenting strategy (see Section H)</li><li>Maximum 1 link per day for the first week</li></ul>
-    </div>
-    <div class="guide-phase">
-      <div class="guide-phase-title">Phase 5: Day 22+ (Full Operation)</div>
-      <ul><li>You are now fully warmed up</li><li>Follow the daily posting schedule in Section F</li><li>Maximum 2 links per day</li><li>Full interaction strategy</li></ul>
-    </div>
+    <p>The profile is your storefront. Almost everyone who clicks your name will decide to follow or not within five seconds of looking at it. Make those five seconds count.</p>
+
+    <h3>Profile Picture (Avatar)</h3>
+    <ul>
+      <li><strong>Clear face shot.</strong> Humans recognize faces faster than anything else — and trust faces more than logos.</li>
+      <li><strong>Bright, daylight lighting.</strong> A bedroom-mirror photo at night will not perform.</li>
+      <li><strong>Good settings:</strong> beach, pool, bed during daylight, cozy room with a window.</li>
+      <li>No explicit nudity — X rules will restrict the account.</li>
+      <li>Dark, blurry, or back-lit photos kill conversion. Replace immediately.</li>
+    </ul>
+
+    <h3>Header / Banner</h3>
+    <p>Use the banner for personality and vibe. Options that work:</p>
+    <ul>
+      <li>A second photo of the creator (different from the avatar)</li>
+      <li>A cosplay or themed shot</li>
+      <li>An aesthetic background (pink gradient, beach view, neon room) with the username overlaid</li>
+      <li>A clean meme that fits the persona</li>
+    </ul>
+    ${warnBox('<strong>Check the banner on a phone after you upload it.</strong> Almost all followers see Twitter on mobile, so this is the only view that matters. If the creator&apos;s face is cut off on mobile — re-crop and re-upload.')}
+
+    <h3>Display Name</h3>
+    <ul>
+      <li>Persona's first name + a soft emoji (e.g. <code>bella ♡</code>, <code>ruby 🌸</code>)</li>
+      <li>Keep it short — long display names get truncated</li>
+      <li>Don't write "18+", "NSFW", or anything explicit in the display name</li>
+    </ul>
+
+    <h3>Bio</h3>
+    <p>The bio has 160 characters. Use a formula:</p>
+    <p><strong>[Personality / niche]</strong> + <strong>[soft hint at the persona]</strong> + <strong>[arrow ↓]</strong> (the arrow points to the link spot — even if there is no link yet, it primes people to look there later).</p>
+    <p>Examples that work — note how short and personal they are:</p>
+    ${codeBlock([
+      '"your online addiction ♡"',
+      '"most viral girl on X for a reason 👇"',
+      '"full time internet gf 🤍"',
+      '"bad decisions only"',
+      '"hai im angelicat lol i cosplay kinda 🪽 see more me :D ↓"',
+      '"Cosplayer ♡ UR Goth GF"',
+    ], 'Working Bio Examples')}
+    <p>Rules:</p>
+    <ul>
+      <li>Maximum 1–2 emojis</li>
+      <li>No <strong>"18+"</strong>, no <strong>"NSFW"</strong>, no <strong>"subscribe"</strong>, no <strong>"DM for"</strong>. These trigger silent reach reductions.</li>
+      <li>No link until 100 followers (see Section K — Justin will create one for you)</li>
+      <li>The arrow ↓ at the end is psychological — it tells people to look down for the link</li>
+    </ul>
+
+    <h3>Pinned Tweet</h3>
+    <p><strong>Don't pin anything yet.</strong> The pinned tweet only matters when one of your posts hits at least 100 likes. Pinning a low-performing tweet sends a worse signal than no pin at all. See Section J for the rules.</p>
+
+    <h3>Location, Website, Birthday</h3>
+    <ul>
+      <li><strong>Location:</strong> set a US city that fits the persona (Los Angeles, Miami, Austin, Tampa, Phoenix all work). Don't pick "United States" — too vague.</li>
+      <li><strong>Website:</strong> leave blank until Justin gives you a link.</li>
+      <li><strong>Birthday:</strong> set a date that makes the persona age 22–28. Keep both year and date hidden (see Section B).</li>
+    </ul>
   `;
 
   const secD = `
-    <p>Twitter shadowbans are more common and harder to detect than Threads restrictions. A shadowbanned account looks normal to you, but your tweets are invisible to everyone else.</p>
-    <h3>Daily Limits — NEVER Exceed These</h3>
-    ${tbl(['Action','During Warm-Up','After Warm-Up','Hard Limit'],[
-      ['Follows','15/day','50/day','Never &gt;100/day'],
-      ['Likes','50/day','200/day','Never &gt;100/hour'],
-      ['Comments/Replies','15/day','50/day','Never &gt;30/hour'],
-      ['Posts','2–3/day','5/day','Never &gt;15/day'],
-      ['Links','0','2/day','Never &gt;2/day'],
-      ['Unfollows','0','20/day','Never &gt;50/day'],
+    <p>Twitter watches new accounts closely. The first three weeks are about looking like a real person before you act like a creator. Rush it and you get shadowbanned within the first month.</p>
+
+    ${warnBox('Posting starts on Day 1 with light volume and ramps up over three weeks. The numbers in this section are the safe path — do not exceed them.')}
+
+    <div class="guide-phase">
+      <div class="guide-phase-title">Phase 1 — Day 1 to Day 3 (Light start)</div>
+      <h4>What to do</h4>
+      <ul>
+        <li><strong>1 post per day</strong> — keep it simple, one good photo + short caption</li>
+        <li>Follow 5–10 creators in our niche (spread across the day, not all at once)</li>
+        <li>Like 10–20 tweets per day</li>
+        <li>Write 5 short, friendly replies on other creators' tweets</li>
+        <li>Scroll the For You page 10 minutes</li>
+      </ul>
+      <h4>What NOT to do</h4>
+      <ul>
+        <li>No link in the bio yet</li>
+        <li>No link in any tweet</li>
+        <li>No mass follow / unfollow</li>
+      </ul>
+    </div>
+
+    <div class="guide-phase">
+      <div class="guide-phase-title">Phase 2 — Day 4 to Day 10 (Engagement build)</div>
+      <h4>What to do</h4>
+      <ul>
+        <li><strong>2 posts per day</strong>, 4–6 hours apart</li>
+        <li>Follow 10–15 more creators (total ~30–40)</li>
+        <li>Like 30–50 tweets per day</li>
+        <li>15 thoughtful replies per day</li>
+        <li>Start using the <strong>Image Comments tactic</strong> (Section L) — small daily dose, 3–5 per day</li>
+      </ul>
+      <h4>What NOT to do</h4>
+      <ul>
+        <li>Still no link anywhere</li>
+        <li>No 3rd-party scheduling apps connected to the account</li>
+      </ul>
+    </div>
+
+    <div class="guide-phase">
+      <div class="guide-phase-title">Phase 3 — Day 11 onward (Full operation)</div>
+      <h4>What to do</h4>
+      <ul>
+        <li><strong>3 posts per day</strong>, spread across the active hours</li>
+        <li>Like 50–100 tweets per day</li>
+        <li>20–30 replies per day, half of them as image-replies on viral posts</li>
+        <li>5–10 follower steals per day (Section M)</li>
+        <li>Once you cross <strong>100 followers</strong>: message Justin → he creates your link → add it to the bio</li>
+      </ul>
+      <h4>What NOT to do</h4>
+      <ul>
+        <li>Never exceed 50 replies per hour</li>
+        <li>Never exceed 100 likes per hour</li>
+        <li>Never post more than 5 tweets in a day, even on a great day</li>
+      </ul>
+    </div>
+
+    <h3>Quick Reference</h3>
+    ${tbl(['Action','Day 1–3','Day 4–10','Day 11 +'],[
+      ['Posts','1 / day','2 / day','3 / day'],
+      ['Follows','5–10 / day','10–15 / day','max 30 / day'],
+      ['Likes','10–20 / day','30–50 / day','50–100 / day'],
+      ['Replies','5 / day','15 / day','20–30 / day'],
+      ['Link in bio','No','No','Only after 100 followers'],
     ])}
-    <h3>What Causes a Shadowban:</h3>
-    <ul>
-      <li>Posting links in main tweets (especially on new accounts)</li>
-      <li>Mass-following or mass-unfollowing</li>
-      <li>Too many likes in a short time</li>
-      <li>Posting the exact same text multiple times</li>
-      <li>Using more than 2 hashtags</li>
-      <li>Using oversaturated hashtags (#OnlyFans, #porn, #nsfw)</li>
-      <li>Using ALL CAPS in tweets</li>
-      <li>Having third-party apps connected to your account</li>
-      <li>Negative, aggressive, or combative tweets (Grok AI detects this!)</li>
-      <li>Posting the same photo with the same caption across multiple accounts</li>
-    </ul>
-    <h3>How to Detect a Shadowban:</h3>
-    <ol><li>Go to <strong>shadowban.eu</strong> and check your account</li><li>Open a private/incognito browser, go to x.com and search for your exact tweet text. If it doesn't appear, you are shadowbanned.</li></ol>
-    <h3>What to Do if Shadowbanned:</h3>
-    <ol>
-      <li><strong>STOP everything</strong> for 24–72 hours (no likes, no follows, no posts)</li>
-      <li>After the cooldown: Only write genuine comments and replies for 2 days (no links)</li>
-      <li>Post quote retweets and photos without links to appear human</li>
-      <li>Slowly return to normal activity</li>
-      <li>If the shadowban persists after 72 hours, contact us</li>
-    </ol>
-    ${warnBox('<strong>Always let us know immediately if you suspect a shadowban</strong> so we can assess the situation and adjust.')}
   `;
 
   const secE = `
-    ${warnBox('<strong>NEVER put a link in your main tweet. EVER.</strong> Since March 2025, Twitter penalizes any tweet with an external link by reducing its reach by 30–50%.', true)}
-    <h3>The Correct Way to Post Links:</h3>
-    <p><strong>Step 1:</strong> Post your tweet with the photo/video and caption. No link.</p>
-    <p><strong>Step 2:</strong> Immediately reply to your own tweet with the link.</p>
-    ${codeBlock(['Main tweet: "am i your type? (be honest) 🖤" + [photo]','Reply to own tweet: "more of me here ↓ [link]"'], 'Example')}
-    <h3>Link Rules:</h3>
+    <p>You do not need to know everything about the algorithm. You need to know the seven rules below and what they look like in real life. Every rule has a real-world scenario.</p>
+
+    <h3>1. Replies are the strongest signal — 150× more valuable than likes</h3>
+    <p>Twitter measures how much your tweet starts conversations. A reply chain (someone replies, you reply, they reply back) tells the algorithm "this is interesting people, push it harder."</p>
+    <div class="guide-scenario">
+      <div class="guide-scenario-label">Scenario</div>
+      <div class="guide-scenario-body">You post a tweet and it gets 50 likes but zero replies. The algorithm reads this as "popular but not interesting" and stops pushing it. <strong>What to do:</strong> always end captions with a question. Adding "(be honest)" doubles reply chances because it reads as a challenge.</div>
+    </div>
+
+    <h3>2. The first 30 minutes decide everything</h3>
+    <p>Twitter tests every tweet on a small audience first. If engagement is strong in the first 30 minutes, it gets pushed wider. If not, it dies.</p>
+    <div class="guide-scenario">
+      <div class="guide-scenario-label">Scenario</div>
+      <div class="guide-scenario-body">You post and then go check the kitchen for 20 minutes. Nobody in your follower list happened to see it pop up. The tweet dies. <strong>What to do:</strong> right after posting — like 3 tweets on the For You page, reply to 2 creators, scroll for 5 minutes. This signals to the algorithm that <em>you</em> are active, which makes it show your tweet to more people.</div>
+    </div>
+
+    <h3>3. Bookmarks are gold — 20× more valuable than likes</h3>
+    <p>Most creators ignore bookmarks. Saving a tweet tells Twitter "I want to come back to this later" — a much stronger signal than a tap of the heart.</p>
+    <div class="guide-scenario">
+      <div class="guide-scenario-label">Scenario</div>
+      <div class="guide-scenario-body">A photo with caption "this is what 180lbs looks like :D" gets bookmarked because viewers want to look at it later. That bookmark counts 20× a like. <strong>What to do:</strong> "save-worthy" photos (full body, well-composed) collect bookmarks even if the likes look quiet.</div>
+    </div>
+
+    <h3>4. Short captions outperform long ones — by 3×</h3>
+    <p>The faster a viewer reads your caption, the more likely they click the photo, like, or reply.</p>
+    <div class="guide-scenario">
+      <div class="guide-scenario-label">Scenario</div>
+      <div class="guide-scenario-body">"am i your type? (be honest)" → 36,116 likes. "Hey guys, hope you're having a great day, just wanted to say hi and ask if you think I'm your type, please let me know honestly" → would have died at 200 likes. <strong>Rule of thumb:</strong> if your caption is longer than the tweet box width on mobile, cut it.</div>
+    </div>
+
+    <h3>5. Questions beat statements — by 50 %</h3>
+    <p>A question is an invitation. A statement is a wall.</p>
+    <div class="guide-scenario">
+      <div class="guide-scenario-label">Scenario</div>
+      <div class="guide-scenario-body">"I love my new outfit" vs "do you like my new outfit?" — same photo, the question gets twice the replies. Adding "(be honest)" doubles it again. <strong>Why it works:</strong> "be honest" reads as a challenge, and people on Twitter cannot resist a challenge.</div>
+    </div>
+
+    <h3>6. Links in the main tweet kill reach — by 30 to 50 %</h3>
+    <p>Twitter does not want users leaving the platform. Any tweet with a link gets throttled. The workaround is Section K — link goes only in the bio, never in a tweet.</p>
+    <div class="guide-scenario">
+      <div class="guide-scenario-label">Scenario</div>
+      <div class="guide-scenario-body">You post a photo with caption "more here ↓ link.me/yourname". Reach drops by half compared to the same photo with caption "good morning ♡". <strong>What to do:</strong> never put a URL in the main tweet. Even writing the words "link in bio" hurts reach a little — let the bio arrow ↓ do the work silently.</div>
+    </div>
+
+    <h3>7. Grok AI reads everything you post (since January 2026)</h3>
+    <p>Grok is X's built-in AI. It reads every tweet's meaning and decides whether to push or quiet it. Specifically: Grok pushes positive, fun, playful content and silently kills negative, aggressive, or political content. Even your <em>tone</em> matters.</p>
+    <div class="guide-scenario">
+      <div class="guide-scenario-label">Scenario</div>
+      <div class="guide-scenario-body">A tweet like "I hate when men ghost me 🙄" might get high engagement from the audience — but Grok reads it as "negative emotion" and quietly reduces reach for the next 24 hours on the whole account. A tweet like "boys are so cute when they get nervous 😭" hits the same emotional angle but reads as positive. <strong>What to do:</strong> rewrite anything that sounds bitter, angry, or political. Keep the tone playful.</div>
+    </div>
+
+    <h3>Two Minor Rules That Still Matter</h3>
     <ul>
-      <li>Maximum 2 links per day on the entire account</li>
-      <li>Links only as replies to your own tweets</li>
-      <li>Or let people find the link in your bio (that's what the arrow ↓ in your bio is for)</li>
-      <li>NEVER write "link in bio" in your main tweet (this also hurts reach)</li>
-      <li>Use soft language: "more of me ↓" or "full set here ↓" or just the link with no text</li>
+      <li><strong>Hashtags:</strong> 1–2 is fine, 3 or more kills reach by 40 %. Most tweets do not need any.</li>
+      <li><strong>ALL CAPS:</strong> the algorithm flags this as shouting / spam. Lowercase is the default look.</li>
     </ul>
   `;
 
   const secF = `
-    <h3>How Many Posts Per Day:</h3>
-    <ul><li><strong>5 posts per day</strong> (same as Threads)</li><li>Space them 2–3 hours apart</li><li>Do NOT post 5 times in 30 minutes</li></ul>
-    <h3>The 90/10 Rule:</h3>
+    <h3>How Many Posts Per Day</h3>
+    ${tbl(['Account Age','Posts / day','Why'],[
+      ['Day 1–3','1','Twitter watches new accounts; one post tests the waters'],
+      ['Day 4–10','2','Account looks active without spamming'],
+      ['Day 11 onward','3','Full operating volume — three solid posts per day is the sweet spot'],
+    ])}
+    <p>Space the posts <strong>3 to 5 hours apart</strong>. Posting twice within an hour gets the second one buried by the algorithm.</p>
+
+    <h3>The 90 / 10 Rule</h3>
+    <p>Out of your daily posts, about 90 % should be organic personality content and only 10 % promotional.</p>
     <ul>
-      <li><strong>90% of your tweets</strong> should be organic (personality, engagement bait, lifestyle, humor)</li>
-      <li><strong>10% of your tweets</strong> should be promotional (with a link in the reply)</li>
-      <li>Out of 5 daily posts, only 1 should have a link reply. The other 4 are pure engagement.</li>
+      <li>If you post 3 times a day: most days zero promotional tweets. Occasional 1 promo tweet on a day when an organic post is performing especially well.</li>
+      <li>Never more than 2 promotional tweets in a single day, account-wide.</li>
     </ul>
-    <h3>Content Types to Post (SFW Only):</h3>
-    <p><strong>Photos:</strong> Bikini/lingerie · Cosplay · Lifestyle selfies (good lighting!) · Fitness · Beach/pool · Mirror selfies (bright)</p>
-    <p><strong>Videos:</strong> Short clips (5–15s) · "Get ready with me" · Dancing/moving · Behind-the-scenes · Always under 2 min 20 sec</p>
-    <p><strong>Text-only:</strong> Funny thoughts · Opinions on trending topics · Relatable moments · Personality-building</p>
-    ${warnBox('<strong>NEVER post:</strong> Explicit nudity · Price lists · Spam hashtag lists · "Subscribe to my OF/Fansly" type tweets · The exact same content that\'s on your paid page')}
-    <h3>Best Posting Times:</h3>
+
+    <h3>When to Post (US Eastern Time)</h3>
+    <p>Our audience is mostly in the United States.</p>
+    ${tbl(['Window (EST)','What this slot is for'],[
+      ['09:00 – 11:00','Morning crowd, "good morning" energy'],
+      ['13:00 – 15:00','Lunch break scrollers — strongest engagement slot'],
+      ['20:00 – 22:00','Evening prime time — best for teases'],
+    ])}
+    <p>Best days: <strong>Tuesday through Thursday</strong>. Saturday late night is the deadest window — avoid.</p>
+
+    <h3>The Before / After Post Routine</h3>
+    <p>This is the routine that wins the first 30 minutes. Do it on every post, especially while the account is under 2,000 followers.</p>
+
+    <h4>2–3 minutes BEFORE posting</h4>
     <ul>
-      <li><strong>Tuesday to Thursday, 9 AM – 3 PM</strong> (US Eastern Time)</li>
-      <li><strong>Evening:</strong> 8–10 PM (US Eastern Time) for NSFW audience</li>
-      <li><strong>Avoid:</strong> Saturday/Sunday late night</li>
-      <li><strong>Avoid:</strong> 3–5 PM weekdays</li>
+      <li>Reply to any comments on your previous post</li>
+      <li>Scroll the For You page and like 3–5 tweets</li>
+      <li>This warms up the algorithm — it tells X you are active</li>
     </ul>
-    <h3>The Posting Routine (Before and After Each Post):</h3>
-    <p><strong>2–3 minutes BEFORE posting:</strong></p>
-    <ul><li>Like and reply to comments under your previous posts</li><li>Scroll the For You page and like 3–5 posts</li></ul>
-    <p><strong>POST your tweet</strong></p>
-    <p><strong>3–5 minutes AFTER posting:</strong></p>
-    <ul><li>Scroll the For You page for 3 minutes</li><li>Comment on 1–2 other creators' posts</li><li>Follow 1–2 new creators (max)</li><li>Do 3–5 follower steals (see Section G)</li><li>Like 5–10 posts</li></ul>
-    ${warnBox('<strong>This before/after routine is CRITICAL until you reach 1,000–2,000 followers.</strong> After 5,000–10,000 followers, the interaction is less important because your account has enough organic reach.')}
+
+    <h4>Hit POST</h4>
+
+    <h4>3–5 minutes AFTER posting</h4>
+    <ul>
+      <li>Stay on the app — don't switch accounts immediately</li>
+      <li>Scroll the For You page for 2 minutes</li>
+      <li>Comment on 2 other creators' fresh viral posts (image comments — Section L)</li>
+      <li>Do 3–5 follower steals (Section M)</li>
+      <li>Like 5–10 tweets</li>
+    </ul>
+
+    <div class="guide-scenario">
+      <div class="guide-scenario-label">Why this matters</div>
+      <div class="guide-scenario-body">Twitter rewards <em>active users</em> more than passive ones. If you post and disappear, the algorithm reads you as a low-quality account. If you post and stay engaged for 5 minutes, the algorithm reads you as a real, active person and pushes your tweet wider.</div>
+    </div>
   `;
 
   const secG = `
-    <p>This works exactly the same as on Threads. You steal followers from other creators' viral posts.</p>
-    <h3>Step 1: Find Good Posts</h3>
-    <ul><li>Have 500+ likes</li><li>From a creator with under 100K followers</li><li>Have recent comments (within the last few hours)</li><li>Have comments with fewer than 10 likes (otherwise too competitive)</li></ul>
-    <h3>Step 2: Find Good Users in the Comments</h3>
-    <ul><li>Older than 25</li><li>Looks American (American name, English comments)</li><li>Has their own posts on their profile (not just replies)</li><li>Has a profile picture</li></ul>
-    <h3>Step 3: Interact</h3>
-    <ol><li>Follow them</li><li>Like their comment</li><li>Go to their profile</li><li>If they have their own posts, comment on one of them</li><li>Something genuine like "love this!" or "that's awesome"</li></ol>
-    <p><strong>90% of the time, they will follow you back</strong> because you showed genuine interest in them.</p>
-    <h3>Limits:</h3>
-    <ul><li>Maximum 5 follower steals per posting round</li><li>Only target US-based users</li><li>Only interact with English-language comments</li><li>Do NOT write "follow me" or anything promotional</li></ul>
-  `;
+    <p>This section is the most important one in the guide. Captions decide whether a tweet lives or dies. The patterns below come from analyzing 4,996 tweets from 226 top creators.</p>
 
-  const secH = `
-    <p>This is the most powerful growth tactic on Twitter. It works even better than on Threads because Premium comments get priority placement.</p>
-    <h3>How It Works:</h3>
-    <p>Instead of writing a text comment on a viral post, you reply with a photo or video of your creator. This gets WAY more attention than a text comment.</p>
-    <h3>Step 1: Find Viral Posts</h3>
-    <ul><li>Posts with 1,000+ likes that are less than 20 hours old</li><li>From creators with 10K–200K followers</li><li>The post should still be gaining likes (growing, not dying)</li></ul>
-    <h3>Step 2: Post Your Image Comment</h3>
-    <p>Reply to the viral post with one of your best photos + a short, relevant caption that relates to the original post.</p>
-    ${codeBlock(["Original post: \"Do I look cute today?\"","Your image reply: [creator's best photo] + \"we could be twins 😭\""], 'Example')}
-    <h3>Step 3: Boost Your Comment</h3>
-    <ul><li>Like your own comment with your other accounts</li><li>This gives it a small initial boost</li><li>If it rises to become a top comment, it gets massive visibility</li></ul>
-    <h3>Rules:</h3>
-    <ul><li>Only comment on posts gaining momentum (1K+ likes in under 20 hours)</li><li>Don't write anything promotional ("follow me", "check my link")</li><li>Be genuine and on-topic</li><li>Maximum 10 image comments per day</li><li>Use different photos each time</li></ul>
-  `;
-
-  const secI = `
-    <p>We analyzed 4,996 tweets from 226 successful creators. Here are the exact captions and patterns that perform best.</p>
-    <h3>Rule #1: Keep It Short</h3>
-    <ul><li>Captions under 25 characters get <strong>3x more engagement</strong> than captions over 60 characters</li><li>The sweet spot is 10–25 characters</li><li>If you can say it in 3 words, don't use 10</li></ul>
-    <h3>Rule #2: Ask Questions</h3>
-    <ul><li>Questions get <strong>50% more engagement</strong> than statements</li><li>Adding "(be honest)" to any question boosts it significantly</li><li>Questions invite replies, and replies are the most valuable signal</li></ul>
-    <h3>Tier 1 — Best Performing Templates:</h3>
-    ${codeBlock([
-      '"am i your type? (be honest)"  → 36,116 likes',
-      '"taking bf applications rn"  → 35,019 likes',
-      '"smash or pass (be honest)"  → 13,806 likes',
-      '"Rate my [body part] 1-10"  → 9,113 likes',
-      '"eyes up here pretty boy"  → 15,539 likes',
-      '"good morning [emoji]"  → 11,736 likes',
-      '"Describe me in 1 word"  → 6,967 likes',
-      '"Yes or no to my body type? Be honest"  → 12,968 likes',
-      '"Do you like [trait] girls?"  → 13,062 likes',
-      '"Caught u staring again"  → 7,490 likes',
-      '"me or your wife?"  → 15,645 likes',
-    ], 'Tier 1 — Best Performing Templates')}
-    <h3>Tier 2 — Strong Templates:</h3>
-    ${codeBlock([
-      '"would you [action]?"','"this is what [X] looks like :D"','"still single btw"',
-      '"who wants to get [action]"','"1 or 2?" / "1 2 3 or 4?"','"hey cutie"',
-      '"too small or just right?"','"A little motivation [emoji]"',
-      '"What kind of day does this remind you of?"','"Taste or pass?"','"hi [emoji]"',
-      '"[cosplay character name] [emoji]"',
-    ], 'Tier 2 — Strong Templates')}
-    <h3>Tier 3 — Personality/Humor (1–2x per day):</h3>
-    ${codeBlock([
-      '"my kink is complete devotion and obsession"','"lord have mercy..."',
-      '"bouncy boobas"','"giggle maxing"','"This is frying me"',
-      '"Where did my car seat go?" (funny/unexpected)',
-    ], 'Tier 3 — Personality / Humor')}
-    <h3>Tier 4 — FOMO/DM Bait (max 1x per day):</h3>
-    ${codeBlock([
-      '"deleting in [X] hours, say \'me\' for a special dm"',
-      '"say hi for a surprise in dms"',
-      '"reply \'yes\' for a surprise dm (i\'m serious)"',
-      '"if you\'re not a bot, say hi. i\'ll follow back"',
-    ], 'Tier 4 — FOMO / DM Bait')}
-    ${warnBox('<strong>IMPORTANT about DM bait:</strong> If you use these, you MUST actually follow through. If someone says "me" or "hi", send them something (even just "hey ❤" with a link). Otherwise people will stop engaging.')}
-    <h3>Caption Don\'ts:</h3>
-    <ul><li>Do NOT write long paragraphs</li><li>Do NOT use more than 2 emojis</li><li>Do NOT include links in the caption</li><li>Do NOT use hashtag lists</li><li>Do NOT write prices</li><li>Do NOT write "link in bio"</li><li>Do NOT copy-paste the exact same caption every day (vary it!)</li></ul>
-  `;
-
-  const secJ = `
-    <p>Depending on your follower count, different numbers count as viral:</p>
-    ${tbl(['Followers','Viral ='],[
-      ['0–500','500+ likes'],['500–1,000','750+ likes'],['1,000–5,000','1,500+ likes'],
-      ['5,000–10,000','3,000+ likes'],['10,000+','5,000+ likes'],
+    <h3>The Four Universal Caption Rules</h3>
+    <h4>1. Short wins.</h4>
+    <p>Captions under 25 characters get <strong>3× more engagement</strong> than captions over 60. The data:</p>
+    ${tbl(['Caption length','Avg likes','Engagement rate'],[
+      ['Short (≤ 25 chars)','2,336','4.5 %'],
+      ['Medium (26–60)','1,489','3.2 %'],
+      ['Long (60 +)','777','1.3 %'],
     ])}
-    <h3>When a Post Goes Viral:</h3>
-    <ol>
-      <li>Send a screenshot to the "Viral Posts" group immediately</li>
-      <li>Do NOT delete the post</li>
-      <li>Reply to as many comments as possible (this feeds the algorithm)</li>
-      <li>Post a follow-up tweet 1–2 hours later to capture the new visitors</li>
-      <li>Make sure your pinned tweet and bio/link are perfect</li>
-    </ol>
-  `;
+    <p><strong>Why this works:</strong> people scroll fast. A short caption is read in half a second. A long one feels like work and gets skipped.</p>
 
-  const secK = `
-    <h3>Rules:</h3>
-    <ul><li><strong>Maximum 1–2 hashtags per tweet</strong></li><li>More than 2 hashtags = 40% reach PENALTY</li><li>Only use niche-specific hashtags, NEVER generic ones</li></ul>
-    <h3>Good Hashtags (use sparingly, rotate):</h3>
-    ${codeBlock(['#cosplay (if doing cosplay content)','#lingerie','#model','#fitness (if fitness niche)','#gamergirllife','#egirl'], 'Good Hashtags')}
-    <h3>BAD Hashtags — Never Use These:</h3>
-    ${warnBox('<strong>NEVER USE:</strong> #OnlyFans · #OF · #porn · #nsfw · #fansly · #sexwork · #sw — Oversaturated with bots and spam. They attract the wrong audience and may trigger a shadowban.', true)}
-    <h3>When to Use Hashtags:</h3>
-    <ul><li>When something is trending and you can post something relevant</li><li>Only if the hashtag adds context, not as spam</li><li>Most of your tweets should have ZERO hashtags</li></ul>
-  `;
+    <h4>2. Questions beat statements by 50 %.</h4>
+    <p>Question tweets average <strong>2,449 likes</strong> vs <strong>1,627</strong> for statements. Questions invite replies — and replies are 150× a like in the algorithm's eyes.</p>
 
-  const secL = `
-    <p>Same as Threads: bots in your comments are GOOD for us.</p>
-    <h3>Why Bots Are Good:</h3>
-    <ul><li>Bot comments mean your post is being shown on the For You page</li><li>More comments = more engagement = more reach</li><li>Bots bring interaction that can make posts go viral</li></ul>
-    ${warnBox('<strong>NEVER block bots · NEVER delete bot comments</strong> · Give bot comments a like (boosts interaction count) · Ignore the content of bot comments (they\'re usually scams)')}
-  `;
+    <h4>3. Adding "be honest" amplifies engagement.</h4>
+    <p>Across the dataset, the top caption category is "be honest / tell me" tweets — average 4,413 likes, 6.7 % engagement rate. "be honest" reads as a challenge and people on Twitter cannot resist.</p>
 
-  const secM = `
-    <h3>Reduced Interaction Time:</h3>
-    <ul><li>Before/after post routine goes from 5 minutes to 2–3 minutes</li><li>Reduce daily comments from 30+ to 15–20</li><li>Focus more on quality posts and less on manual interaction</li></ul>
-    <h3>New Tactics:</h3>
-    <ul><li>Start looking for SFS (Shoutout for Shoutout) partners</li><li>Join 2–3 retweet groups (Telegram/Discord)</li><li>Start posting threads (multiple connected tweets — 3x more engagement)</li><li>Consider starting a second backup account</li></ul>
-    <h3>SFS (Shoutout for Shoutout):</h3>
-    <p>Find SFS partners by searching: "sw sfs" · "onlyfans sfs" · "s4s" · "swrt" (sex worker retweet). Click "Latest" tab to find active creators.</p>
-    <p><strong>Rules for SFS:</strong></p>
-    <ul><li>Partner with creators in a similar niche and similar follower count</li><li>Maximum 3–5 SFS groups at a time</li><li>All members must retweet within 15 minutes</li><li>Don't ONLY do SFS content — mix it with organic posts</li></ul>
-  `;
+    <h4>4. Lowercase looks more authentic.</h4>
+    <p>"am i your type" outperforms "Am I Your Type" or "AM I YOUR TYPE". Lowercase reads as casual, friend-talk. Capitalized reads as marketing. ALL CAPS reads as shouting and gets flagged.</p>
 
-  const secN = `
-    <p>At 5,000+ followers:</p>
+    <h3>Top All-Time Captions From the Dataset</h3>
+    ${codeBlock([
+      '"am i your type? (be honest)"  →  36,116 likes',
+      '"taking bf applications rn"  →  35,019 likes',
+      '"smash or pass (be honest) 🤭"  →  avg 13,806 likes',
+      '"good morning 🫶"  →  avg 11,736 likes',
+      '"eyes up here pretty boy"  →  avg 7,626 likes',
+      '"Rate my arch 1-10"  →  6.5 % engagement (highest in category)',
+    ], 'Top Performers')}
+
+    <h3>Why These Worked — Real Analysis</h3>
+
+    <h4>"am i your type? (be honest)" → 36,116 likes</h4>
     <ul>
-      <li>Interaction is less critical (account has organic reach)</li>
-      <li>Increase posting if you want (up to 8–10 posts per day)</li>
-      <li>Start automating scheduling with Buffer or similar tools</li>
-      <li>Consider paid SFS with larger creators</li>
-      <li>Cross-promote between multiple accounts</li>
+      <li><strong>The setup:</strong> photo of the creator looking directly into camera</li>
+      <li><strong>Why it exploded:</strong> "am i your type" is already a question — invites a reply. The "(be honest)" is the unlock — it transforms a soft compliment-seek into a challenge. Every guy seeing it thinks "what would I actually say if she asked me that to my face?"</li>
+      <li><strong>Reply types that flooded the comments:</strong> "100 %", "absolutely", "you're literally my dream girl" → algorithm sees a reply storm and pushes the tweet to millions.</li>
+    </ul>
+
+    <h4>"taking bf applications rn" → 35,019 likes</h4>
+    <ul>
+      <li><strong>The setup:</strong> attractive photo + a fantasy people want to engage with</li>
+      <li><strong>Why it worked:</strong> "applications" is playful framing — turns "I'm single" (boring) into a game (engaging). Guys reply "putting my application in", "interview when", "where do I apply" — a thread of replies, which is the most valuable signal in the algorithm.</li>
+    </ul>
+
+    <h4>"good morning 🫶" → avg 11,736 likes</h4>
+    <ul>
+      <li><strong>The setup:</strong> waking-up photo (in bed, soft natural light)</li>
+      <li><strong>Why it worked:</strong> "good morning" is the universal greeting that opens conversations. Combined with the photo, it triggers a parasocial reaction — followers feel like the creator is greeting <em>them</em>. Replies are mostly "good morning beautiful", which is the easiest reply to write and the algorithm counts every one.</li>
+    </ul>
+
+    <h4>"this is what 180lbs looks like :D" → 21,818 likes</h4>
+    <ul>
+      <li><strong>The setup:</strong> full body photo</li>
+      <li><strong>Why it worked:</strong> body positivity + a specific number. The specific number (180lbs) makes the tweet feel real and personal, not generic. The ":D" softens it — turns what could read as a complaint into a flex. Guys reply with compliments, the algorithm reads it as a positive conversation, and Grok pushes it (see Section E.7).</li>
+    </ul>
+
+    <h3>Where to Find Fresh Caption Ideas Daily</h3>
+    <p>Open this dashboard. The <strong>Viral Text</strong> tab shows the highest-performing tweets sorted by likes — those are the patterns that are working <em>right now</em>. The patterns shift over time, so check this tab at least twice a week.</p>
+    <p>Don't copy captions word-for-word across accounts (Twitter detects duplicates and penalizes everyone involved). Adapt: swap a word, change an emoji, mix two ideas.</p>
+    ${warnBox('Section H has 60+ ready-to-use captions sorted by category. Use them as a starting point, then rotate.')}
+
+    <h3>Caption Don'ts</h3>
+    <ul>
+      <li>No paragraphs — keep it one line</li>
+      <li>No more than 2 emojis</li>
+      <li>No <strong>"link in bio"</strong> in the caption — it hurts reach (the bio arrow ↓ does this silently)</li>
+      <li>No prices, no "subscribe", no "DM me for"</li>
+      <li>No hashtag lists</li>
+      <li>No exact-same caption twice in the same week on the same account</li>
     </ul>
   `;
 
+  const secH = `
+    <p>Around 60 tested captions sorted by category. Copy with the button on the right. <strong>Rotate</strong> — never use the same caption twice in one week.</p>
+
+    <div class="guide-caption-cat">
+      <h4>"Be honest" — Strongest tier</h4>
+      ${captionItems(['am i your type? (be honest)','smash or pass (be honest)','yes or no to my body type? (be honest)','rate my arch 1-10','rate my waist 1-10','do you like tattooed girls?','do you like redhead girls?','describe me in 1 word','me or your wife?','what would you do?','one word — go','too small or just right?'])}
+    </div>
+
+    <div class="guide-caption-cat">
+      <h4>Short &amp; sweet</h4>
+      ${captionItems(['hey cutie','hi ♡','good morning 🫶','good night 🌙','bouncy','lord have mercy…','enjoy :)','WHOA','watch again','hey x ♡','lace 🤍'])}
+    </div>
+
+    <div class="guide-caption-cat">
+      <h4>Boyfriend / girlfriend energy</h4>
+      ${captionItems(['taking bf applications rn','taking boyfriend applications ↓','still single btw','i need a hug','i am ur e-girlfriend now, no takebacks','first date — where are we going?','need a winter cuddle buddy'])}
+    </div>
+
+    <div class="guide-caption-cat">
+      <h4>Personality / humor</h4>
+      ${captionItems(['my kink is complete devotion and obsession','this is frying me','where did my car seat go?','giggle maxing','this is what 180lbs looks like :D','imagine hating tummy!?','heard u like abs','pspspsps come here loser'])}
+    </div>
+
+    <div class="guide-caption-cat">
+      <h4>Tease / suggestive</h4>
+      ${captionItems(['eyes up here pretty boy','i know what you are looking at 🖤','your knees hurt yet?','a little motivation ♡','sound on for this one','just studying 📚','is pink my color?','what kind of day does this remind you of?'])}
+    </div>
+
+    <div class="guide-caption-cat">
+      <h4>FOMO / DM bait — max 1× per day</h4>
+      ${captionItems(['deleting in 6 hours, say "me" for a special dm','say hi for a surprise in dms','reply "yes" for a surprise dm (i am serious)','if you are not a bot, say hi. i will follow back','do not open the comments','i dare you to open the comments'])}
+    </div>
+
+    <div class="guide-caption-cat">
+      <h4>Cosplay / character (if persona fits)</h4>
+      ${captionItems(['nico robin 🤲','mother makima','who wants this character?','2B from NieR'])}
+    </div>
+
+    ${warnBox('<strong>DM bait rule:</strong> if you write "say me for a dm" — you actually have to follow through. Send a "hey ❤" with the bio link. Otherwise people stop engaging and the tactic stops working.')}
+  `;
+
+  const secI = `
+    <p>The photos and videos you post need to be <strong>SFW (safe for work)</strong> — Twitter is fine with suggestive, but explicit content gets the account restricted within hours.</p>
+
+    <h3>What to Post</h3>
+    <ul>
+      <li>Bikini / lingerie / matching sets (suggestive, not explicit)</li>
+      <li>Cosplay shoots</li>
+      <li>Lifestyle photos with good lighting (cafe, beach, bed, room)</li>
+      <li>Mirror selfies in bright rooms</li>
+      <li>Workout / fitness content</li>
+      <li>"Get ready with me" short videos (5–15 seconds)</li>
+      <li>Behind-the-scenes / candid moments</li>
+      <li>Walking / dancing short videos</li>
+    </ul>
+
+    <h3>Video Rules</h3>
+    <ul>
+      <li>Keep videos <strong>under 2 minutes 20 seconds</strong> — anything longer gets less reach</li>
+      <li>Best length: <strong>5–15 seconds</strong> (matches the scroll pattern on Twitter)</li>
+      <li>Vertical (9:16) and square (1:1) both work — landscape feels old and gets ignored</li>
+      <li>Always check the first frame looks good — it is the thumbnail</li>
+    </ul>
+
+    <h3>The Cropping &amp; Editing Tip (Optional but Recommended)</h3>
+    <p>Twitter is getting better at detecting duplicate content. If you take a photo straight from the source and post it as-is, the system might flag it — especially if the same photo has appeared elsewhere before.</p>
+    <p>This is an <strong>optional safety layer</strong>. You do not have to do it — but it protects the account.</p>
+
+    <div class="guide-step-grid">
+      <div class="guide-step">
+        <div class="guide-step-num">1</div>
+        <div class="guide-step-body"><strong>Crop the photo slightly</strong> — even 5–10 % off the edges changes the file fingerprint. Use the phone&apos;s built-in photo editor.</div>
+      </div>
+      <div class="guide-step">
+        <div class="guide-step-num">2</div>
+        <div class="guide-step-body"><strong>Adjust brightness or contrast a touch</strong> — push it +5 / −5. Subtle enough that the photo still looks natural, different enough that the file is now unique.</div>
+      </div>
+      <div class="guide-step">
+        <div class="guide-step-num">3</div>
+        <div class="guide-step-body"><strong>For videos:</strong> trim 0.5 seconds off the start or end, or apply a subtle filter. Same effect — file fingerprint changes.</div>
+      </div>
+    </div>
+
+    <h3>Reposting What Works</h3>
+    <p>If a photo or video performs especially well, you can post it again — but follow these rules:</p>
+    <ul>
+      <li>Wait at least <strong>one full week</strong> between posts of the same photo / video</li>
+      <li>Use a <strong>different caption</strong> the second time</li>
+      <li>Apply the cropping / editing trick (above) so the file is technically unique</li>
+      <li>Don't repost more than twice — the third time triggers duplicate detection</li>
+    </ul>
+
+    <h3>What NOT to Post</h3>
+    <ul>
+      <li>Explicit nudity — the account will be restricted</li>
+      <li>Anything involving minors, weapons, drugs, gore</li>
+      <li>Politics, religion, drama, takes on current events</li>
+      <li>The same photo posted within 7 days</li>
+      <li>Photos with watermarks from other platforms still visible (TikTok logo, Instagram logo, etc.)</li>
+    </ul>
+  `;
+
+  const secJ = `
+    <p>The pinned tweet is the first thing anyone sees when they click on the profile. Most non-followers decide whether to follow based on the pinned tweet plus the bio — within five seconds.</p>
+
+    <h3>Don't Pin Anything at First</h3>
+    ${warnBox('<strong>While the account is fresh, leave the pin empty.</strong> Pinning a tweet with 4 likes makes the account look dead. A profile with no pin actually looks more curated than one with a weak pin.')}
+
+    <h3>When to Pin Your First Tweet</h3>
+    <p>Wait until one of your tweets crosses <strong>100 likes</strong>. That is the threshold where the pin starts working in your favor.</p>
+
+    <div class="guide-scenario">
+      <div class="guide-scenario-label">Why 100 likes</div>
+      <div class="guide-scenario-body">A pinned tweet with 100+ likes signals to a profile visitor: "other people approve of this — it is safe to follow." Anything below 100 makes the account look quiet and the visitor scrolls away.</div>
+    </div>
+
+    <h3>What to Pin</h3>
+    <p>Pin your <strong>single best-performing tweet</strong> by likes. Photo or video tweets work better than text-only.</p>
+    <ul>
+      <li>The pin should be visually striking — strong first impression matters</li>
+      <li>The caption should match the persona (don't pin something off-brand)</li>
+      <li>If the tweet has many replies, even better — visitors see the engagement instantly</li>
+    </ul>
+
+    <h3>When to Replace the Pin</h3>
+    <p>Every time a newer tweet beats the pinned one by likes — replace it. Always be pinning your current best.</p>
+    <ul>
+      <li>Check pin candidates once a week</li>
+      <li>To replace: tap the three dots on the new tweet → "Pin to your profile". This automatically unpins the old one.</li>
+    </ul>
+  `;
+
+  const secK = `
+    ${warnBox('<strong>This is the single most important rule in the guide. Read it twice.</strong>', true)}
+
+    <h3>The Rule</h3>
+    <p>You may <strong>NEVER</strong> put a URL in the main text of a tweet. Twitter punishes external links inside tweets by reducing reach by 30 to 50 %. This has been the case since March 2025.</p>
+
+    <h3>Where the Link Goes</h3>
+    <p>Once you have a link (see below), it goes <strong>only in the bio</strong>. Nothing in the tweet — just an arrow ↓ in the bio that points down to where the website field shows on the profile.</p>
+
+    <h3>How to Get Your Link</h3>
+    <p>You do not get a link on day one. You earn it.</p>
+
+    <div class="guide-step-grid">
+      <div class="guide-step">
+        <div class="guide-step-num">1</div>
+        <div class="guide-step-body"><strong>Reach 100 followers</strong> through warm-up, posting, and the growth tactics (Sections L &amp; M).</div>
+      </div>
+      <div class="guide-step">
+        <div class="guide-step-num">2</div>
+        <div class="guide-step-body"><strong>Message Justin on X:</strong> open his profile, send a DM saying "Hey, [account] just hit 100 followers — ready for a link". He will create it and send it back within a day.</div>
+      </div>
+      <div class="guide-step">
+        <div class="guide-step-num">3</div>
+        <div class="guide-step-body"><strong>Add the link to the bio</strong>, in the website field. Keep the arrow ↓ at the end of the bio text.</div>
+      </div>
+    </div>
+
+    <div class="guide-contact-card">
+      <div class="contact-label">Contact for your link</div>
+      <div class="contact-handle">@SunnyAngels_Admin (Justin)</div>
+      <div class="contact-desc">DM him on X once your account hits 100 followers. He sets up the link, sends it back, you add it to the bio.</div>
+    </div>
+
+    <h3>Why We Wait Until 100 Followers</h3>
+    <ul>
+      <li>An account with a link and fewer than 100 followers looks like an obvious spam / promo account → Twitter throttles it</li>
+      <li>An account that grew to 100 followers through personality first looks like a <em>real person who happens to have a link</em> → Twitter treats it as a normal account</li>
+      <li>The 100-follower milestone also tells us your account is healthy enough to drive real traffic</li>
+    </ul>
+
+    <h3>Once You Have the Link</h3>
+    <ul>
+      <li>Link lives in the bio website field — never in a tweet</li>
+      <li>Don't write "link in bio" in tweet captions — even the words "link in bio" hurt reach slightly</li>
+      <li>The arrow ↓ at the end of the bio points to the link silently — that is enough</li>
+      <li>Never share the link in DMs unless someone asks for it directly</li>
+    </ul>
+
+    ${warnBox('<strong>If you put a link in a tweet by accident:</strong> delete the tweet immediately, do not edit. Editing keeps the algorithm penalty. Deleting and re-posting clean costs you nothing.', true)}
+  `;
+
+  const secL = `
+    <p>This is the single most powerful growth tactic on Twitter. It outperforms posting, following, and almost everything else combined.</p>
+
+    <h3>The Idea</h3>
+    <p>Instead of writing a text reply on someone else's viral tweet, you reply with one of your <strong>best photos or videos</strong>. The viral tweet has thousands of eyeballs on it. Your photo gets seen by a slice of those eyeballs — and the ones who like what they see, click your profile and follow.</p>
+
+    <h3>Why It Works Better Than Anything Else</h3>
+    <ul>
+      <li>You borrow someone else's audience without spending money</li>
+      <li>Image replies are visually loud — they stop the scroll inside the reply thread</li>
+      <li>The bigger the original tweet, the bigger the borrowed audience</li>
+    </ul>
+
+    <h3>How to Run It — Step by Step</h3>
+
+    <div class="guide-step-grid">
+      <div class="guide-step">
+        <div class="guide-step-num">1</div>
+        <div class="guide-step-body"><strong>Open the Viral Photos or Viral Videos tab</strong> on this dashboard. Sort by Most Recent. You are looking for tweets that are fresh and gaining momentum.</div>
+      </div>
+      <div class="guide-step">
+        <div class="guide-step-num">2</div>
+        <div class="guide-step-body"><strong>Pick a target:</strong> a tweet with 1,000+ likes that is less than 20 hours old, from a creator with 10K–200K followers. (Bigger creators have too much competition in the replies; smaller ones do not have enough audience to borrow.)</div>
+      </div>
+      <div class="guide-step">
+        <div class="guide-step-num">3</div>
+        <div class="guide-step-body"><strong>Open the tweet on X.</strong> Tap reply.</div>
+      </div>
+      <div class="guide-step">
+        <div class="guide-step-num">4</div>
+        <div class="guide-step-body"><strong>Reply with one of your best photos</strong> + a short relevant caption that connects to the original tweet. See examples below.</div>
+      </div>
+      <div class="guide-step">
+        <div class="guide-step-num">5</div>
+        <div class="guide-step-body"><strong>After posting:</strong> like your own reply if you can with a second account, otherwise leave it and move on. Don&apos;t follow up. Don&apos;t add a link.</div>
+      </div>
+    </div>
+
+    <h3>Caption Examples for Image Replies</h3>
+    ${codeBlock([
+      'Original: "Do I look cute today?"  →  Your reply: [best photo] + "we could be twins 😭"',
+      'Original: "rate my outfit"  →  Your reply: [fit photo] + "trade fits?"',
+      'Original: "tell me i am pretty"  →  Your reply: [photo] + "you are gorgeous 🥹 (me though?)"',
+      'Original: "anyone else feeling cute today?"  →  Your reply: [photo] + "🙋‍♀️"',
+    ], 'Image Reply Examples')}
+
+    <h3>Rules</h3>
+    <ul>
+      <li><strong>Maximum 10 image replies per day</strong> — more triggers spam detection</li>
+      <li>Use a <strong>different photo</strong> each time — never the same one twice</li>
+      <li>Caption stays short, relevant, and never promotional</li>
+      <li>Never write "follow me", "check my profile", "DM me" — that is spam, you will get blocked and Twitter will penalize</li>
+      <li>Only reply on tweets that are <strong>gaining momentum</strong> — likes still climbing, not on dead tweets from yesterday</li>
+    </ul>
+
+    <div class="guide-good">
+      <span class="guide-good-icon">✅</span>
+      <div class="guide-good-body"><strong>Daily target:</strong> 5–10 image replies during active hours. Done consistently, this brings 20–80 new followers per day in the early weeks.</div>
+    </div>
+  `;
+
+  const secM = `
+    <p>"Follower stealing" sounds aggressive — it is actually polite. You are going to other creators' viral tweets, finding fans who left a comment, and making a friendly connection with them. Most of them follow back because you noticed them.</p>
+
+    <h3>How to Find Targets</h3>
+
+    <div class="guide-step-grid">
+      <div class="guide-step">
+        <div class="guide-step-num">1</div>
+        <div class="guide-step-body"><strong>Open the Viral Photos or Viral Text tab</strong> on this dashboard. Pick a tweet from a creator in our niche with 500+ likes.</div>
+      </div>
+      <div class="guide-step">
+        <div class="guide-step-num">2</div>
+        <div class="guide-step-body"><strong>Open the tweet on X and scroll the replies.</strong> Look for people who left a comment with <strong>fewer than 10 likes</strong> on their comment. (More than 10 likes means too many other creators are already chasing them.)</div>
+      </div>
+      <div class="guide-step">
+        <div class="guide-step-num">3</div>
+        <div class="guide-step-body"><strong>Filter for good targets:</strong> looks American, English comment, has a profile photo, has tweets of their own (not just replies), looks 25+. Skip obvious bots, locked accounts, and women.</div>
+      </div>
+    </div>
+
+    <h3>The Interaction (~90 % Follow-Back Rate)</h3>
+
+    <div class="guide-step-grid">
+      <div class="guide-step">
+        <div class="guide-step-num">1</div>
+        <div class="guide-step-body"><strong>Follow them.</strong></div>
+      </div>
+      <div class="guide-step">
+        <div class="guide-step-num">2</div>
+        <div class="guide-step-body"><strong>Like the comment they left</strong> on the original viral tweet.</div>
+      </div>
+      <div class="guide-step">
+        <div class="guide-step-num">3</div>
+        <div class="guide-step-body"><strong>Open their profile.</strong> Find one of their own tweets (not a reply to someone else).</div>
+      </div>
+      <div class="guide-step">
+        <div class="guide-step-num">4</div>
+        <div class="guide-step-body"><strong>Leave a short, genuine reply</strong> — "love this!", "this is amazing", "great take". Nothing promotional, nothing about you.</div>
+      </div>
+    </div>
+
+    <p>That is it. Most of them notice the activity (follow + like + reply) and follow back within an hour or two. They feel seen — that is all the magic is.</p>
+
+    <h3>Limits</h3>
+    <ul>
+      <li>Maximum <strong>5 follower steals per posting session</strong>, 10–15 per day total</li>
+      <li>Never write anything promotional in the reply on their profile</li>
+      <li>Only US-based, English-speaking, real-looking accounts</li>
+      <li>Don't do them all at once — spread across the day</li>
+    </ul>
+  `;
+
+  const secN = `
+    <p>A shadowban means Twitter is silently hiding your tweets from people who don't already follow you. The account looks fine to you — but your reach drops to almost zero. It is the most common cause of an account dying.</p>
+
+    <h3>Daily Limits — Never Exceed These</h3>
+    ${tbl(['Action','During Warm-Up','After Warm-Up','Hard Limit'],[
+      ['Follows','5–10 / day','20–30 / day','Never &gt; 50 / day'],
+      ['Unfollows','0','10 / day','Never &gt; 30 / day'],
+      ['Likes','10–50 / day','50–100 / day','Never &gt; 100 / hour'],
+      ['Replies','5–15 / day','20–30 / day','Never &gt; 30 / hour'],
+      ['Posts','1–2 / day','3 / day','Never &gt; 5 / day'],
+      ['Image replies','0','5–10 / day','Never &gt; 15 / day'],
+    ])}
+
+    <h3>What Triggers a Shadowban</h3>
+    <ul>
+      <li>A link in the main tweet (especially on a new account)</li>
+      <li>Mass follow or unfollow in a short window</li>
+      <li>Too many likes too fast (more than 100 in an hour)</li>
+      <li>The exact same reply text used 5+ times</li>
+      <li>3+ hashtags in a tweet (especially #OnlyFans, #porn, #nsfw — even one of those is enough)</li>
+      <li>ALL CAPS in tweets</li>
+      <li>Third-party apps connected to the account</li>
+      <li>The same photo posted with the same caption across multiple accounts (the agency network gets detected)</li>
+      <li>Aggressive or political tone (Grok flags it — see Section E.7)</li>
+    </ul>
+
+    <h3>How to Tell If You Are Shadowbanned</h3>
+
+    <div class="guide-step-grid">
+      <div class="guide-step">
+        <div class="guide-step-num">1</div>
+        <div class="guide-step-body">Open <code>shadowban.eu</code> in the phone browser and enter the @handle. If any flag shows red — you are banned.</div>
+      </div>
+      <div class="guide-step">
+        <div class="guide-step-num">2</div>
+        <div class="guide-step-body">In a private / incognito browser, go to x.com (do not sign in) and search for the exact text of a recent tweet. If the tweet does not appear in results — you are invisible to non-followers.</div>
+      </div>
+      <div class="guide-step">
+        <div class="guide-step-num">3</div>
+        <div class="guide-step-body">Watch the engagement pattern. If likes drop more than 70 % overnight on the same kind of content — that is a strong signal.</div>
+      </div>
+    </div>
+
+    <h3>Recovery — What to Do If You Are Shadowbanned</h3>
+
+    <div class="guide-step-grid">
+      <div class="guide-step">
+        <div class="guide-step-num">1</div>
+        <div class="guide-step-body"><strong>Stop. For 24 to 72 hours.</strong> No likes, no follows, no posts, no replies. Don&apos;t even open the app on that account.</div>
+      </div>
+      <div class="guide-step">
+        <div class="guide-step-num">2</div>
+        <div class="guide-step-body"><strong>Day 4–5:</strong> only short, genuine replies on other creators&apos; tweets. No links anywhere, no photos yet.</div>
+      </div>
+      <div class="guide-step">
+        <div class="guide-step-num">3</div>
+        <div class="guide-step-body"><strong>Day 6–7:</strong> resume photo tweets — but only 1 per day, no link, short captions.</div>
+      </div>
+      <div class="guide-step">
+        <div class="guide-step-num">4</div>
+        <div class="guide-step-body"><strong>Day 8 +:</strong> back to normal schedule.</div>
+      </div>
+      <div class="guide-step">
+        <div class="guide-step-num">5</div>
+        <div class="guide-step-body"><strong>Still banned after 7 days?</strong> Message Justin (see Section T) and let him know — we may need to retire the account.</div>
+      </div>
+    </div>
+
+    ${warnBox('<strong>Tell us immediately if you suspect a shadowban.</strong> We can advise quickly. Do not try to push through it — you will make it worse.', true)}
+  `;
+
   const secO = `
-    <div class="guide-phase">
-      <div class="guide-phase-title">Step 1: Clean Up</div>
-      <ul><li>Delete all poorly performing posts (keep viral ones with 1K+ likes)</li><li>Update bio and profile picture</li></ul>
+    <p>You will get bot comments and bot followers. This is normal. Twitter is full of them.</p>
+
+    <h3>The Counterintuitive Rule</h3>
+    <p>Bots in your comments are <strong>good for the account</strong>. Don't block them, don't delete their comments. Here is why.</p>
+
+    <div class="guide-scenario">
+      <div class="guide-scenario-label">Why bots help</div>
+      <div class="guide-scenario-body">When a bot comments on your tweet, it adds to the engagement count. The algorithm sees "this tweet has 30 replies" and pushes it wider — it can&apos;t tell which replies are from real people. The fact that bots showed up means your tweet hit the For You page in the first place. That is a good sign.</div>
     </div>
-    <div class="guide-phase">
-      <div class="guide-phase-title">Step 2: Rest and Steal</div>
-      <ul><li>Let the account rest for 24 hours (no posts)</li><li>Focus entirely on follower stealing</li><li>Try to gain at least 200 new followers through interaction</li></ul>
-    </div>
-    <div class="guide-phase">
-      <div class="guide-phase-title">Step 3: Soft Restart</div>
-      <ul><li>After 24 hours, post only 1 post per day for 3 days</li><li>Make sure it's your best content</li><li>After 3 days, return to normal schedule</li></ul>
-    </div>
-    <div class="guide-phase">
-      <div class="guide-phase-title">Step 4: If It's Still Dead</div>
-      <ul><li>Reduce posting from 5 to 3 posts per day</li><li>Change the bio and profile picture</li><li>Focus heavily on commenting strategy for 1 week</li><li>Contact us if nothing works after 1 week</li></ul>
-    </div>
+
+    <h3>What to Do With Bot Comments</h3>
+    <ul>
+      <li>Give bot comments a like (boosts the engagement count even more)</li>
+      <li>Don't reply to them (they are not real people)</li>
+      <li>Don't block them</li>
+      <li>Don't report them</li>
+    </ul>
+
+    <h3>How to Spot a Bot</h3>
+    <ul>
+      <li>Generic praise: "amazing!", "wow!", "❤️❤️❤️" repeated</li>
+      <li>Crypto / NFT / "DM for $$$" in their own bio</li>
+      <li>Profile created within the last week</li>
+      <li>No profile photo or a stock photo</li>
+      <li>Following thousands of accounts, almost no followers themselves</li>
+    </ul>
+
+    <h3>If a Bot DMs You</h3>
+    <p>Ignore it. Don't click any links they send. Don't reply. Their goal is to phish you or scam followers — neither serves us.</p>
   `;
 
   const secP = `
-    <p>If you see a pattern like this:</p>
-    ${codeBlock(['Post 1: 500 likes','Post 2: 300 likes','Post 3: 20 likes','Post 4: 10 likes'], 'Example Drop Pattern')}
-    <p>Something happened between Post 2 and Post 3. Your account may have been restricted.</p>
-    <h3>Steps:</h3>
-    <ol>
-      <li><strong>Check shadowban.eu</strong> to see if you're shadowbanned</li>
-      <li><strong>Delete the posts</strong> that were published on the day the drop started</li>
-      <li><strong>Reduce</strong> posting from 5 to 3 per day</li>
-      <li><strong>Wait 72 hours</strong> and monitor performance</li>
-      <li><strong>During the 72 hours:</strong> Focus on follower stealing and genuine comments</li>
-      <li><strong>After 72 hours:</strong> Return to normal posting</li>
-      <li><strong>If it doesn't improve:</strong> Contact us for help</li>
-    </ol>
+    <p>"Viral" is relative to the account size. Use the table below to know when you have hit it.</p>
+
+    ${tbl(['Followers','Viral threshold (likes)'],[
+      ['0 – 500','500 +'],
+      ['500 – 1,000','750 +'],
+      ['1,000 – 5,000','1,500 +'],
+      ['5,000 – 10,000','3,000 +'],
+      ['10,000 +','5,000 +'],
+    ])}
+
+    <h3>What to Do When It Hits</h3>
+
+    <div class="guide-step-grid">
+      <div class="guide-step">
+        <div class="guide-step-num">1</div>
+        <div class="guide-step-body"><strong>Don&apos;t delete the tweet.</strong> Don&apos;t edit it. Don&apos;t panic.</div>
+      </div>
+      <div class="guide-step">
+        <div class="guide-step-num">2</div>
+        <div class="guide-step-body"><strong>Reply to as many comments as you can — at least the first 20.</strong> Every reply you write feeds the algorithm. Even a "🥺" or "🫶" reply counts.</div>
+      </div>
+      <div class="guide-step">
+        <div class="guide-step-num">3</div>
+        <div class="guide-step-body"><strong>Post a follow-up tweet 1–2 hours later</strong> with a different photo and a caption that references the viral one (e.g. "y all were so sweet on the last one ♡"). This captures the new visitors who just discovered the account.</div>
+      </div>
+      <div class="guide-step">
+        <div class="guide-step-num">4</div>
+        <div class="guide-step-body"><strong>Check that the bio is clean</strong> and the pinned tweet is still the best one. A flood of new visitors is going to look at both.</div>
+      </div>
+      <div class="guide-step">
+        <div class="guide-step-num">5</div>
+        <div class="guide-step-body"><strong>Send a screenshot to Justin (@SunnyAngels_Admin)</strong> so he knows the account is performing — and so we can adjust strategy, unlock the link, or activate Premium if it is the right time.</div>
+      </div>
+    </div>
+
+    <h3>Don't Try to Force a Second Viral</h3>
+    <p>The instinct after a viral hit is "post the same thing again". <strong>Wait at least 7 days</strong> before reposting the same photo with a different caption (see Section I). Posting it again the same day or even the next day will look obvious and the second post will flop.</p>
   `;
 
   const secQ = `
-    <p>Tweet threads are a series of connected tweets that tell a story or build up to something. They get <strong>3x more engagement</strong> than single tweets.</p>
-    <h3>When to Use Threads:</h3>
-    <ul><li>When you have multiple photos from one set</li><li>For "transformation" or "before/after" content</li><li>For storytelling</li><li>For building anticipation</li></ul>
-    <h3>Thread Structure:</h3>
+    <p>Every account hits a rut at some point. The signs:</p>
     ${codeBlock([
-      'Tweet 1 (Hook): Bold statement + best photo — "you\'re not ready for this..."',
-      'Tweet 2: Another photo + building anticipation — "getting closer..."',
-      'Tweet 3: The payoff photo — "told you 😏"',
-      'Tweet 4 (optional): Link as reply — "more like this ↓ [link]"',
-    ], 'Thread Structure')}
-    <h3>Thread Rules:</h3>
-    <ul><li>Maximum 3–5 tweets per thread</li><li>Each tweet should have a photo/video</li><li>The first tweet MUST have a strong hook</li><li>The link goes in the LAST tweet or as a reply</li><li>Don't make threads longer than 5 tweets (people lose interest)</li></ul>
+      'Tweet 1 (Monday):    500 likes',
+      'Tweet 2 (Tuesday):   400 likes',
+      'Tweet 3 (Wednesday):  60 likes',
+      'Tweet 4 (Thursday):   20 likes',
+      'Tweet 5 (Thursday):    8 likes',
+    ], 'A typical slowdown pattern')}
+    <p>If you see a drop like this — something changed. Usually it is an algorithm flag, sometimes an early shadowban.</p>
+
+    <h3>Recovery Plan</h3>
+
+    <div class="guide-step-grid">
+      <div class="guide-step">
+        <div class="guide-step-num">1</div>
+        <div class="guide-step-body"><strong>Check shadowban.eu first</strong> — if you are banned, follow Section N&apos;s recovery instead.</div>
+      </div>
+      <div class="guide-step">
+        <div class="guide-step-num">2</div>
+        <div class="guide-step-body"><strong>Delete the worst-performing tweet from the slowdown window.</strong> Underperforming tweets drag the whole account&apos;s "score" down.</div>
+      </div>
+      <div class="guide-step">
+        <div class="guide-step-num">3</div>
+        <div class="guide-step-body"><strong>Cut posting down to 2 / day for 3 days.</strong> Less volume, higher quality. Use your best photos.</div>
+      </div>
+      <div class="guide-step">
+        <div class="guide-step-num">4</div>
+        <div class="guide-step-body"><strong>Shift to interaction mode for those 3 days.</strong> Heavy on image replies (Section L) and follower stealing (Section M). The algorithm rewards activity from <em>you</em>, not just on you.</div>
+      </div>
+      <div class="guide-step">
+        <div class="guide-step-num">5</div>
+        <div class="guide-step-body"><strong>If still slow after a week:</strong> change the avatar and refresh the bio. Sometimes the look is the problem.</div>
+      </div>
+      <div class="guide-step">
+        <div class="guide-step-num">6</div>
+        <div class="guide-step-body"><strong>If still slow after two weeks:</strong> message Justin (@SunnyAngels_Admin). We will review the account together and decide on a new strategy.</div>
+      </div>
+    </div>
   `;
 
   const secR = `
-    <h3>Why:</h3>
-    <ul><li>If your main gets banned, you don't lose everything</li><li>You can cross-promote between accounts</li><li>"5 accounts with 10K each is better than 1 account with 50K" (less risk)</li></ul>
-    <h3>Setup:</h3>
-    <ul><li>Different username but mention each other in bios</li><li>Example: Main bio says "backup @creatorbackup" | Backup bio says "main @creatormain"</li><li>Use different content on each (don't duplicate everything)</li><li>Each account needs its own email and phone number</li></ul>
-  `;
-
-  const secS = `
-    <h3>Daily Tasks</h3>
+    <h3>Daily Checklist</h3>
     ${checklist([
-      '5 posts (90% organic, 10% promo with link in reply)',
-      '2–3 min interaction before and after each post',
-      "15–30 comments on other creators' posts",
-      '5–10 follower steals per posting round',
-      '50–100 likes distributed throughout the day',
-      'Reply to all comments on your posts',
+      'Open the dashboard, check Viral Photos / Viral Videos / Viral Text for fresh ideas',
+      'Post the planned number of tweets for today (1 / 2 / 3 depending on account age)',
+      'Run the before-and-after-post routine on every post (5 min before, 5 min after)',
+      'At least 5 image replies on viral tweets (Section L)',
+      'At least 5 follower steals on viral comment sections (Section M)',
+      'Like and reply to comments on your own tweets',
+      'Like 20–50 tweets in the For You feed',
     ], 'daily')}
-    <h3>Weekly Tasks</h3>
+
+    <h3>Weekly Checklist</h3>
     ${checklist([
-      'Check shadowban.eu for all accounts',
-      'Review which posts performed best this week',
-      'Check follower growth (track in spreadsheet)',
-      'Update pinned tweet if a better post exists',
-      'Check if any SFS opportunities are available',
-      'Report any account issues to the team',
+      'Run shadowban.eu on the account — make sure no flags',
+      'Review the week: which post performed best? Why?',
+      'Update the pinned tweet if a new post beat the current pin (100+ likes)',
+      'Refresh caption ideas from the Viral Text tab',
+      'Send Justin a quick update if anything broke or hit big',
     ], 'weekly')}
-    <h3>Monthly Tasks</h3>
+
+    <h3>Monthly Checklist</h3>
     ${checklist([
-      'Review overall growth trend',
-      'Refresh bio if needed',
-      'Update profile picture if needed',
-      'Clean up underperforming posts',
-      'Evaluate and adjust posting strategy based on what worked',
+      'Look at the follower growth chart — is it climbing or plateauing?',
+      'Re-check the avatar and banner — still fresh, or time for a refresh?',
+      'Delete any tweets older than 30 days that have fewer than 5 likes',
+      'Audit the bio — is it still in the right tone?',
     ], 'monthly')}
   `;
 
-  const rules = [
-    { title: 'X Premium is mandatory', desc: 'No Premium = no reach. $8/month is non-negotiable.' },
-    { title: 'NEVER put a link in your main tweet', desc: 'Always post the link as a reply to your own tweet.' },
-    { title: 'Replies are 150x more valuable than likes', desc: 'Focus on getting replies — they drive the algorithm.' },
-    { title: 'Keep captions SHORT', desc: 'Under 25 characters is best. Less is always more.' },
-    { title: 'Ask questions', desc: 'Questions get 50% more engagement than statements.' },
-    { title: 'First 30 minutes decide everything', desc: 'Engage immediately after posting — this is critical.' },
-    { title: 'Maximum 2 links per day', desc: 'On the entire account, not per post.' },
-    { title: 'Maximum 1–2 hashtags', desc: 'More than 2 = 40% reach penalty.' },
-    { title: "Tease, don't show", desc: 'Keep the fantasy gap for your paid content.' },
-    { title: 'Warm up for 7–21 days', desc: "Don't rush new accounts or you'll get shadowbanned." },
-    { title: 'Maximum 50 replies per day', desc: 'More = shadowban risk. Stay within limits.' },
-    { title: 'Image comments on viral posts', desc: 'Strongest growth tactic on the platform.' },
-    { title: 'Always have a backup account', desc: 'Bans happen. Be prepared.' },
-    { title: 'Stay positive in tone', desc: 'Grok AI penalizes negative, aggressive content.' },
-    { title: 'Watermark all your images', desc: "Add the creator's handle or domain to every image." },
-  ];
+  const secS = `
+    <p>Once an account crosses <strong>1,000 followers</strong>, we activate X Premium for it. Until then, it is not worth the cost.</p>
+
+    <h3>What X Premium Gives the Account</h3>
+    <ul>
+      <li><strong>10× more reach</strong> per tweet (Twitter explicitly boosts Premium accounts)</li>
+      <li><strong>Comments appear at the top</strong> of any reply thread — even on huge tweets — which makes the image-reply tactic (Section L) much stronger</li>
+      <li><strong>Blue checkmark</strong> — instant credibility</li>
+      <li><strong>Edit button</strong> — useful for fixing typos without losing the engagement</li>
+      <li><strong>4,000 character limit</strong> instead of 280 (for the occasional long post)</li>
+      <li><strong>TweepCred boost</strong> — a hidden trust score Twitter uses to rank accounts</li>
+    </ul>
+
+    <h3>Why We Wait Until 1,000 Followers</h3>
+    <p>Premium costs about $8 / month per account. On a fresh account it is wasted — the audience is not big enough yet for the boost to compound. At 1,000 followers, the boost starts producing measurable extra growth, and the cost-per-new-follower drops sharply.</p>
+
+    <h3>How to Activate It</h3>
+    <p>You don't pay — we do. Just message Justin once the account hits 1,000.</p>
+
+    <div class="guide-contact-card">
+      <div class="contact-label">Contact to activate Premium</div>
+      <div class="contact-handle">@SunnyAngels_Admin (Justin)</div>
+      <div class="contact-desc">Send him a DM saying "[account] just hit 1,000 followers — ready for Premium". He will activate it on the billing side and confirm.</div>
+    </div>
+  `;
+
   const secT = `
-    <p>Print this out and keep it next to your screen.</p>
-    <div class="guide-rules-grid">
-      ${rules.map((r, i) => `<div class="guide-rule-card"><div class="guide-rule-num">${i + 1}</div><div class="guide-rule-text"><strong>${escHtml(r.title)}</strong>${escHtml(r.desc)}</div></div>`).join('')}
+    <h3>Who to Contact</h3>
+    <div class="guide-contact-card">
+      <div class="contact-label">Main contact</div>
+      <div class="contact-handle">@SunnyAngels_Admin (Justin)</div>
+      <div class="contact-desc">Justin handles: link creation at 100 followers · Premium activation at 1,000 followers · shadowban or suspension issues · viral post moments · anything else you are unsure about.</div>
     </div>
+    <p>If you are ever in doubt — message Justin. Better to ask before doing something risky than to fix the damage after.</p>
+
+    <h3>FAQ</h3>
+
+    <h4>"My account has 70 followers — can I get the link early?"</h4>
+    <p>No. The 100-follower line exists because Twitter throttles new accounts that have a link before they look real. Stay patient — the last 30 followers go faster than the first 30.</p>
+
+    <h4>"Can I post the same photo on two of our accounts?"</h4>
+    <p>Not with the same caption. Twitter detects duplicate photo + caption combinations across accounts and penalizes both. Use the same photo with different captions, or modify the photo slightly (see Section I).</p>
+
+    <h4>"My likes dropped overnight — what do I do?"</h4>
+    <p>Step 1: check shadowban.eu. Step 2: if shadowbanned → follow Section N recovery. Step 3: if not shadowbanned → follow Section Q (Account Slowdown) recovery.</p>
+
+    <h4>"How many accounts can I run at once?"</h4>
+    <p>Five is the practical max. Past that, you can&apos;t run the image-reply tactic (Section L) properly for each one, and they all start to suffer.</p>
+
+    <h4>"A creator I look up to broke half these rules — why?"</h4>
+    <p>Large accounts (100K +) have organic momentum and can break some rules safely. Small accounts cannot. Stick to the playbook until the account crosses 5,000 followers — then we revisit.</p>
+
+    <h4>"Can I use any auto-scheduler or bot app?"</h4>
+    <p>No. Twitter detects third-party automation and penalizes accounts. All posts go out manually from the X app.</p>
+
+    <h4>"What if Twitter prompts me to verify with a phone or selfie?"</h4>
+    <p>Stop and message Justin immediately. Do not answer the prompt yourself.</p>
+
+    <h4>"What if a follower DMs me asking explicit questions?"</h4>
+    <p>If they are polite — reply softly and casually. If they are aggressive or weird — ignore. Never send explicit content yourself, regardless of what they offer.</p>
+
+    <h4>"Can I do giveaways or contests?"</h4>
+    <p>Not without checking with Justin first. Twitter has rules around giveaways that can suspend the account if you do it wrong.</p>
+
+    <h4>"How do I tell which posting time is best for my account?"</h4>
+    <p>Try all three windows (morning, lunch, evening) over a week. The one with the highest average engagement is your account&apos;s sweet spot. Stick to it, but check again monthly — audience habits drift.</p>
   `;
 
-  const secU = `
-    ${warnBox('<strong>Shadowban detected:</strong> Notify team immediately in the group. Pause all activity.', true)}
-    ${warnBox('<strong>Account suspended:</strong> Notify team with a screenshot. Do NOT create a new account without permission.', true)}
-    ${warnBox('<strong>Restriction received:</strong> Notify team. Follow the cooldown procedure in Section D.')}
-    ${warnBox('<strong>Post goes viral:</strong> Send screenshot to "Viral Posts" group. Keep engaging with comments.')}
-    ${warnBox('<strong>Unsure about something:</strong> Ask in the team group before acting. When in doubt, do less rather than more.')}
-  `;
-
-  const secV = `
-    <p>80+ tested captions sorted by category. Rotate through these and never use the same caption twice in one week.</p>
-    <div class="guide-caption-cat">
-      <h4>Engagement Questions</h4>
-      ${captionItems(['am i your type? (be honest)','smash or pass (be honest)','Yes or no to my body type? Be honest','Rate my [arch/waist/figure] 1-10','Do you like [tattooed/redhead/short/tall] girls?','Describe me in 1 word','what would you do?','would you [kiss me/take me out/hold my hand]?','me or your wife?','me or $5 mil?','Taste or pass?','1 or 2?','too small or just right?','Caught u staring again','Stop scrolling and rate me','Who wants to get [crushed/hugged]?','Can you handle this?','girlfriend or wife?'])}
-    </div>
-    <div class="guide-caption-cat">
-      <h4>Short &amp; Sweet</h4>
-      ${captionItems(['hey cutie','hi ♡','good morning ☀️','good night 🌙','bouncy','lord have mercy...','enjoy :)','lace','WHOA','OH NO','watch again','hey x ♡'])}
-    </div>
-    <div class="guide-caption-cat">
-      <h4>Boyfriend / Girlfriend Energy</h4>
-      ${captionItems(['taking bf applications rn','taking boyfriend applications ↓','still single btw',"who needs a gf for christmas? say 'me'",'first date where are we going?','hey (with intentions to talk every day and cuddle)',"i'm ur e-girlfriend now, no takebacks"])}
-    </div>
-    <div class="guide-caption-cat">
-      <h4>Personality / Humor</h4>
-      ${captionItems(['my kink is complete devotion and obsession','This is frying me','Where did my car seat go?','giggle maxing','this is what [X]lbs looks like :D','imagine hating tummy!?','Heard u like abs','right side enjoyers come here','pspspsps come here loser'])}
-    </div>
-    <div class="guide-caption-cat">
-      <h4>Tease / Suggestive</h4>
-      ${captionItems(['eyes up here pretty boy','I know what you\'re looking at 🖤','Your knees hurt yet?','A little motivation ♡','you\'ll want sound on for this video','just studying 📚','is pink my color?','What kind of day does this picture remind you of?','let me know if you have any questions'])}
-    </div>
-    <div class="guide-caption-cat">
-      <h4>FOMO / DM Bait (max 1x per day)</h4>
-      ${captionItems(["deleting in [X] hours, say 'me' for a special dm","say hi for a surprise in dms","reply 'yes' for a surprise dm (i'm serious)","if you're not a bot, say hi. i'll follow back immediately","don't open the comments","I dare you to open the comments"])}
-    </div>
-    <div class="guide-caption-cat">
-      <h4>Cosplay / Character</h4>
-      ${captionItems(['[Character Name] [emoji]','Mother Makima','Nico Robin 🤲','who wants [character name]?'])}
-    </div>
-    <div class="guide-caption-cat">
-      <h4>Body Count / Viral Format</h4>
-      ${captionItems(['my body count history: 2011: 0 2012: 0 2013: 0 ...show more','body count: 2020: 0 2021:0 2022: 0 2023: 0 2024: 1 ...show more'])}
-    </div>
-  `;
+  const rules = [
+    { title: 'Personality before promo', desc: '90% personality content, 10% promo at most.' },
+    { title: 'Never put a link in a tweet', desc: 'Link lives only in the bio, never inside any tweet.' },
+    { title: 'Wait until 100 followers for the link', desc: 'Message Justin (@SunnyAngels_Admin) to get yours.' },
+    { title: 'Replies > Likes', desc: 'A reply chain is 150× more valuable than a like.' },
+    { title: 'Short captions win', desc: 'Under 25 characters performs 3× better.' },
+    { title: 'Ask questions', desc: 'Questions get 50% more engagement than statements.' },
+    { title: 'First 30 minutes decide', desc: 'Engage actively right after posting.' },
+    { title: 'Three posts per day max', desc: '1 → 2 → 3 ramp over three weeks. Never more.' },
+    { title: 'Image comments on viral posts', desc: 'The strongest growth tactic on the platform.' },
+    { title: 'Wait a week before reposting', desc: 'Same photo: 7-day cooldown, different caption.' },
+    { title: 'Tone stays positive', desc: 'Grok AI silently suppresses negative or political content.' },
+    { title: 'When in doubt, ask Justin', desc: 'Better to ask once than to fix damage later.' },
+  ];
 
   // ── Build sections list ────────────────────────────────────────────
   const sections = [
-    { id: 'a', l: 'A', t: 'Threads vs Twitter/X',          b: secA, open: true  },
-    { id: 'b', l: 'B', t: 'Account Setup',                 b: secB              },
-    { id: 'c', l: 'C', t: 'Account Warm-Up',               b: secC              },
-    { id: 'd', l: 'D', t: 'Avoiding Restrictions',         b: secD              },
-    { id: 'e', l: 'E', t: 'The Link Rule (CRITICAL)',      b: secE              },
-    { id: 'f', l: 'F', t: 'Daily Posting Schedule',        b: secF              },
-    { id: 'g', l: 'G', t: 'Follower Stealing',             b: secG              },
-    { id: 'h', l: 'H', t: 'Image Commenting Strategy',     b: secH              },
-    { id: 'i', l: 'I', t: 'Caption Strategy',              b: secI              },
-    { id: 'j', l: 'J', t: 'What Counts as Viral',          b: secJ              },
-    { id: 'k', l: 'K', t: 'Hashtag Strategy',              b: secK              },
-    { id: 'l', l: 'L', t: 'Dealing with Bots',             b: secL              },
-    { id: 'm', l: 'M', t: 'Growing Beyond 1,000 Followers',b: secM              },
-    { id: 'n', l: 'N', t: 'Growing Beyond 5,000 Followers',b: secN              },
-    { id: 'o', l: 'O', t: 'If an Account Dies',            b: secO              },
-    { id: 'p', l: 'P', t: 'If Likes Drop Suddenly',        b: secP              },
-    { id: 'q', l: 'Q', t: 'Tweet Threads Strategy',        b: secQ              },
-    { id: 'r', l: 'R', t: 'Backup Accounts',               b: secR              },
-    { id: 's', l: 'S', t: 'Weekly/Monthly Checklist',      b: secS              },
-    { id: 't', l: 'T', t: '15 Golden Rules',               b: secT              },
-    { id: 'u', l: 'U', t: 'Emergency Contacts',            b: secU              },
-    { id: 'v', l: 'V', t: 'Caption Bank (80+ captions)',   b: secV              },
+    { id: 'a', l: 'A', t: 'Welcome — The Big Picture',         b: secA, open: true },
+    { id: 'b', l: 'B', t: 'Creating the Account',              b: secB },
+    { id: 'c', l: 'C', t: 'Profile Setup',                     b: secC },
+    { id: 'd', l: 'D', t: 'Account Warm-Up (Day 1–21)',        b: secD },
+    { id: 'e', l: 'E', t: "How Twitter's Algorithm Works",     b: secE },
+    { id: 'f', l: 'F', t: 'Daily Posting Schedule',            b: secF },
+    { id: 'g', l: 'G', t: 'Captions: What Works & Why',        b: secG },
+    { id: 'h', l: 'H', t: 'Caption Bank (60+ captions)',       b: secH },
+    { id: 'i', l: 'I', t: 'Content Rules (Photos & Videos)',   b: secI },
+    { id: 'j', l: 'J', t: 'Pinned Tweet — Wait for 100 Likes', b: secJ },
+    { id: 'k', l: 'K', t: 'The Link Rule (CRITICAL)',          b: secK },
+    { id: 'l', l: 'L', t: 'Growth Tactic: Image Comments',     b: secL },
+    { id: 'm', l: 'M', t: 'Growth Tactic: Follower Stealing',  b: secM },
+    { id: 'n', l: 'N', t: 'Avoiding Shadowbans',               b: secN },
+    { id: 'o', l: 'O', t: 'Bots in Your Comments',             b: secO },
+    { id: 'p', l: 'P', t: 'When a Post Goes Viral',            b: secP },
+    { id: 'q', l: 'Q', t: 'When Your Account Slows Down',      b: secQ },
+    { id: 'r', l: 'R', t: 'Daily / Weekly Checklist',          b: secR },
+    { id: 's', l: 'S', t: 'At 1,000 Followers: X Premium',     b: secS },
+    { id: 't', l: 'T', t: 'FAQ + How to Reach Us',             b: secT },
   ];
 
   // ── TOC ────────────────────────────────────────────────────────────
