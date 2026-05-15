@@ -389,6 +389,11 @@ def _persist_media_paths(posts_with_media, media_stats):
             log.warning(f"media_local persist failed for post {pid}: {e}")
 
 
+def run_daily_refresh_pipeline():
+    """Refresh existing accounts (last 1 day) — for keeping data fresh."""
+    _run_refresh_window("daily_refresh", days_back=1, label="DAILY REFRESH")
+
+
 def run_refresh_pipeline():
     """Refresh existing accounts (last 7 days)."""
     _run_refresh_window("refresh", days_back=7, label="REFRESH")

@@ -1446,6 +1446,43 @@ function renderGuide() {
       .guide-phase-title { font-size: 14px; font-weight: 600; color: #635bff; margin-bottom: 6px; }
       .guide-highlight { background: rgba(99, 91, 255,.25); border-radius: 2px; padding: 0 1px; }
       .guide-section.search-hidden { display: none; }
+      .guide-scenario { background: #16181c; border: 1px solid #2f3336; border-left: 3px solid #22d3ee; border-radius: 8px; padding: 12px 16px; margin: 10px 0; }
+      .guide-scenario-label { font-size: 11px; font-weight: 700; color: #22d3ee; text-transform: uppercase; letter-spacing: .08em; margin-bottom: 6px; }
+      .guide-scenario-body { font-size: 13px; color: #c4cdd5; line-height: 1.6; }
+      .guide-scenario-body strong { color: #e7e9ea; }
+      .guide-good { background: rgba(0,186,124,.08); border: 1px solid rgba(0,186,124,.35); border-radius: 8px; padding: 12px 16px; margin: 12px 0; display: flex; gap: 10px; align-items: flex-start; }
+      .guide-good-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+      .guide-good-body { font-size: 13px; color: #c4cdd5; line-height: 1.6; }
+      .guide-good-body strong { color: #00ba7c; }
+      .guide-contact-card { background: linear-gradient(135deg, rgba(99, 91, 255,.18), rgba(99, 91, 255,.05)); border: 1px solid rgba(99, 91, 255,.45); border-radius: 12px; padding: 16px 20px; margin: 16px 0; }
+      .guide-contact-card .contact-label { font-size: 11px; font-weight: 700; color: #635bff; text-transform: uppercase; letter-spacing: .08em; margin-bottom: 4px; }
+      .guide-contact-card .contact-handle { font-size: 18px; font-weight: 700; color: #e7e9ea; margin-bottom: 6px; word-break: break-all; }
+      .guide-contact-card .contact-desc { font-size: 13px; color: #c4cdd5; line-height: 1.55; margin: 0; }
+      .guide-tip { background: rgba(255, 210, 80,.08); border: 1px solid rgba(255, 210, 80,.35); border-radius: 8px; padding: 12px 16px; margin: 12px 0; display: flex; gap: 10px; align-items: flex-start; }
+      .guide-tip-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+      .guide-tip-body { font-size: 13px; color: #c4cdd5; line-height: 1.6; }
+      .guide-tip-body strong { color: #ffd250; }
+      @media (max-width: 720px) {
+        .guide-wrap { padding: 16px 12px 60px; }
+        .guide-toc { padding: 14px 16px; }
+        .guide-toc-grid { grid-template-columns: 1fr; gap: 2px; }
+        .guide-toc-link { font-size: 13.5px; padding: 6px 0; white-space: normal; }
+        .guide-section-header { padding: 14px 14px; }
+        .guide-section-header h2 { font-size: 14px; gap: 8px; }
+        .guide-section-letter { width: 24px; height: 24px; font-size: 11px; }
+        .guide-section-body { padding: 16px 14px; }
+        .guide-section-body p, .guide-section-body li { font-size: 14px; line-height: 1.65; }
+        .guide-section-body h3 { font-size: 14px; margin-top: 18px; }
+        .guide-rules-grid { grid-template-columns: 1fr; }
+        .guide-table { font-size: 12.5px; }
+        .guide-table th, .guide-table td { padding: 7px 10px; }
+        .guide-caption-item { padding: 10px 12px; }
+        .guide-caption-copy { padding: 6px 12px; font-size: 12px; }
+        .guide-code-copy { padding: 5px 10px; font-size: 12px; }
+        .guide-checklist input[type=checkbox] { width: 18px; height: 18px; margin-top: 1px; }
+        .guide-checklist li { font-size: 14px; padding: 8px 0; gap: 12px; }
+        .guide-contact-card .contact-handle { font-size: 16px; }
+      }
     `;
     document.head.appendChild(style);
   }
@@ -2119,6 +2156,7 @@ function bindEvents() {
     $('#btn-scrape-full').addEventListener('click', () => startScrape('full'));
     $('#btn-scrape-new').addEventListener('click', () => startScrape('new-only'));
     $('#btn-scrape-refresh').addEventListener('click', () => startScrape('refresh'));
+    $('#btn-scrape-daily').addEventListener('click', () => startScrape('daily-refresh'));
     $('#btn-scrape-monthly').addEventListener('click', () => startScrape('monthly-refresh'));
     $('#btn-scrape-backfill').addEventListener('click', () => startScrape('media-backfill'));
     $('#btn-scrape-stop').addEventListener('click', stopScrape);

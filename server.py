@@ -28,7 +28,7 @@ from db.database import (
 from tasks import task_manager
 from tasks.pipeline import (
     run_full_pipeline, run_new_only_pipeline,
-    run_refresh_pipeline, run_monthly_refresh_pipeline,
+    run_daily_refresh_pipeline, run_refresh_pipeline, run_monthly_refresh_pipeline,
     run_media_backfill_pipeline,
 )
 
@@ -155,6 +155,16 @@ async def scrape_new(pin: str = "", role=Depends(require_admin)):
         raise HTTPException(409, "A scrape is already running")
     task_manager.start_task(run_new_only_pipeline)
     return {"status": "started"}
+
+
+@app.post("/api/scrape/daily-refresh")
+async def scrape_daily_refresh(pin: str = "", role=Depends(require_admin)):
+    if pin != SCRAPE_PIN:
+        raise HTTPException(403, "Invalid PIN")
+    if task_manager.is_running():
+        raise HTTPException(409, "A scrape is already running")
+    task_manager.start_task(run_daily_refresh_pipeline)
+    return {"status": "started", "window_days": 1}
 
 
 @app.post("/api/scrape/refresh")
@@ -520,7 +530,7 @@ async def get_auto_refresh(role=Depends(require_admin)):
     next_run = None
     if _scheduler:
         try:
-            job = _scheduler.get_job("monthly_auto_refresh")
+            job = _scheduler.get_job("daily_auto_refresh")
             if job and job.next_run_time:
                 next_run = job.next_run_time.isoformat()
         except Exception:
@@ -528,7 +538,7 @@ async def get_auto_refresh(role=Depends(require_admin)):
     return {
         "enabled": enabled,
         "next_run": next_run,
-        "schedule": "1st of month, 02:00 Europe/Berlin",
+        "schedule": "Daily, 02:00 Europe/Berlin",
     }
 
 
@@ -542,7 +552,7 @@ async def set_auto_refresh(enabled: bool, role=Depends(require_admin)):
 
 
 def _auto_refresh_job():
-    """Cron-fired monthly refresh. Skips if disabled or another scrape running."""
+    """Cron-fired daily refresh. Skips if disabled or another scrape running."""
     try:
         settings = _load_settings()
         if not settings.get("auto_refresh_enabled"):
@@ -551,9 +561,9 @@ def _auto_refresh_job():
         if task_manager.is_running():
             log.warning("Auto-refresh: scrape already running, skipping this slot")
             return
-        started = task_manager.start_task(run_monthly_refresh_pipeline)
+        started = task_manager.start_task(run_daily_refresh_pipeline)
         if started:
-            log.info("Auto-refresh: started monthly refresh")
+            log.info("Auto-refresh: started daily refresh")
         else:
             log.error("Auto-refresh: could not start task")
     except Exception as e:
@@ -583,7 +593,7 @@ async def startup():
     init_db()
     cancel_stale_jobs()
 
-    # Monthly auto-refresh: 1st of each month at 02:00 Europe/Berlin
+    # Daily auto-refresh: every day at 02:00 Europe/Berlin
     try:
         from apscheduler.schedulers.background import BackgroundScheduler
         from apscheduler.triggers.cron import CronTrigger
@@ -591,14 +601,14 @@ async def startup():
         _scheduler = BackgroundScheduler(timezone=pytz.timezone("Europe/Berlin"))
         _scheduler.add_job(
             _auto_refresh_job,
-            trigger=CronTrigger(day=1, hour=2, minute=0, timezone="Europe/Berlin"),
-            id="monthly_auto_refresh",
+            trigger=CronTrigger(hour=2, minute=0, timezone="Europe/Berlin"),
+            id="daily_auto_refresh",
             max_instances=1,
             coalesce=True,
             misfire_grace_time=3600,
         )
         _scheduler.start()
-        log.info("Scheduler started: monthly auto-refresh = 1st of month, 02:00 Europe/Berlin")
+        log.info("Scheduler started: daily auto-refresh = 02:00 Europe/Berlin")
     except Exception as e:
         log.warning(f"Scheduler init failed: {e}")
 

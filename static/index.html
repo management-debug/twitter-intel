@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/static/style.css?v=23" />
+  <link rel="stylesheet" href="/static/style.css?v=24" />
 </head>
 <body>
 
@@ -130,6 +130,7 @@
           <div class="scrape-buttons">
             <button class="btn btn-primary" id="btn-scrape-full">Full Scrape</button>
             <button class="btn btn-secondary" id="btn-scrape-new">New Only</button>
+            <button class="btn btn-secondary" id="btn-scrape-daily" title="Re-scrape posts from the last day">Daily (1d)</button>
             <button class="btn btn-secondary" id="btn-scrape-refresh" title="Re-scrape posts from the last 7 days">Refresh (7d)</button>
             <button class="btn btn-secondary" id="btn-scrape-monthly" title="Re-scrape posts from the last 30 days">Monthly (30d)</button>
             <button class="btn btn-secondary" id="btn-scrape-backfill" title="Download missing images/videos for existing posts (no API credits)">Backfill Media</button>
@@ -154,8 +155,8 @@
             <span class="slider"></span>
           </label>
           <div class="auto-refresh-info">
-            <div class="auto-refresh-title">Monthly Auto-Refresh</div>
-            <div class="auto-refresh-sub" id="auto-refresh-sub">1st of month, 02:00 Europe/Berlin · 30-day window</div>
+            <div class="auto-refresh-title">Daily Auto-Refresh</div>
+            <div class="auto-refresh-sub" id="auto-refresh-sub">Daily, 02:00 Europe/Berlin · 1-day window</div>
           </div>
         </div>
       </div>
@@ -505,6 +506,6 @@
   <!-- ════════════════════════════════════════════════════ TOAST -->
   <div id="toast-container"></div>
 
-  <script src="/static/app.js?v=23"></script>
+  <script src="/static/app.js?v=24"></script>
 </body>
 </html>
