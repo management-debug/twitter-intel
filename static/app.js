@@ -183,7 +183,8 @@ async function login() {
   const errEl    = $('#login-error');
   const btn      = $('#login-btn');
 
-  if (!email || !password) { showError(errEl, 'Please fill in all fields.'); return; }
+  // Workers log in with just the password — email is optional.
+  if (!password) { showError(errEl, 'Please enter the password.'); return; }
 
   btn.disabled = true;
   btn.textContent = 'Signing in…';

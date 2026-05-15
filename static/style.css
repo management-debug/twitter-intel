@@ -975,6 +975,11 @@ select option {
   justify-content: center;
   padding: 20px;
 }
+/* The .active utility class sets display: block !important, which overrides
+   the flex centering on .modal-overlay. We restore flex here so the modal
+   stays centered when opened. */
+.modal-overlay.active { display: flex !important; }
+.modal-overlay.hidden { display: none !important; }
 
 .modal-box {
   background: var(--bg3);
