@@ -1964,6 +1964,23 @@ button, a, [role="button"], input, select, textarea, label, .tab-btn, .period-bt
   h2 { font-size: 16px; }
 }
 
+/* Mobile: don't stick the top nav. It eats vertical reading space on
+   small screens, and users can swipe to the top to switch tabs. The
+   safe-area-inset still applies via the topnav's own padding-top. */
+@media (max-width: 720px) {
+  .topnav {
+    position: static;
+    top: auto;
+    left: auto;
+    right: auto;
+    height: auto;
+    min-height: var(--nav-h);
+  }
+  #app {
+    padding-top: 0;
+  }
+}
+
 /* Info banner — sits at the top of a tab to explain how to use it */
 .info-banner {
   display: flex;

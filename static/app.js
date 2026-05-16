@@ -1672,7 +1672,18 @@ function renderGuide() {
         .gd-wrap { padding: 18px 14px 60px; }
         .gd-hero h1 { font-size: 26px; }
         .gd-hero p { font-size: 13.5px; }
-        .gd-chnav { grid-template-columns: repeat(2, 1fr); padding: 10px 0; gap: 7px; overflow-x: visible; }
+        .gd-chnav {
+          position: static;
+          top: auto;
+          grid-template-columns: repeat(2, 1fr);
+          padding: 10px 0;
+          gap: 7px;
+          overflow-x: visible;
+          background: transparent;
+          backdrop-filter: none;
+          -webkit-backdrop-filter: none;
+          border-bottom: none;
+        }
         .gd-chtab { padding: 10px 12px; }
         .gd-chtab-icon { font-size: 18px; }
         .gd-chtab-title { font-size: 12.5px; }
