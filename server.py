@@ -555,6 +555,7 @@ async def get_auto_refresh(role=Depends(require_admin)):
         "enabled": enabled,
         "next_run": next_run,
         "schedule": "Daily, 02:00 Europe/Berlin",
+        "window_days": 3,  # keep in sync with run_daily_refresh_pipeline
     }
 
 

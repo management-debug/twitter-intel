@@ -453,7 +453,8 @@ async function loadAutoRefresh() {
     if (toggle) toggle.checked = !!data.enabled;
     if (sub) {
       const next = data.next_run ? new Date(data.next_run).toLocaleString() : '—';
-      sub.textContent = `${data.schedule || '1st of month, 02:00 Europe/Berlin'} · 30-day window · next: ${next}`;
+      const window = data.window_days ? `${data.window_days}-day window` : '3-day window';
+      sub.textContent = `${data.schedule || 'Daily, 02:00 Europe/Berlin'} · ${window} · next: ${next}`;
     }
   } catch (_) {}
 }
