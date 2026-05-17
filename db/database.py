@@ -932,8 +932,18 @@ def _period_range(period):
             yesterday_start.astimezone(timezone.utc).isoformat(),
             today_start.astimezone(timezone.utc).isoformat(),
         )
-    if period == "week":
-        return ((now_manila - timedelta(days=7)).astimezone(timezone.utc).isoformat(), None)
+    if period == "week" or period == "this_week":
+        # Calendar week — Monday 00:00 in Manila up to now.
+        week_start = today_start - timedelta(days=today_start.weekday())
+        return (week_start.astimezone(timezone.utc).isoformat(), None)
+    if period == "last_week":
+        # Previous Monday 00:00 to this Monday 00:00 (Manila).
+        this_week_start = today_start - timedelta(days=today_start.weekday())
+        last_week_start = this_week_start - timedelta(days=7)
+        return (
+            last_week_start.astimezone(timezone.utc).isoformat(),
+            this_week_start.astimezone(timezone.utc).isoformat(),
+        )
     if period == "2weeks":
         return ((now_manila - timedelta(days=14)).astimezone(timezone.utc).isoformat(), None)
     if period == "this_month":
