@@ -295,7 +295,7 @@ def get_accounts(limit=500, sort="followers", search="", is_team=None, status=No
     if USE_SUPABASE:
         params = {"select": "*", "order": f"{sort}.desc.nullslast", "limit": limit}
         if search:
-            params["username"] = f"ilike.%{search}%"
+            params["username"] = f"ilike.*{search}*"
         if is_team is not None:
             params["is_our_team"] = f"eq.{is_team}"
         if status:
@@ -536,7 +536,7 @@ def get_posts(page=1, limit=50, sort="likes", media_type=None, viral_only=False,
         if account_id:
             params["account_id"] = f"eq.{account_id}"
         if search:
-            params["caption"] = f"ilike.%{search}%"
+            params["caption"] = f"ilike.*{search}*"
         if period != "all":
             start, end = _period_range(period)
             if start:
@@ -604,7 +604,7 @@ def get_post_count(media_type=None, viral_only=False, period="all", min_mult=0, 
         if min_mult > 0:
             params["performance_multiplier"] = f"gte.{min_mult}"
         if search:
-            params["caption"] = f"ilike.%{search}%"
+            params["caption"] = f"ilike.*{search}*"
         if period != "all":
             start, end = _period_range(period)
             if start:
@@ -933,16 +933,15 @@ def _period_range(period):
             today_start.astimezone(timezone.utc).isoformat(),
         )
     if period == "week" or period == "this_week":
-        # Calendar week — Monday 00:00 in Manila up to now.
-        week_start = today_start - timedelta(days=today_start.weekday())
-        return (week_start.astimezone(timezone.utc).isoformat(), None)
+        # Rolling 7 days — calendar week was too confusing for VAs (on
+        # Mondays "this week" would only contain today, while yesterday
+        # rolled into "last week"). Rolling matches the worker mental
+        # model: "this week" = the last 7 days, "last week" = the 7 before.
+        return ((now_manila - timedelta(days=7)).astimezone(timezone.utc).isoformat(), None)
     if period == "last_week":
-        # Previous Monday 00:00 to this Monday 00:00 (Manila).
-        this_week_start = today_start - timedelta(days=today_start.weekday())
-        last_week_start = this_week_start - timedelta(days=7)
         return (
-            last_week_start.astimezone(timezone.utc).isoformat(),
-            this_week_start.astimezone(timezone.utc).isoformat(),
+            (now_manila - timedelta(days=14)).astimezone(timezone.utc).isoformat(),
+            (now_manila - timedelta(days=7)).astimezone(timezone.utc).isoformat(),
         )
     if period == "2weeks":
         return ((now_manila - timedelta(days=14)).astimezone(timezone.utc).isoformat(), None)
