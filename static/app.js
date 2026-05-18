@@ -1254,37 +1254,25 @@ async function addBulk() {
 }
 
 // ─── STRATEGY TAB ────────────────────────────────────────────────────
-const strategyData = {
-  formats: [
-    { label: 'Photo posts',    value: 8.4, color: '#635bff' },
-    { label: 'Video posts',    value: 12.1, color: '#22d3ee' },
-    { label: 'Text only',      value: 4.2, color: '#00ba7c' },
-    { label: 'Thread starter', value: 6.7, color: '#ffad1f' },
-  ],
-  captions: [
-    { label: 'Question hook',    value: 9.8, color: '#635bff' },
-    { label: 'Controversial take',value: 11.2, color: '#ff6b8a' },
-    { label: 'Personal story',   value: 8.5, color: '#22d3ee' },
-    { label: 'Tips & advice',    value: 7.3, color: '#00ba7c' },
-    { label: 'Humor / meme',     value: 10.4, color: '#ffad1f' },
-    { label: 'Call to action',   value: 6.1, color: '#ff7a00' },
-    { label: 'Behind the scenes',value: 8.9, color: '#00d4ff' },
-    { label: 'Announcement',     value: 5.4, color: '#71767b' },
-  ],
+// Format + caption-length numbers are pulled live from the DB via
+// /api/strategy and stored back into strategyData when the tab loads.
+// Algorithm weights are the real values from Twitter's open-source
+// algorithm repo — these don't change so they're constants. The best-
+// times heat map is generic US-prime-time guidance.
+let strategyData = {
+  formats: [],          // populated from /api/strategy
+  captionLengths: [],   // populated from /api/strategy
+  engagement: null,     // populated from /api/strategy
+  totalViral: 0,        // populated from /api/strategy
   algoWeights: [
-    { signal: 'Bookmarks / saves', weight: 95, notes: 'Strongest quality signal' },
-    { signal: 'Replies (comments)', weight: 80, notes: 'Conversation drives reach' },
-    { signal: 'Link clicks (off-X)', weight: 75, notes: 'Intent signal; penalized by reach algo' },
-    { signal: 'Quote tweets',        weight: 60, notes: 'Discussion amplifier' },
-    { signal: 'Retweets',            weight: 55, notes: 'Classic virality signal' },
-    { signal: 'Likes',               weight: 50, notes: 'High volume, lower weight' },
-    { signal: 'Profile visits',       weight: 40, notes: 'Curiosity signal' },
-    { signal: 'Follows from post',    weight: 35, notes: 'Strong quality but rare' },
-    { signal: 'Video completion',     weight: 85, notes: 'Key for video posts' },
-    { signal: 'View time',            weight: 70, notes: 'Time spent on post' },
+    { signal: 'Reply + author replies back', weight: 150, notes: 'The single strongest signal — start conversations' },
+    { signal: 'Reply',                        weight: 27,  notes: 'Comments drive reach far more than likes' },
+    { signal: 'Profile click + engagement',   weight: 24,  notes: 'Visitor stuck around — quality signal' },
+    { signal: 'Dwell time (2+ min)',          weight: 20,  notes: 'How long viewers stayed on the tweet' },
+    { signal: 'Bookmark',                     weight: 20,  notes: 'Save-for-later — most creators ignore this' },
+    { signal: 'Retweet',                      weight: 2,   notes: 'Classic virality signal' },
+    { signal: 'Like',                         weight: 1,   notes: 'Baseline — every other signal compared to this' },
   ],
-  // heat map: 24h x 7days (Mon-Sun). Values 0-5 for heat intensity
-  // rows = hours 6am-11pm, cols = Mon-Sun
   bestTimes: {
     days: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
     hours: ['6am', '7am', '8am', '9am', '10am', '11am', '12pm',
@@ -1314,9 +1302,21 @@ const strategyData = {
   },
 };
 
-function renderStrategy() {
-  renderBarChart('format-chart', strategyData.formats, 'Avg Virality Score');
-  renderBarChart('caption-chart', strategyData.captions, 'Avg Virality Score');
+async function renderStrategy() {
+  // Pull live aggregates from the DB. Algorithm weights + heat map are
+  // baked into strategyData; format/caption-length come from /api/strategy.
+  try {
+    const data = await apiGet('/api/strategy', 'strategy_stats');
+    if (data) {
+      strategyData.formats        = data.formats || [];
+      strategyData.captionLengths = data.caption_lengths || [];
+      strategyData.engagement     = data.engagement || null;
+      strategyData.totalViral     = data.total_viral || 0;
+    }
+  } catch (_) { /* render whatever we have */ }
+
+  renderBarChart('format-chart',  strategyData.formats,        'Avg engagement');
+  renderBarChart('caption-chart', strategyData.captionLengths, 'Avg likes');
   renderAlgoTable();
   renderTimeGrid();
 }
@@ -1324,14 +1324,18 @@ function renderStrategy() {
 function renderBarChart(containerId, items, unit = '') {
   const container = $(`#${containerId}`);
   if (!container) return;
-  const max = Math.max(...items.map(i => i.value));
+  if (!items || !items.length) {
+    container.innerHTML = '<div style="color:var(--text3);font-size:13px;padding:16px 0;">Loading…</div>';
+    return;
+  }
+  const max = Math.max(...items.map(i => i.value || 0)) || 1;
   container.innerHTML = items.map(item => `
     <div class="bar-row">
       <div class="bar-label">${escHtml(item.label)}</div>
       <div class="bar-track">
-        <div class="bar-fill" style="width:${(item.value / max * 100).toFixed(1)}%;background:${item.color};"></div>
+        <div class="bar-fill" style="width:${((item.value || 0) / max * 100).toFixed(1)}%;background:${item.color};"></div>
       </div>
-      <div class="bar-value">${item.value.toFixed(1)}</div>
+      <div class="bar-value">${(item.value || 0).toLocaleString()}${item.count ? ` <span style="color:var(--text3);font-weight:400;font-size:11px;">(${item.count.toLocaleString()})</span>` : ''}</div>
     </div>
   `).join('');
 }

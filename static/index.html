@@ -14,7 +14,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/static/style.css?v=37" />
+  <link rel="stylesheet" href="/static/style.css?v=38" />
 </head>
 <body>
 
@@ -408,21 +408,24 @@
       <div class="strategy-grid">
         <!-- Format comparison -->
         <div class="strategy-card wide">
-          <h3>Format Performance</h3>
+          <h3>Format Performance — Avg Engagement per Viral Post</h3>
+          <p style="color:var(--text3);font-size:12px;margin:-4px 0 8px;">Real numbers from our viral-post database. Photos &amp; Text show avg likes; Video shows avg views. The number in grey = how many viral posts were in that bucket.</p>
           <div class="bar-chart" id="format-chart"></div>
         </div>
 
-        <!-- Caption categories -->
+        <!-- Caption length comparison -->
         <div class="strategy-card wide">
-          <h3>Caption Category Performance</h3>
+          <h3>Caption Length — Avg Likes per Viral Post</h3>
+          <p style="color:var(--text3);font-size:12px;margin:-4px 0 8px;">Short captions consistently outperform long ones — here is the data.</p>
           <div class="bar-chart" id="caption-chart"></div>
         </div>
 
         <!-- Algorithm weights -->
         <div class="strategy-card">
-          <h3>Algorithm Weights</h3>
+          <h3>X Algorithm — Signal Weights (× a Like)</h3>
+          <p style="color:var(--text3);font-size:12px;margin:-4px 0 8px;">From Twitter&apos;s open-source algorithm repo. Each number is how much that signal counts versus a single like.</p>
           <table class="algo-table" id="algo-table">
-            <thead><tr><th>Signal</th><th>Weight</th><th>Notes</th></tr></thead>
+            <thead><tr><th>Signal</th><th>× a Like</th><th>Notes</th></tr></thead>
             <tbody id="algo-tbody"></tbody>
           </table>
         </div>
@@ -531,6 +534,6 @@
   <!-- ════════════════════════════════════════════════════ TOAST -->
   <div id="toast-container"></div>
 
-  <script src="/static/app.js?v=37"></script>
+  <script src="/static/app.js?v=38"></script>
 </body>
 </html>

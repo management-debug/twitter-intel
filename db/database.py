@@ -204,6 +204,11 @@ def _sb_count(table, filters=None):
 _STATS_CACHE = {"data": None, "ts": 0}
 _STATS_TTL = 60
 
+# Strategy stats — heavier (scans viral posts to compute averages). Longer
+# TTL since the numbers shift slowly.
+_STRATEGY_CACHE = {"data": None, "ts": 0}
+_STRATEGY_TTL = 600  # 10 minutes
+
 
 # ─── Supabase Storage ───────────────────────────────────────────────────────
 
@@ -970,3 +975,115 @@ def _period_cutoff(period):
     """Back-compat shim — returns only the start of the range."""
     start, _ = _period_range(period)
     return start
+
+
+# ─── Strategy Stats ─────────────────────────────────────────────────────────
+
+def _fetch_all_viral_posts():
+    """Fetch every viral post (media_type / caption / metrics only). PostgREST
+    caps a single GET at 1000 rows by default; we paginate to get everything.
+    Returns list of dicts."""
+    if USE_SUPABASE:
+        rows = []
+        page_size = 1000
+        offset = 0
+        while True:
+            batch = _sb_get("posts", {
+                "select": "media_type,likes,views,caption,bookmarks,retweets,replies",
+                "is_viral": "eq.1",
+                "order": "id.asc",
+                "limit": page_size,
+                "offset": offset,
+            })
+            if not batch:
+                break
+            rows.extend(batch)
+            if len(batch) < page_size:
+                break
+            offset += page_size
+            if offset > 50000:  # safety stop
+                break
+        return rows
+    conn = get_db()
+    rows = conn.execute("""
+        SELECT media_type, likes, views, caption, bookmarks, retweets, replies
+        FROM posts WHERE is_viral=1
+    """).fetchall()
+    conn.close()
+    return [dict(r) for r in rows]
+
+
+def get_strategy_stats():
+    """Aggregate viral-post stats for the Strategy tab.
+
+    Returns real numbers from the DB, not hard-coded placeholders:
+      * formats: avg likes per media_type, plus N count
+      * caption_lengths: avg likes by length bucket (≤25 / 26-60 / 60+)
+      * engagement: avg replies/bookmarks/retweets per viral post
+      * total_viral: total count
+    """
+    now = time.time()
+    if _STRATEGY_CACHE["data"] and (now - _STRATEGY_CACHE["ts"]) < _STRATEGY_TTL:
+        return _STRATEGY_CACHE["data"]
+
+    posts = _fetch_all_viral_posts()
+
+    by_type = {"photo": [], "video": [], "text": []}
+    by_length = {"short": [], "medium": [], "long": []}
+    bookmarks = []
+    retweets = []
+    replies = []
+
+    for p in posts:
+        mt = p.get("media_type")
+        likes = p.get("likes") or 0
+        views = p.get("views") or 0
+        bm = p.get("bookmarks") or 0
+        rt = p.get("retweets") or 0
+        rp = p.get("replies") or 0
+
+        if mt in by_type:
+            # Photo / Text: rank on likes. Video: rank on views.
+            metric = views if mt == "video" else likes
+            if metric:
+                by_type[mt].append(metric)
+
+        cap = (p.get("caption") or "").strip()
+        L = len(cap)
+        if L == 0:
+            pass  # skip empty captions in length analysis
+        elif L <= 25:
+            by_length["short"].append(likes)
+        elif L <= 60:
+            by_length["medium"].append(likes)
+        else:
+            by_length["long"].append(likes)
+
+        if bm: bookmarks.append(bm)
+        if rt: retweets.append(rt)
+        if rp: replies.append(rp)
+
+    def avg(arr):
+        return round(sum(arr) / len(arr)) if arr else 0
+
+    result = {
+        "formats": [
+            {"label": "Photos (avg likes)", "value": avg(by_type["photo"]), "count": len(by_type["photo"]), "color": "#635bff"},
+            {"label": "Videos (avg views)", "value": avg(by_type["video"]), "count": len(by_type["video"]), "color": "#22d3ee"},
+            {"label": "Text (avg likes)",   "value": avg(by_type["text"]),  "count": len(by_type["text"]),  "color": "#00ba7c"},
+        ],
+        "caption_lengths": [
+            {"label": "Short (≤25 chars)",  "value": avg(by_length["short"]),  "count": len(by_length["short"]),  "color": "#4ade80"},
+            {"label": "Medium (26–60)",     "value": avg(by_length["medium"]), "count": len(by_length["medium"]), "color": "#fbbf24"},
+            {"label": "Long (60+)",         "value": avg(by_length["long"]),   "count": len(by_length["long"]),   "color": "#ff6b8a"},
+        ],
+        "engagement": {
+            "avg_bookmarks": avg(bookmarks),
+            "avg_retweets":  avg(retweets),
+            "avg_replies":   avg(replies),
+        },
+        "total_viral": len(posts),
+    }
+    _STRATEGY_CACHE["data"] = result
+    _STRATEGY_CACHE["ts"] = now
+    return result

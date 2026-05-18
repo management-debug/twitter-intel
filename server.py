@@ -19,7 +19,7 @@ from config import (
 )
 from db.database import (
     init_db, cancel_stale_jobs,
-    get_dashboard_stats, get_top_creators,
+    get_dashboard_stats, get_top_creators, get_strategy_stats,
     get_accounts, get_account, add_account, bulk_add_accounts, update_account, delete_account,
     get_posts, get_post, get_post_count, get_account_posts, delete_post,
     get_jobs, get_job,
@@ -137,6 +137,12 @@ async def login(request: Request):
 @app.get("/api/dashboard/stats")
 async def dashboard_stats(role=Depends(require_auth)):
     return get_dashboard_stats()
+
+
+@app.get("/api/strategy")
+async def strategy(role=Depends(require_auth)):
+    """Aggregated stats for the Strategy tab — real numbers from the DB."""
+    return get_strategy_stats()
 
 
 @app.get("/api/dashboard/scrape-status")
