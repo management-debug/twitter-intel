@@ -264,6 +264,12 @@ function navigateTo(tab, pushState = true) {
   if (tab === 'add' && state.role !== 'admin') tab = WORKER_DEFAULT_TAB;
   if (state.role !== 'admin' && WORKER_BLOCKED_TABS.has(tab)) tab = WORKER_DEFAULT_TAB;
 
+  // Stop any guide video that was playing — workers were closing the tab
+  // and music kept going in the background.
+  if (state.activeTab === 'guide' && tab !== 'guide') {
+    try { pauseAllGuideVideos(); } catch (_) {}
+  }
+
   state.activeTab = tab;
   localStorage.setItem('twi_tab', tab);
 
@@ -1651,10 +1657,10 @@ function renderGuide() {
       /* Video walkthroughs */
       .gd-video { margin: 14px 0; border-radius: 14px; overflow: hidden; background: #000; border: 1px solid var(--gborder); box-shadow: 0 8px 28px rgba(0,0,0,.4); }
       .gd-video video { width: 100%; display: block; max-height: 70vh; background: #000; }
-      .gd-imggrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; margin: 12px 0; }
-      .gd-imggrid a { display: block; border-radius: 10px; overflow: hidden; border: 1px solid var(--gborder); background: #0a0a0f; transition: transform .15s ease, border-color .15s ease; }
-      .gd-imggrid a:hover { transform: translateY(-2px); border-color: var(--gaccent); }
-      .gd-imggrid img { width: 100%; height: 100%; object-fit: cover; display: block; aspect-ratio: 3 / 1; }
+      .gd-imggrid { display: flex; flex-direction: column; gap: 14px; margin: 14px 0; }
+      .gd-imggrid a { display: block; border-radius: 14px; overflow: hidden; border: 1px solid var(--gborder); background: #0a0a0f; transition: transform .15s ease, border-color .15s ease, box-shadow .15s ease; box-shadow: 0 4px 14px rgba(0,0,0,.25); }
+      .gd-imggrid a:hover { transform: translateY(-2px); border-color: var(--gaccent); box-shadow: 0 10px 24px rgba(0,0,0,.4); }
+      .gd-imggrid img { width: 100%; height: auto; display: block; object-fit: contain; background: #fff; }
 
       .gd-faq { background: rgba(26,26,34,.7); border: 1px solid var(--gborder); border-radius: 12px; margin: 8px 0; overflow: hidden; }
       .gd-faq-q { padding: 16px 20px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-weight: 600; font-size: 14.5px; color: var(--gtext); user-select: none; transition: background .15s; gap: 14px; }
@@ -2481,7 +2487,14 @@ function renderGuide() {
 
   // ── Chapters ─────────────────────────────────────────────────────────
   const chapters = [
-    { id: 'video', icon: '🎥', title: 'Video Walkthroughs', sub: 'Watch how to do every setting',
+    { id: 'setup', icon: '🚀', title: 'Setup', sub: 'Account creation, profile, warm-up',
+      sections: [
+        { num: 1, id: 'welcome', title: 'Welcome — The Big Picture', body: sec01 },
+        { num: 2, id: 'create',  title: 'Creating the Account',      body: sec02 },
+        { num: 3, id: 'profile', title: 'Profile Setup',             body: sec03 },
+        { num: 4, id: 'warmup',  title: 'Account Warm-Up (Day 1–21)', body: sec04 },
+      ]},
+    { id: 'video', icon: '🎥', title: 'After Setup — Configure', sub: 'Video walkthroughs for every setting',
       sections: [
         { num: 'V1',  id: 'v-banner',     title: 'Banner — Set a Clean Banner',                 body: secV01 },
         { num: 'V2',  id: 'v-bio',        title: 'Bio — Use the Bios Tab for Inspiration',      body: secV02 },
@@ -2495,13 +2508,6 @@ function renderGuide() {
         { num: 'V10', id: 'v-privacy',    title: 'Safari: Privacy & Safety Settings',            body: secV10 },
         { num: 'V11', id: 'v-interact',   title: 'Interact 10–15min BEFORE Posting',             body: secV11 },
         { num: 'V12', id: 'v-rooms',      title: 'Use Communities / Rooms',                      body: secV12 },
-      ]},
-    { id: 'setup', icon: '🚀', title: 'Setup', sub: 'Account creation, profile, warm-up',
-      sections: [
-        { num: 1, id: 'welcome', title: 'Welcome — The Big Picture', body: sec01 },
-        { num: 2, id: 'create',  title: 'Creating the Account',      body: sec02 },
-        { num: 3, id: 'profile', title: 'Profile Setup',             body: sec03 },
-        { num: 4, id: 'warmup',  title: 'Account Warm-Up (Day 1–21)', body: sec04 },
       ]},
     { id: 'daily', icon: '📅', title: 'Daily Posting', sub: 'Schedule, link rule, captions, content',
       sections: [
@@ -2823,8 +2829,18 @@ function bindViralFilters(tab) {
 }
 
 function closePostModal() {
+  // Stop any playing media so audio doesn't keep going after the modal hides.
+  $$('#post-modal video, #post-modal audio').forEach(v => {
+    try { v.pause(); v.currentTime = 0; } catch (_) {}
+  });
   $('#post-modal').classList.add('hidden');
   $('#post-modal').classList.remove('active');
+}
+
+function pauseAllGuideVideos() {
+  $$('#tab-guide video, #tab-guide audio').forEach(v => {
+    try { v.pause(); } catch (_) {}
+  });
 }
 
 function closeCreatorModal() {
