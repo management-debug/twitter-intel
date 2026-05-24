@@ -847,10 +847,41 @@ select option {
   font-weight: 600;
   color: var(--accent);
   margin-bottom: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-width: 0;
+}
+.post-card-author > span {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  min-width: 0;
 }
+.card-copy-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(99, 91, 255, 0.12);
+  border: 1px solid rgba(99, 91, 255, 0.3);
+  color: #b6b1ff;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 9px;
+  border-radius: 999px;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background var(--transition), color var(--transition), transform var(--transition);
+}
+.card-copy-btn:hover {
+  background: var(--accent);
+  color: #fff;
+  transform: scale(1.04);
+}
+.card-copy-btn:active { transform: scale(0.96); }
+.card-copy-btn svg { flex-shrink: 0; }
 
 .post-card-caption {
   font-size: 13px;

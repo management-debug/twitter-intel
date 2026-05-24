@@ -908,6 +908,12 @@ async function loadViralTab(tab, page = 1, append = false) {
         el.innerHTML = buildPostCard(p);
         const card = el.firstElementChild;
         card.addEventListener('click', () => openPostModal(parseInt(card.dataset.id)));
+        $$(`.copy-btn`, card).forEach(btn => {
+          btn.addEventListener('click', e => {
+            e.stopPropagation();
+            copyToClipboard(p.caption || '');
+          });
+        });
         frag.appendChild(card);
       });
       grid.appendChild(frag);
@@ -1020,10 +1026,14 @@ function buildPostCard(post) {
 
   const captionPreview = (post.caption || '').slice(0, 120);
 
+  const hasCaption = !!(post.caption || '').trim();
   return `<div class="post-card" data-id="${post.id}">
     ${mediaHtml}
     <div class="post-card-body">
-      <div class="post-card-author">@${escHtml(post.username || '—')}</div>
+      <div class="post-card-author">
+        <span>@${escHtml(post.username || '—')}</span>
+        ${hasCaption ? `<button class="card-copy-btn copy-btn" title="Copy caption">${copyIconSvg()}<span>Copy</span></button>` : ''}
+      </div>
       ${captionPreview ? `<div class="post-card-caption">${escHtml(captionPreview)}</div>` : ''}
       <div class="post-card-stats">
         <span class="post-stat">${heartSvg()} ${fmtNum(post.likes)}</span>
@@ -1033,6 +1043,10 @@ function buildPostCard(post) {
       </div>
     </div>
   </div>`;
+}
+
+function copyIconSvg() {
+  return '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>';
 }
 
 function buildTextPostCard(post) {
@@ -1457,7 +1471,7 @@ function renderGuide() {
       .gd-info .gd-hl { color: var(--gaccent2); font-weight: 700; }
 
       .gd-chnav {
-        display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px;
+        display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 8px;
         padding: 14px 0; margin: 24px 0 8px;
       }
       .gd-chtab {
@@ -1634,6 +1648,14 @@ function renderGuide() {
       .gd-contact-handle { font-size: 22px; font-weight: 800; color: #fff; margin-bottom: 8px; word-break: break-word; position: relative; }
       .gd-contact-desc { font-size: 14px; color: #c4c4d6; line-height: 1.6; margin: 0; position: relative; }
 
+      /* Video walkthroughs */
+      .gd-video { margin: 14px 0; border-radius: 14px; overflow: hidden; background: #000; border: 1px solid var(--gborder); box-shadow: 0 8px 28px rgba(0,0,0,.4); }
+      .gd-video video { width: 100%; display: block; max-height: 70vh; background: #000; }
+      .gd-imggrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; margin: 12px 0; }
+      .gd-imggrid a { display: block; border-radius: 10px; overflow: hidden; border: 1px solid var(--gborder); background: #0a0a0f; transition: transform .15s ease, border-color .15s ease; }
+      .gd-imggrid a:hover { transform: translateY(-2px); border-color: var(--gaccent); }
+      .gd-imggrid img { width: 100%; height: 100%; object-fit: cover; display: block; aspect-ratio: 3 / 1; }
+
       .gd-faq { background: rgba(26,26,34,.7); border: 1px solid var(--gborder); border-radius: 12px; margin: 8px 0; overflow: hidden; }
       .gd-faq-q { padding: 16px 20px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-weight: 600; font-size: 14.5px; color: var(--gtext); user-select: none; transition: background .15s; gap: 14px; }
       .gd-faq-q:hover { background: rgba(99,91,255,.05); }
@@ -1757,6 +1779,20 @@ function renderGuide() {
       </div>
       <div class="gd-sec-body">${body}</div>
     </div>`;
+  }
+
+  // Video player — uses native <video controls>, lazy-loaded via preload=metadata
+  const VID_BASE = 'https://ttdsvkpqobfutsahblos.supabase.co/storage/v1/object/public/guide-assets/videos/';
+  const IMG_BASE = 'https://ttdsvkpqobfutsahblos.supabase.co/storage/v1/object/public/guide-assets/images/';
+  function video(filename) {
+    return `<div class="gd-video">
+      <video controls preload="metadata" playsinline src="${VID_BASE}${filename}"></video>
+    </div>`;
+  }
+  function imgGrid(filenames) {
+    return `<div class="gd-imggrid">${filenames.map(f =>
+      `<a href="${IMG_BASE}${f}" target="_blank" rel="noopener"><img loading="lazy" src="${IMG_BASE}${f}" alt="example"></a>`
+    ).join('')}</div>`;
   }
 
   // ══════════════════════════════════════════════════════════════════
@@ -2331,8 +2367,135 @@ function renderGuide() {
     ${faq('How do I tell which posting time is best for my account?', 'Try all three windows (morning, lunch, evening) over a week. The one with highest average engagement is the sweet spot. Stick to it, but check again monthly — audience habits drift.')}
   `;
 
+  // ══════════════════════════════════════════════════════════════════
+  // VIDEO WALKTHROUGHS — screen recordings with explanations
+  // ══════════════════════════════════════════════════════════════════
+
+  const secV01 = `
+    ${alert_('blue', '<strong>Pro tip:</strong> Use the same simple style as in the video — a white background plus one emoji. We do <strong>not</strong> use real photos of the creator on banners. Look at how the top creators below do it for inspiration.')}
+    ${video('banner.mp4')}
+    <h3>📸 Examples — copy the vibe, not the exact image</h3>
+    ${imgGrid(['banner-example-1.png','banner-example-2.png','banner-example-3.png','banner-example-4.png','banner-example-5.png'])}
+    <p>Notice: clean background, single emoji or graphic, no creator face. Keep it minimal and on-brand.</p>
+  `;
+
+  const secV02 = `
+    ${video('bio.mp4')}
+    <h3>How to do it</h3>
+    ${step('1', 'Open the dashboard and go to the <strong>Bios</strong> tab in the top nav.')}
+    ${step('2', 'Browse the bios of other top creators in our niche to get a feel for what works.')}
+    ${step('3', 'Pick one that fits your creator&apos;s vibe — or even better, write your own short bio in that style.')}
+    ${alert_('yellow', '<strong>Do not copy a bio 1:1</strong>. In the video I copied one directly just to demonstrate the flow — but in practice you should always rewrite it so it fits your specific creator.')}
+  `;
+
+  const secV03 = `
+    ${video('location.mp4')}
+    <p>Location is part of how you look natural on X. Use the <strong>Bios</strong> tab in the dashboard — you&apos;ll see real locations other creators use, plenty of inspiration there.</p>
+    ${doDont(
+      'Good location values',
+      ['<strong>United States</strong> (written out)', 'United States 🇺🇸 (with flag)', 'Pretty special characters / decorative text', 'Anything that reads as "US" but isn&apos;t a single city'],
+      'Avoid',
+      ['<strong>Single city names</strong> (NYC, LA, Miami) — too specific, easier to fact-check', 'Random/joke locations', 'Empty / leaving it blank']
+    )}
+  `;
+
+  const secV04 = `
+    ${alert_('red', '<strong>Everyone must do this.</strong> Without a Professional / Creator account you are not eligible for the features we rely on.')}
+    ${video('professional.mp4')}
+    <h3>Steps</h3>
+    ${step('1', 'Profile → Settings → Account → Switch to professional account.')}
+    ${step('2', 'Choose <strong>Creator</strong> (not Business).')}
+    ${step('3', 'Pick a category. I used <em>Fashion Model</em> in the video, but anything that fits works — <strong>Influencer</strong>, <strong>Content Creator</strong>, etc.')}
+  `;
+
+  const secV05 = `
+    ${alert_('red', '<strong>Critical — do this immediately after account setup.</strong> Otherwise the email inbox gets flooded with X marketing mails and your supervisor gets spammed.')}
+    ${video('notifications.mp4')}
+    <p>Turn off everything you don&apos;t need — especially anything that emails you. Push notifications inside the app are fine to keep on minimally, but the email channel should be silent.</p>
+  `;
+
+  const secV06 = `
+    ${video('language.mp4')}
+    <p>Settings → <strong>Accessibility, display, and languages</strong> → <strong>Languages</strong> → make sure <strong>English</strong> is the only active content language. This keeps the FYP US-only and keeps the content you see relevant.</p>
+  `;
+
+  const secV07 = `
+    ${alert_('blue', '<strong>This is the single most important step for a fresh account.</strong> Take your time here — the FYP you build now decides the quality of every recommendation X serves you for months.')}
+    ${video('viral-interaction.mp4')}
+    <h3>What I do in the video</h3>
+    ${step('1', 'Open the <strong>Viral Photos / Videos / Text</strong> tabs in this dashboard to find real creators in our niche.')}
+    ${step('2', 'Click through to their X profiles and <strong>follow them</strong>. Like a few of their posts while you&apos;re there.')}
+    ${step('3', 'Repeat until your account follows <strong>50–100 creators in week 1</strong>. This is the base of your FYP.')}
+    ${step('4', 'While following, do small interactions — likes, an occasional comment. Don&apos;t go crazy on day one; spread it over the week.')}
+    <p>The point: by the end of week 1, when you open X, your FYP is <em>only</em> niche creators that use Twitter as a traffic source. That&apos;s the foundation everything else builds on.</p>
+  `;
+
+  const secV08 = `
+    ${alert_('yellow', '<strong>Must be done inside the in-app browser</strong> — this option is hidden from the normal X app settings. You can only find it after logging in via the in-app browser on x.com.')}
+    ${video('sensitive-content.mp4')}
+    <h3>Where</h3>
+    <p>x.com (in-app browser) → Settings → <strong>Privacy and Safety</strong> → <strong>Content you see</strong> → enable <strong>"Display media that may contain sensitive content"</strong>.</p>
+    ${alert_('blue', '<strong>Don&apos;t worry — NSFW is still blurred by default.</strong> This setting only affects whether posts from restricted accounts show up at all. We need it on, otherwise you can&apos;t see half the creators in our niche. We never engage with NSFW — only SFW creators.')}
+  `;
+
+  const secV09 = `
+    ${alert_('yellow', '<strong>Open Safari (not the X app).</strong> The pro-account category can only be removed via the web — the app won&apos;t let you. We want the category removed once the account is set up.')}
+    ${video('safari-category.mp4')}
+    ${step('1', 'Open Safari → go to <strong>x.com</strong> and log in.')}
+    ${step('2', 'Click <strong>Edit profile</strong>.')}
+    ${step('3', 'Scroll to <strong>Edit professional profile</strong> → turn the <strong>category off</strong>.')}
+  `;
+
+  const secV10 = `
+    ${alert_('yellow', 'Still inside Safari (not the app). These two location/explore settings only show correctly in the web UI.')}
+    ${video('privacy-safety.mp4')}
+    ${step('1', 'Settings → <strong>Privacy and Safety</strong> → <strong>Location information</strong> → turn off <em>Personalize based on places you&apos;ve been</em>.')}
+    ${step('2', 'Settings → <strong>Privacy and Safety</strong> → <strong>Explore settings</strong> → turn off <strong>both</strong> options shown there.')}
+  `;
+
+  const secV11 = `
+    ${alert_('red', '<strong>Never post cold.</strong> Always interact for at least <strong>10–15 minutes</strong> before publishing. Posting without warming up gets accounts restricted. The video shows a sped-up demo — in reality you should take your time.')}
+    ${video('interact-before-post.mp4')}
+    <h3>The flow shown in the video</h3>
+    ${step('1', 'Open the <strong>Viral Photos</strong> tab here in the dashboard.')}
+    ${step('2', 'Find a strong post — good image + good caption.')}
+    ${step('3', 'Use the new <strong>Copy</strong> button on the card to grab the caption.')}
+    ${step('4', 'Save the image, switch to X, interact for 10–15 minutes (likes, replies, joining rooms).')}
+    ${step('5', 'Now post your image with the caption you copied (or rewrite it slightly so it fits your creator). This is almost identical to the Threads workflow.')}
+    ${alert_('blue', 'Always adapt the caption to your specific creator&apos;s voice. The Viral Tab is for inspiration — not blind copy-paste.')}
+  `;
+
+  const secV12 = `
+    ${alert_('blue', '<strong>Communities (Rooms) are gold.</strong> If a creator you follow has a room, join it. You can post directly in the room and only the targeted niche audience sees it. They&apos;ll also show up at the top of your feed.')}
+    ${video('communities.mp4')}
+    <h3>Why it matters</h3>
+    <ul>
+      <li>Anyone in the room is already in our target audience — no wasted reach.</li>
+      <li>Posts in a room don&apos;t fight against the public algorithm.</li>
+      <li>Once joined, the room sits at the top of your feed permanently — easy to revisit.</li>
+    </ul>
+    <h3>Bonus walkthrough</h3>
+    <p>Same idea, alternate demo with a different account:</p>
+    ${video('communities-extra.mp4')}
+  `;
+
   // ── Chapters ─────────────────────────────────────────────────────────
   const chapters = [
+    { id: 'video', icon: '🎥', title: 'Video Walkthroughs', sub: 'Watch how to do every setting',
+      sections: [
+        { num: 'V1',  id: 'v-banner',     title: 'Banner — Set a Clean Banner',                 body: secV01 },
+        { num: 'V2',  id: 'v-bio',        title: 'Bio — Use the Bios Tab for Inspiration',      body: secV02 },
+        { num: 'V3',  id: 'v-location',   title: 'Location — What to Pick',                      body: secV03 },
+        { num: 'V4',  id: 'v-pro',        title: 'Switch to a Professional / Creator Account',   body: secV04 },
+        { num: 'V5',  id: 'v-notif',      title: 'Turn Off Email Notifications',                 body: secV05 },
+        { num: 'V6',  id: 'v-lang',       title: 'Set Content Language to English',              body: secV06 },
+        { num: 'V7',  id: 'v-fyp',        title: 'Build Your FYP From the Viral Tab',            body: secV07 },
+        { num: 'V8',  id: 'v-sensitive',  title: 'Enable Sensitive-Content (In-App Browser)',    body: secV08 },
+        { num: 'V9',  id: 'v-safari',     title: 'Safari: Turn Off Category on Profile',         body: secV09 },
+        { num: 'V10', id: 'v-privacy',    title: 'Safari: Privacy & Safety Settings',            body: secV10 },
+        { num: 'V11', id: 'v-interact',   title: 'Interact 10–15min BEFORE Posting',             body: secV11 },
+        { num: 'V12', id: 'v-rooms',      title: 'Use Communities / Rooms',                      body: secV12 },
+      ]},
     { id: 'setup', icon: '🚀', title: 'Setup', sub: 'Account creation, profile, warm-up',
       sections: [
         { num: 1, id: 'welcome', title: 'Welcome — The Big Picture', body: sec01 },
