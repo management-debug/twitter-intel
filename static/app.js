@@ -861,10 +861,21 @@ async function loadViralTab(tab, page = 1, append = false) {
   const search  = $(`#${cfg.searchId}`).value.trim();
 
   if (!append) {
+    // Filter change: invalidate any in-flight fetch + stop the old
+    // IntersectionObserver. Without this, a fast period-switch caused the
+    // observer from the previous filter to fire on the new sentinel and
+    // append duplicate posts on top of the freshly cleared grid (3x rows
+    // of the same 4 yesterday-photos was this bug).
+    state[`${tab}_done`] = true;
+    if (_scrollObservers[tab]) { _scrollObservers[tab].disconnect(); _scrollObservers[tab] = null; }
     state.pages[tab] = 1;
     page = 1;
     grid.innerHTML = '';
   }
+  // Bump a per-tab request id; only the latest issuer is allowed to render.
+  state._viralReqId = state._viralReqId || {};
+  state._viralReqId[tab] = (state._viralReqId[tab] || 0) + 1;
+  const reqId = state._viralReqId[tab];
 
   loadBtn.disabled = true;
   loadBtn.textContent = 'Loading…';
@@ -879,6 +890,10 @@ async function loadViralTab(tab, page = 1, append = false) {
     });
     const data = await apiGet(`/api/posts/viral?${params}`, cacheKey);
     if (!data) return;
+
+    // Stale-fetch guard: if a newer filter change happened while we were
+    // awaiting, ignore this result so we don't paint over the new state.
+    if (state._viralReqId && state._viralReqId[tab] !== reqId) return;
 
     const posts = Array.isArray(data) ? data : (data.posts || data.items || []);
     const total = data.total ?? posts.length;
