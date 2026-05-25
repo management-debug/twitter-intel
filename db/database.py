@@ -293,7 +293,8 @@ def get_account(account_id=None, username=None):
 
 
 def get_accounts(limit=500, sort="followers", search="", is_team=None, status=None):
-    """List accounts with filters."""
+    """List accounts with filters. Blocked accounts are always excluded
+    unless explicitly requested via status='blocked'."""
     valid_sorts = {"followers", "avg_likes_30d", "avg_views_30d", "username", "created_at", "last_scraped_at"}
     sort = sort if sort in valid_sorts else "followers"
 
@@ -305,6 +306,9 @@ def get_accounts(limit=500, sort="followers", search="", is_team=None, status=No
             params["is_our_team"] = f"eq.{is_team}"
         if status:
             params["scrape_status"] = f"eq.{status}"
+        else:
+            # Hide blocked from the default Creators view
+            params["scrape_status"] = "neq.blocked"
         return _sb_get("accounts", params)
 
     conn = get_db()
@@ -319,6 +323,8 @@ def get_accounts(limit=500, sort="followers", search="", is_team=None, status=No
     if status:
         q += " AND scrape_status = ?"
         args.append(status)
+    else:
+        q += " AND scrape_status != 'blocked'"
     q += f" ORDER BY {sort} DESC LIMIT ?"
     args.append(limit)
     rows = conn.execute(q, args).fetchall()
@@ -341,19 +347,32 @@ def update_account(account_id, data):
 
 
 def delete_account(account_id):
-    """Delete account and all associated posts."""
+    """Soft-delete an account: drop posts + watchlist entries, then mark the
+    account row as 'blocked' instead of deleting it. We keep the username
+    around so future bulk_add_accounts() calls see it as 'already exists'
+    and skip it — that's our cheap blocklist without a schema migration.
+    Blocked rows are filtered out of get_accounts() and the dashboard
+    stats by default."""
     if USE_SUPABASE:
-        _sb_delete("watchlist", {"account_id": account_id})
+        _sb_delete("watclist".replace("watclist", "watchlist"), {"account_id": account_id})
         _sb_delete("posts", {"account_id": account_id})
-        _sb_delete("accounts", {"id": account_id})
+        _sb_update("accounts", {"id": account_id}, {
+            "scrape_status": "blocked",
+            "is_our_team": 0,
+            "notes": "[blocked by admin]",
+        })
         return True
 
     conn = get_db()
     conn.execute("DELETE FROM watchlist WHERE account_id = ?", (account_id,))
     conn.execute("DELETE FROM posts WHERE account_id = ?", (account_id,))
-    conn.execute("DELETE FROM accounts WHERE id = ?", (account_id,))
+    conn.execute(
+        "UPDATE accounts SET scrape_status='blocked', is_our_team=0, notes='[blocked by admin]' WHERE id = ?",
+        (account_id,)
+    )
     conn.commit()
     conn.close()
+    return True
     return True
 
 
@@ -716,7 +735,7 @@ def get_dashboard_stats():
         # Run all Supabase counts concurrently — slowest call dominates
         # instead of summing 10 sequential roundtrips.
         with ThreadPoolExecutor(max_workers=10) as ex:
-            f_total_accounts = ex.submit(_sb_count, "accounts")
+            f_total_accounts = ex.submit(_sb_count, "accounts", {"scrape_status": "neq.blocked"})
             f_scraped        = ex.submit(_sb_count, "accounts", {"scrape_status": "eq.scraped"})
             f_pending        = ex.submit(_sb_count, "accounts", {"scrape_status": "eq.pending"})
             f_total_posts    = ex.submit(_sb_count, "posts")

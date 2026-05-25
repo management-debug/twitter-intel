@@ -560,7 +560,7 @@ async def get_auto_refresh(role=Depends(require_admin)):
     return {
         "enabled": enabled,
         "next_run": next_run,
-        "schedule": "Daily, 02:00 Europe/Berlin",
+        "schedule": "Daily, 02:05 Europe/Berlin",
         "window_days": 3,  # keep in sync with run_daily_refresh_pipeline
     }
 
@@ -624,7 +624,7 @@ async def startup():
         _scheduler = BackgroundScheduler(timezone=pytz.timezone("Europe/Berlin"))
         _scheduler.add_job(
             _auto_refresh_job,
-            trigger=CronTrigger(hour=2, minute=0, timezone="Europe/Berlin"),
+            trigger=CronTrigger(hour=2, minute=5, timezone="Europe/Berlin"),
             id="daily_auto_refresh",
             max_instances=1,
             coalesce=True,

@@ -578,7 +578,7 @@ function renderCreatorsTable(creators) {
 }
 
 async function deleteCreator(id, username) {
-  if (!confirm(`Delete @${username} and all their posts? This cannot be undone.`)) return;
+  if (!confirm(`Delete @${username}?\n\nAll their posts will be removed and the username gets added to the blocklist — bulk-add will skip it from now on.`)) return;
   try {
     await apiDelete(`/api/creators/${id}`);
     toast(`Deleted @${username}`, 'success');
@@ -1036,17 +1036,19 @@ function buildPostCard(post) {
   return `<div class="post-card" data-id="${post.id}">
     ${mediaHtml}
     <div class="post-card-body">
-      <div class="post-card-author">
-        <span>@${escHtml(post.username || '—')}</span>
-        ${hasCaption ? `<button class="card-copy-btn copy-btn" title="Copy caption">${copyIconSvg()}<span>Copy</span></button>` : ''}
+      <div class="post-card-top">
+        <span class="post-card-author"><span>@${escHtml(post.username || '—')}</span></span>
+        <div class="post-card-stats">
+          <span class="post-stat">${heartSvg()} ${fmtNum(post.likes)}</span>
+          ${post.views  ? `<span class="post-stat">${eyeSvg()} ${fmtNum(post.views)}</span>` : ''}
+          ${post.bookmarks ? `<span class="post-stat">${bookmarkSvg()} ${fmtNum(post.bookmarks)}</span>` : ''}
+          ${post.retweets ? `<span class="post-stat">${retweetSvg()} ${fmtNum(post.retweets)}</span>` : ''}
+        </div>
       </div>
-      ${captionPreview ? `<div class="post-card-caption">${escHtml(captionPreview)}</div>` : ''}
-      <div class="post-card-stats">
-        <span class="post-stat">${heartSvg()} ${fmtNum(post.likes)}</span>
-        ${post.views  ? `<span class="post-stat">${eyeSvg()} ${fmtNum(post.views)}</span>` : ''}
-        ${post.bookmarks ? `<span class="post-stat">${bookmarkSvg()} ${fmtNum(post.bookmarks)}</span>` : ''}
-        ${post.retweets ? `<span class="post-stat">${retweetSvg()} ${fmtNum(post.retweets)}</span>` : ''}
-      </div>
+      ${hasCaption ? `<div class="post-card-caption-box">
+        <div class="post-card-caption">${escHtml(captionPreview)}</div>
+        <button class="card-copy-btn copy-btn" title="Copy full caption">${copyIconSvg()}<span>Copy caption</span></button>
+      </div>` : ''}
     </div>
   </div>`;
 }
@@ -1390,7 +1392,7 @@ function estToManila(estHour) {
   if (m[2] === 'pm') h += 12;
   const ph24 = (h + 13) % 24;
   const ph12 = ph24 % 12 || 12;
-  const suf = ph24 < 12 ? 'a' : 'p';
+  const suf = ph24 < 12 ? 'am' : 'pm';
   return `${ph12}${suf}`;
 }
 
@@ -1789,10 +1791,12 @@ function renderGuide() {
 
   // Video player — uses native <video controls>, lazy-loaded via preload=metadata
   const VID_BASE = 'https://ttdsvkpqobfutsahblos.supabase.co/storage/v1/object/public/guide-assets/videos/';
+  const POSTER_BASE = 'https://ttdsvkpqobfutsahblos.supabase.co/storage/v1/object/public/guide-assets/posters/';
   const IMG_BASE = 'https://ttdsvkpqobfutsahblos.supabase.co/storage/v1/object/public/guide-assets/images/';
   function video(filename) {
+    const poster = POSTER_BASE + filename.replace(/\.mp4$/, '.jpg');
     return `<div class="gd-video">
-      <video controls preload="metadata" playsinline src="${VID_BASE}${filename}"></video>
+      <video controls preload="none" playsinline src="${VID_BASE}${filename}" poster="${poster}"></video>
     </div>`;
   }
   function imgGrid(filenames) {
@@ -2207,6 +2211,48 @@ function renderGuide() {
     ${scen('blue', '📅 What happens', '10 posts one day then nothing for three days = flagged as bot-like behavior. Steady 1–3 posts a day every day = normal account, normal growth.')}
   `;
 
+  const sec_communities = `
+    <p>X <strong>Communities</strong> (also called rooms) are closed groups around a niche. Posts inside only show to members — which means you are posting to a pre-qualified audience instead of fighting the public algorithm. This is one of the strongest growth levers we have on X.</p>
+
+    ${video('communities.mp4')}
+
+    <h3>🚪 How to use them</h3>
+    ${step('1', 'When you find a creator in our niche (Viral Photos / Videos tab), check their profile for the <strong>Communities</strong> section.')}
+    ${step('2', 'Tap any community they&apos;re in. If you like the vibe (active posts in the last 24h, mostly our niche) → request to join.')}
+    ${step('3', 'Once accepted, the community pinned at the top of your feed — easy to come back to.')}
+    ${step('4', 'Post directly inside the community using the FAB button. The post appears only to members.')}
+
+    ${alert_('blue', '<strong>Why this works:</strong> 100 community impressions are worth more than 1,000 public ones because every viewer is already in the target audience. Higher reply rate, higher follow-back rate, higher click-through.')}
+
+    <h3>📋 The Hard Rules</h3>
+    ${doDont(
+      'DO',
+      [
+        '<strong>Max 3 community posts per day</strong>, total across all communities',
+        '<strong>At least 1 hour</strong> between two community posts',
+        'Spread them across <strong>different</strong> communities',
+        'Pick <strong>active</strong> communities (recent posts, real engagement)',
+        'Same caption-and-image quality as a public post — communities are not a dump'
+      ],
+      'DON\'T',
+      [
+        '<strong>Never post the same content twice in the same community</strong> — instant mod-flag',
+        'Don&apos;t post 3× in a row in the same community even if different content — looks spammy',
+        'Don&apos;t join dead communities (no posts in 7 days) — wastes a feed slot',
+        'No links, no promo — same public rules apply, mods enforce them harder',
+        'Don&apos;t flood — start with 1 post / day in 1 community, ramp up over a week'
+      ]
+    )}
+
+    <h3>🎯 What to post in a community</h3>
+    <p>Same content rules as public, but lean into anything <strong>niche-specific</strong> the community is built around — if it&apos;s a "morning posters" community, post a morning shot. Use the Copy button on viral cards to grab proven captions, then adapt them to fit.</p>
+
+    ${alert_('yellow', '<strong>Counts toward your daily 3-post limit:</strong> Public + community posts together max 3 per day. A community post still counts as a post on your timeline as far as the algorithm is concerned.')}
+
+    ${alert_('green', '<strong>Bonus walkthrough — alternate demo:</strong>')}
+    ${video('communities-extra.mp4')}
+  `;
+
   const sec14 = `
     <p>A shadowban means X is silently hiding your tweets from people who don&apos;t already follow you. The account looks fine to you — but reach drops to zero. Most common cause of an account dying.</p>
 
@@ -2516,13 +2562,14 @@ function renderGuide() {
         { num: 7, id: 'captions', title: 'Captions: What Works & Why',     body: sec07 },
         { num: 8, id: 'content',  title: 'Content Rules (Photos & Videos)', body: sec08 },
       ]},
-    { id: 'growth', icon: '🛠️', title: 'Growth Tactics', sub: 'FYP, image comments, follower stealing',
+    { id: 'growth', icon: '🛠️', title: 'Growth Tactics', sub: 'FYP, image comments, communities, follower stealing',
       sections: [
-        { num: 9,  id: 'fyp',       title: 'Building Your FYP — Follow 5/Day',     body: sec09 },
-        { num: 10, id: 'imgrep',    title: 'Image Comments (Strongest Growth)',    body: sec10 },
-        { num: 11, id: 'steal',     title: 'Follower Stealing',                    body: sec11 },
-        { num: 12, id: 'pinned',    title: 'Pinned Tweet — Wait for 100 Likes',    body: sec12 },
-        { num: 13, id: 'algorithm', title: "How X's Algorithm Decides (Reference)", body: sec13 },
+        { num: 9,  id: 'fyp',         title: 'Building Your FYP — Follow 5/Day',         body: sec09 },
+        { num: 10, id: 'imgrep',      title: 'Image Comments (Strongest Growth)',        body: sec10 },
+        { num: 11, id: 'steal',       title: 'Follower Stealing',                        body: sec11 },
+        { num: 12, id: 'communities', title: 'Communities / Rooms (Targeted Reach)',     body: sec_communities },
+        { num: 13, id: 'pinned',      title: 'Pinned Tweet — Wait for 100 Likes',        body: sec12 },
+        { num: 14, id: 'algorithm',   title: "How X's Algorithm Decides (Reference)",    body: sec13 },
       ]},
     { id: 'safe', icon: '🛡️', title: 'Keep Account Safe', sub: 'Shadowbans, bots, viral, slowdowns',
       sections: [
