@@ -616,7 +616,7 @@ async def startup():
     init_db()
     cancel_stale_jobs()
 
-    # Daily auto-refresh: every day at 02:00 Europe/Berlin
+    # Daily auto-refresh: every day at 02:05 Europe/Berlin
     try:
         from apscheduler.schedulers.background import BackgroundScheduler
         from apscheduler.triggers.cron import CronTrigger
@@ -631,7 +631,7 @@ async def startup():
             misfire_grace_time=3600,
         )
         _scheduler.start()
-        log.info("Scheduler started: daily auto-refresh = 02:00 Europe/Berlin")
+        log.info("Scheduler started: daily auto-refresh = 02:05 Europe/Berlin")
     except Exception as e:
         log.warning(f"Scheduler init failed: {e}")
 
