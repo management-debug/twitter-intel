@@ -403,7 +403,7 @@ def run_daily_refresh_pipeline():
     every refresh, using the current account avg_likes/avg_views — so
     is_viral gets corrected upward as the post accumulates likes.
     """
-    _run_refresh_window("daily_refresh", days_back=1, label="DAILY REFRESH")
+    _run_refresh_window("daily_refresh", days_back=3, label="DAILY REFRESH")
 
 
 def run_refresh_pipeline():

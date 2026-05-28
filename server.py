@@ -22,7 +22,7 @@ from db.database import (
     get_dashboard_stats, get_top_creators, get_strategy_stats,
     get_accounts, get_account, add_account, bulk_add_accounts, update_account, delete_account,
     get_posts, get_post, get_post_count, get_account_posts, delete_post,
-    get_jobs, get_job,
+    get_jobs, get_job, recompute_viral_flags,
     add_to_watchlist, remove_from_watchlist, get_watchlist, is_watched,
 )
 from tasks import task_manager
@@ -207,6 +207,14 @@ async def scrape_monthly_refresh(pin: str = "", role=Depends(require_admin)):
         raise HTTPException(409, "A scrape is already running")
     task_manager.start_task(run_monthly_refresh_pipeline)
     return {"status": "started", "window_days": 30}
+
+
+@app.post("/api/admin/recompute-viral")
+async def recompute_viral(pin: str = "", role=Depends(require_admin)):
+    """Re-apply current viral thresholds to all existing posts (no re-scrape)."""
+    if pin != SCRAPE_PIN:
+        raise HTTPException(403, "Invalid PIN")
+    return recompute_viral_flags()
 
 
 @app.get("/api/debug/storage")

@@ -906,9 +906,16 @@ async function loadViralTab(tab, page = 1, append = false) {
       return;
     }
 
+    // De-dupe against cards already rendered. OFFSET pagination can return the
+    // same post on two consecutive pages when the underlying data shifts
+    // between fetches (e.g. the nightly scrape updates like counts), which
+    // would otherwise append a duplicate card during infinite scroll.
+    const seen = new Set(Array.from(grid.querySelectorAll('[data-id]'), el => el.dataset.id));
+    const newPosts = posts.filter(p => !seen.has(String(p.id)));
+
     if (tab === 'text') {
       const frag = document.createDocumentFragment();
-      posts.forEach(p => {
+      newPosts.forEach(p => {
         const el = document.createElement('div');
         el.innerHTML = buildTextPostCard(p);
         const card = el.firstElementChild;
@@ -924,7 +931,7 @@ async function loadViralTab(tab, page = 1, append = false) {
       grid.appendChild(frag);
     } else {
       const frag = document.createDocumentFragment();
-      posts.forEach(p => {
+      newPosts.forEach(p => {
         const el = document.createElement('div');
         el.innerHTML = buildPostCard(p);
         const card = el.firstElementChild;

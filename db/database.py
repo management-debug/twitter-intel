@@ -547,7 +547,10 @@ def get_posts(page=1, limit=50, sort="likes", media_type=None, viral_only=False,
     if USE_SUPABASE:
         params = {
             "select": "*",
-            "order": f"{sort}.desc.nullslast",
+            # id is the unique tiebreaker — without it, OFFSET pagination is
+            # non-deterministic across requests when the sort column has ties
+            # or the data shifts, which surfaced the same post on two pages.
+            "order": f"{sort}.desc.nullslast,id.desc",
             "limit": limit,
             "offset": offset,
         }
@@ -599,7 +602,7 @@ def get_posts(page=1, limit=50, sort="likes", media_type=None, viral_only=False,
             q += " AND create_time < ?"
             args.append(end)
 
-    q += f" ORDER BY {sort} DESC LIMIT ? OFFSET ?"
+    q += f" ORDER BY {sort} DESC, id DESC LIMIT ? OFFSET ?"
     args.extend([limit, offset])
 
     rows = conn.execute(q, args).fetchall()
@@ -721,6 +724,47 @@ def calc_viral(media_type, likes, views, avg_likes, avg_views):
         return True, 0
 
     return False, 0
+
+
+def recompute_viral_flags():
+    """Re-apply the current viral thresholds to existing posts.
+
+    Additive: flags posts that now qualify under the configured multipliers,
+    using the already-stored performance_multiplier — so no re-scrape and no
+    API credits are needed. Run this after lowering a VIRAL_MULTIPLIER_* value
+    so the change applies retroactively to the whole back-catalogue.
+    """
+    plan = [
+        ("photo", "likes", VIRAL_MIN_LIKES_PHOTO, VIRAL_MULTIPLIER_PHOTO),
+        ("video", "views", VIRAL_MIN_VIEWS_VIDEO, VIRAL_MULTIPLIER_VIDEO),
+        ("text",  "likes", VIRAL_MIN_LIKES_TEXT,  VIRAL_MULTIPLIER_TEXT),
+    ]
+    result = {}
+    if USE_SUPABASE:
+        url = f"{SUPABASE_URL}/rest/v1/posts"
+        for mt, metric, minv, mult in plan:
+            before = _sb_count("posts", {"media_type": f"eq.{mt}", "is_viral": "eq.1"})
+            params = {"media_type": f"eq.{mt}", metric: f"gte.{minv}",
+                      "performance_multiplier": f"gte.{mult}"}
+            r = httpx.patch(url, headers={**_sb_headers, "Prefer": "return=minimal"},
+                            params=params, json={"is_viral": 1}, timeout=120)
+            r.raise_for_status()
+            after = _sb_count("posts", {"media_type": f"eq.{mt}", "is_viral": "eq.1"})
+            result[mt] = {"before": before, "after": after, "added": after - before}
+        return result
+
+    conn = get_db()
+    for mt, metric, minv, mult in plan:
+        before = conn.execute("SELECT COUNT(*) FROM posts WHERE media_type=? AND is_viral=1", (mt,)).fetchone()[0]
+        conn.execute(
+            f"UPDATE posts SET is_viral=1 WHERE media_type=? AND {metric}>=? AND performance_multiplier>=?",
+            (mt, minv, mult),
+        )
+        after = conn.execute("SELECT COUNT(*) FROM posts WHERE media_type=? AND is_viral=1", (mt,)).fetchone()[0]
+        result[mt] = {"before": before, "after": after, "added": after - before}
+    conn.commit()
+    conn.close()
+    return result
 
 
 # ─── Stats / Dashboard ─────────────────────────────────────────────────────
