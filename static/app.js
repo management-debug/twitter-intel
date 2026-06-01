@@ -1853,6 +1853,38 @@ function renderGuide() {
     ${alert_('red', '<strong>THE ONE RULE TO REMEMBER</strong>Never put a link in any tweet. Ever. The link lives only in the bio. The chapter on the link rule explains why and what to do.')}
   `;
 
+  const secHygiene = `
+    ${alert_('red', '<strong>Do this BEFORE you touch the X app.</strong> Skipping any of these steps lets the X app pick up your phone&apos;s cached location (Philippines, Nigeria, etc.) at signup — that kills reach and gets the account suspended within days. Non-optional, applies to <em>every</em> fresh social-media account you create.')}
+
+    <h3>📱 1. App Reset (every app, every time)</h3>
+    <p>Run these steps for the X app — and for any other social app you&apos;re creating a fresh account on. This clears all cached metadata so the app reads your proxy location fresh on signup.</p>
+    ${step('1', 'iPhone <strong>Settings</strong> → <strong>General</strong>.')}
+    ${step('2', 'Tap <strong>iPhone Storage</strong>.')}
+    ${step('3', 'Tap the app you&apos;re about to reset (X, TikTok, Threads, Instagram — whichever you&apos;re creating fresh).')}
+    ${step('4', 'Tap <strong>Offload App</strong>.')}
+    ${step('5', 'Then tap <strong>Delete App</strong>.')}
+    ${step('6', 'Open the <strong>App Store</strong> → tap your profile icon (top right).')}
+    ${step('7', 'Scroll down to <strong>Personalized Recommendations</strong> → tap <strong>Clear App Usage Data</strong> and confirm.')}
+    ${step('8', '<strong>Restart the phone.</strong> Critical — do not skip.')}
+    ${step('9', 'After restart, open <strong>Shadowrocket</strong> and connect to your US proxy.')}
+    ${step('10', 'Open Safari → go to <strong>whatismyipaddress.com</strong> and verify the country shows <strong>United States</strong>. If it doesn&apos;t, fix the proxy first — do not continue.')}
+    ${step('11', 'Redownload the app from the App Store. Now you&apos;re safe to create the account.')}
+
+    ${alert_('yellow', '<strong>Shadowrocket settings unclear?</strong> Full step-by-step guide with screenshots: <a href="https://shadowrocket-guide.netlify.app/" target="_blank" rel="noopener">shadowrocket-guide.netlify.app</a>. For new proxy credentials, message your supervisor.')}
+
+    <h3>🌐 2. Verify US IP — Every Time You Open the App</h3>
+    <p>Even after the reset, check the IP at the start of every working session. <strong>whatismyipaddress.com</strong> must show <strong>United States</strong> before you open X, TikTok, Threads or Instagram. One open with the wrong IP can flag the account permanently.</p>
+
+    <h3>⬆️ 3. Keep iOS + Every App on the Latest Version</h3>
+    <p>Old app versions are the fastest invisible killer of an account. Platforms use version mismatches to flag traffic as bot / automation. The account&apos;s reach drops to zero, comments get hidden, and you only notice when it&apos;s already dead.</p>
+    ${step('1', '<strong>Every Monday morning:</strong> iPhone <strong>Settings</strong> → <strong>General</strong> → <strong>Software Update</strong> → install any iOS update available.')}
+    ${step('2', 'Open the <strong>App Store</strong> → tap your profile icon → scroll down → update every app on the list.')}
+    ${step('3', 'Pay extra attention to: <strong>X, TikTok, Threads, Instagram, Shadowrocket</strong>. These must always be on the newest version before you log in or post.')}
+    ${step('4', 'Recommended: enable auto-updates. iPhone <strong>Settings</strong> → <strong>App Store</strong> → turn ON <strong>App Updates</strong> under Automatic Downloads.')}
+
+    ${alert_('red', '<strong>No excuses on this one.</strong> An outdated app is the fastest way to lose an account without seeing it coming.')}
+  `;
+
   const sec02 = `
     <p>The first hour after creating the account decides a lot. Skip a setting and you fight an uphill battle for weeks.</p>
 
@@ -2555,12 +2587,13 @@ function renderGuide() {
 
   // ── Chapters ─────────────────────────────────────────────────────────
   const chapters = [
-    { id: 'setup', icon: '🚀', title: 'Setup', sub: 'Account creation, profile, warm-up',
+    { id: 'setup', icon: '🚀', title: 'Setup', sub: 'Phone hygiene, account creation, profile, warm-up',
       sections: [
-        { num: 1, id: 'welcome', title: 'Welcome — The Big Picture', body: sec01 },
-        { num: 2, id: 'create',  title: 'Creating the Account',      body: sec02 },
-        { num: 3, id: 'profile', title: 'Profile Setup',             body: sec03 },
-        { num: 4, id: 'warmup',  title: 'Account Warm-Up (Day 1–21)', body: sec04 },
+        { num: 1,   id: 'welcome',  title: 'Welcome — The Big Picture',       body: sec01 },
+        { num: 'P', id: 'hygiene',  title: 'Phone Hygiene Before You Start',  body: secHygiene },
+        { num: 2,   id: 'create',   title: 'Creating the Account',            body: sec02 },
+        { num: 3,   id: 'profile',  title: 'Profile Setup',                   body: sec03 },
+        { num: 4,   id: 'warmup',   title: 'Account Warm-Up (Day 1–21)',      body: sec04 },
       ]},
     { id: 'video', icon: '🎥', title: 'After Setup — Configure', sub: 'Video walkthroughs for every setting',
       sections: [
