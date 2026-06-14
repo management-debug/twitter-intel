@@ -145,14 +145,49 @@ _sb_headers = {
 
 
 def _sb_get(table, params=None, single=False):
-    """Supabase REST GET."""
+    """Supabase REST GET.
+
+    PostgREST caps every response at 1000 rows. Callers that pass an explicit
+    `limit` get a single page honoring it (so callers that paginate themselves
+    with their own offset/keyset cursor keep working). Callers that pass NO
+    `limit` are walked to completion, so full-table reads (e.g.
+    get_scraped_accounts) return every row instead of a silent first-1000 slice.
+    """
+    params = dict(params or {})
     url = f"{SUPABASE_URL}/rest/v1/{table}"
-    r = httpx.get(url, headers=_sb_headers, params=params or {}, timeout=30)
-    r.raise_for_status()
-    data = r.json()
+
     if single:
+        r = httpx.get(url, headers=_sb_headers, params=params, timeout=30)
+        r.raise_for_status()
+        data = r.json()
         return data[0] if data else None
-    return data
+
+    # Honor the caller's target: `want` rows starting at `base_offset`. When
+    # want is None we read the whole result set. Either way we page in 1000-row
+    # chunks (PostgREST's hard cap) and stop on a short page or once want is met.
+    want = params.pop("limit", None)
+    base_offset = int(params.pop("offset", 0) or 0)
+    try:
+        want = int(want) if want is not None else None
+    except (TypeError, ValueError):
+        want = None
+
+    PAGE = 1000
+    rows = []
+    offset = base_offset
+    while True:
+        remaining = PAGE if want is None else min(PAGE, want - len(rows))
+        if remaining <= 0:
+            break
+        page_params = {**params, "limit": remaining, "offset": offset}
+        r = httpx.get(url, headers=_sb_headers, params=page_params, timeout=30)
+        r.raise_for_status()
+        batch = r.json()
+        rows.extend(batch)
+        if len(batch) < remaining:
+            break
+        offset += len(batch)
+    return rows
 
 
 def _sb_insert(table, rows, upsert_col=None):
