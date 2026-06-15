@@ -572,6 +572,19 @@ def update_post_media(post_id, media_local=None, thumbnail_local=None):
     conn.close()
 
 
+def update_post_viral(post_id, is_viral, multiplier):
+    """Patch is_viral / performance_multiplier for a single post."""
+    fields = {"is_viral": int(is_viral), "performance_multiplier": multiplier}
+    if USE_SUPABASE:
+        _sb_update("posts", {"id": post_id}, fields)
+        return
+    conn = get_db()
+    conn.execute("UPDATE posts SET is_viral = ?, performance_multiplier = ? WHERE id = ?",
+                 (int(is_viral), multiplier, post_id))
+    conn.commit()
+    conn.close()
+
+
 def get_posts(page=1, limit=50, sort="likes", media_type=None, viral_only=False,
               period="all", min_mult=0, search="", account_id=None):
     """Get posts with extensive filtering."""

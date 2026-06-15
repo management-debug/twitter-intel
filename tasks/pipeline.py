@@ -8,7 +8,7 @@ from config import USE_SUPABASE
 from db.database import (
     get_pending_accounts, get_scraped_accounts, get_accounts,
     update_account, bulk_upsert_posts, update_post_media,
-    get_posts_missing_media,
+    get_posts_missing_media, get_account_posts, update_post_viral,
     create_job, update_job,
     calc_viral,
 )
@@ -440,6 +440,72 @@ def run_backfill_pipeline(days_back=3650):
     empty = [a for a in scraped if post_count(a) == 0]
     log.info(f"BACKFILL: {len(empty)} empty accounts of {len(scraped)} scraped, {days_back}d window")
     _run_refresh_window("backfill", days_back=days_back, label="BACKFILL", accounts=empty)
+
+
+def run_recompute_stats_pipeline():
+    """Recompute account medians/counts and per-post viral flags from posts
+    already in the DB — no re-scrape, no API credits.
+
+    Targets accounts that have posts but still carry zeroed averages (the
+    wide-window backfill ingests posts while the account baseline is still 0,
+    which makes calc_viral flag every above-minimum post as viral with
+    multiplier 0). This rebuilds each account's median baseline from its full
+    post set, then re-evaluates is_viral / performance_multiplier per post so
+    the backfilled creators match the rest of the DB. Idempotent / re-runnable.
+    """
+    job_id = create_job("recompute_stats")
+    log.info(f"Starting RECOMPUTE STATS pipeline (job #{job_id})")
+
+    try:
+        accounts = get_scraped_accounts()
+        targets = [a for a in accounts
+                   if (a.get("avg_likes_30d") or 0) == 0 and (a.get("avg_views_30d") or 0) == 0]
+        total = len(targets)
+        update_job(job_id, {"total_accounts": total})
+        log.info(f"RECOMPUTE: {total} accounts with zeroed averages")
+
+        processed = 0
+        posts_fixed = 0
+        viral_after = 0
+        for acc in targets:
+            if should_stop():
+                update_job(job_id, {"status": "cancelled",
+                                    "completed_at": datetime.now(timezone.utc).isoformat()})
+                return
+
+            posts = get_account_posts(acc["id"], limit=1000)
+            if posts:
+                _update_account_averages(acc["id"], posts)
+                avg_likes = _median([p["likes"] for p in posts])
+                avg_views = _median([p["views"] for p in posts])
+                for p in posts:
+                    is_v, mult = calc_viral(p["media_type"], p["likes"], p["views"], avg_likes, avg_views)
+                    new_v = 1 if is_v else 0
+                    if new_v != (p.get("is_viral") or 0) or (p.get("performance_multiplier") or 0) != mult:
+                        update_post_viral(p["id"], new_v, mult)
+                        posts_fixed += 1
+                    if new_v:
+                        viral_after += 1
+
+            processed += 1
+            if processed % 10 == 0 or processed == total:
+                update_job(job_id, {"processed_accounts": processed,
+                                    "total_posts_found": posts_fixed,
+                                    "viral_found": viral_after})
+
+        update_job(job_id, {
+            "status": "completed",
+            "processed_accounts": processed,
+            "total_posts_found": posts_fixed,
+            "viral_found": viral_after,
+            "completed_at": datetime.now(timezone.utc).isoformat(),
+        })
+        log.info(f"RECOMPUTE complete! {processed} accounts, {posts_fixed} posts updated, {viral_after} now viral")
+
+    except Exception as e:
+        log.error(f"Pipeline error: {e}", exc_info=True)
+        update_job(job_id, {"status": "failed", "error_message": str(e)[:500],
+                            "completed_at": datetime.now(timezone.utc).isoformat()})
 
 
 def run_media_backfill_pipeline():

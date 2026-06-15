@@ -29,7 +29,7 @@ from tasks import task_manager
 from tasks.pipeline import (
     run_full_pipeline, run_new_only_pipeline,
     run_daily_refresh_pipeline, run_refresh_pipeline, run_monthly_refresh_pipeline,
-    run_media_backfill_pipeline, run_backfill_pipeline,
+    run_media_backfill_pipeline, run_backfill_pipeline, run_recompute_stats_pipeline,
 )
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(name)s: %(message)s")
@@ -225,6 +225,18 @@ async def recompute_viral(pin: str = "", role=Depends(require_admin)):
     if pin != SCRAPE_PIN:
         raise HTTPException(403, "Invalid PIN")
     return recompute_viral_flags()
+
+
+@app.post("/api/admin/recompute-stats")
+async def recompute_stats(pin: str = "", role=Depends(require_admin)):
+    """Rebuild account averages/counts and per-post viral flags for accounts
+    ingested with a zero baseline (e.g. the wide backfill). No re-scrape."""
+    if pin != SCRAPE_PIN:
+        raise HTTPException(403, "Invalid PIN")
+    if task_manager.is_running():
+        raise HTTPException(409, "A scrape is already running")
+    task_manager.start_task(run_recompute_stats_pipeline)
+    return {"status": "started"}
 
 
 @app.get("/api/debug/storage")
