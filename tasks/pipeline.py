@@ -258,17 +258,24 @@ def _refresh_one_account(acc, days_back=7):
         return [], 0
 
 
-def _run_refresh_window(job_type, days_back, label):
+def _run_refresh_window(job_type, days_back, label, accounts=None):
     """Shared refresh implementation. Re-scrapes posts for the last `days_back`
-    days across all scraped accounts, in parallel. Then downloads media so
-    images/videos survive past the ~24h Twitter CDN expiry."""
+    days across `accounts` (defaults to all scraped accounts), in parallel. Then
+    downloads media so images/videos survive past the ~24h Twitter CDN expiry."""
     job_id = create_job(job_type)
     log.info(f"Starting {label} pipeline (job #{job_id}, {REFRESH_WORKERS} workers, {days_back}d window)")
 
     try:
-        accounts = get_scraped_accounts()
+        if accounts is None:
+            accounts = get_scraped_accounts()
         total = len(accounts)
         update_job(job_id, {"total_accounts": total})
+
+        if total == 0:
+            update_job(job_id, {"status": "completed", "error_message": "No accounts to process",
+                                "completed_at": datetime.now(timezone.utc).isoformat()})
+            log.info(f"{label}: no accounts to process")
+            return
 
         counters = {"processed": 0, "posts": 0, "viral": 0}
         all_upserted = []
@@ -414,6 +421,25 @@ def run_refresh_pipeline():
 def run_monthly_refresh_pipeline():
     """Refresh existing accounts (last 30 days)."""
     _run_refresh_window("monthly_refresh", days_back=30, label="MONTHLY REFRESH")
+
+
+def run_backfill_pipeline(days_back=3650):
+    """One-time wide-window backfill for accounts that have no posts yet.
+
+    Freshly added creators often come back empty from the normal scrape because
+    the API only returns their most-popular tweets, which are frequently older
+    than the daily-refresh window. This pulls each empty account's all-time
+    popular tweets using a very wide window, WITHOUT touching the global
+    DAYS_BACK used by the daily refresh. Re-runnable: once an account has posts
+    it drops out of the empty set and is skipped."""
+    scraped = get_scraped_accounts()
+
+    def post_count(a):
+        return (a.get("photo_count") or 0) + (a.get("video_count") or 0) + (a.get("text_count") or 0)
+
+    empty = [a for a in scraped if post_count(a) == 0]
+    log.info(f"BACKFILL: {len(empty)} empty accounts of {len(scraped)} scraped, {days_back}d window")
+    _run_refresh_window("backfill", days_back=days_back, label="BACKFILL", accounts=empty)
 
 
 def run_media_backfill_pipeline():

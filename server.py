@@ -29,7 +29,7 @@ from tasks import task_manager
 from tasks.pipeline import (
     run_full_pipeline, run_new_only_pipeline,
     run_daily_refresh_pipeline, run_refresh_pipeline, run_monthly_refresh_pipeline,
-    run_media_backfill_pipeline,
+    run_media_backfill_pipeline, run_backfill_pipeline,
 )
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(name)s: %(message)s")
@@ -207,6 +207,16 @@ async def scrape_monthly_refresh(pin: str = "", role=Depends(require_admin)):
         raise HTTPException(409, "A scrape is already running")
     task_manager.start_task(run_monthly_refresh_pipeline)
     return {"status": "started", "window_days": 30}
+
+
+@app.post("/api/scrape/backfill")
+async def scrape_backfill(pin: str = "", days_back: int = 3650, role=Depends(require_admin)):
+    if pin != SCRAPE_PIN:
+        raise HTTPException(403, "Invalid PIN")
+    if task_manager.is_running():
+        raise HTTPException(409, "A scrape is already running")
+    task_manager.start_task(run_backfill_pipeline, args=(days_back,))
+    return {"status": "started", "window_days": days_back}
 
 
 @app.post("/api/admin/recompute-viral")
