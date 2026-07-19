@@ -2,7 +2,7 @@
 import logging
 import threading
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 
 from config import USE_SUPABASE
 from db.database import (
@@ -220,11 +220,16 @@ def run_new_only_pipeline():
                             "completed_at": datetime.now(timezone.utc).isoformat()})
 
 
-def _refresh_one_account(acc, days_back=7):
+TOP_N_PER_ACCOUNT = 10  # cost cap: keep only the N best posts per account per refresh
+
+
+def _refresh_one_account(acc, days_back=7, tweets_map=None):
     """Refresh a single account. Thread-safe — no shared state writes.
     Returns (upserted_rows, viral_count). Upserted rows have DB id populated,
     which the media downloader needs to key files correctly. Errors logged
     but not raised so one bad account doesn't poison the batch.
+    tweets_map: prefetched Apify tweets ({username_lower: [raw]}); when given,
+    posts come from it instead of ScrapeCreators (which can't see 18+ accounts).
     """
     try:
         profile = scrape_profile(acc["username"])
@@ -239,7 +244,16 @@ def _refresh_one_account(acc, days_back=7):
                 "last_scraped_at": datetime.now(timezone.utc).isoformat(),
             })
 
-        posts = scrape_posts(acc["username"], acc["id"], days_back=days_back)
+        if tweets_map is not None:
+            from scrapers.post_scraper import _parse_tweet
+            cutoff = datetime.now(timezone.utc) - timedelta(days=days_back)
+            uname = acc["username"].lower()
+            posts = [p for p in (_parse_tweet(t, uname, acc["id"], cutoff)
+                                 for t in tweets_map.get(uname, [])) if p]
+            posts.sort(key=lambda p: p["likes"], reverse=True)
+            posts = posts[:TOP_N_PER_ACCOUNT]
+        else:
+            posts = scrape_posts(acc["username"], acc["id"], days_back=days_back)
         avg_likes = acc.get("avg_likes_30d", 0) or 0
         avg_views = acc.get("avg_views_30d", 0) or 0
 
@@ -277,13 +291,25 @@ def _run_refresh_window(job_type, days_back, label, accounts=None):
             log.info(f"{label}: no accounts to process")
             return
 
+        # Prefetch all tweets via Apify in rate-limited chunks (18+ capable).
+        # Empty token or total failure -> tweets_map=None -> old ScrapeCreators path.
+        tweets_map = None
+        from config import APIFY_TOKEN
+        if APIFY_TOKEN:
+            try:
+                from scrapers.apify_tweets import fetch_tweets_map
+                tweets_map = fetch_tweets_map([a["username"] for a in accounts], days_back)
+                log.info(f"{label}: apify prefetch done, {len(tweets_map)} accounts with tweets")
+            except Exception as e:
+                log.error(f"{label}: apify prefetch failed, falling back to ScrapeCreators: {e}")
+
         counters = {"processed": 0, "posts": 0, "viral": 0}
         all_upserted = []
         lock = threading.Lock()
         cancelled = False
 
         with ThreadPoolExecutor(max_workers=REFRESH_WORKERS) as executor:
-            futures = {executor.submit(_refresh_one_account, acc, days_back): acc for acc in accounts}
+            futures = {executor.submit(_refresh_one_account, acc, days_back, tweets_map): acc for acc in accounts}
             for fut in as_completed(futures):
                 if should_stop():
                     cancelled = True

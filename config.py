@@ -21,6 +21,7 @@ for d in [IMAGES_DIR, THUMBNAILS_DIR, VIDEOS_DIR, AVATARS_DIR, EXPORTS_DIR, DB_P
 
 # --- API Keys ---
 SCRAPECREATORS_API_KEY = os.getenv("SCRAPECREATORS_API_KEY", "")
+APIFY_TOKEN = os.getenv("APIFY_TOKEN", "")  # tweet fetching via Apify (18+ capable); empty -> ScrapeCreators fallback
 
 # --- Supabase (dual-mode: if set, uses Supabase; otherwise SQLite) ---
 SUPABASE_URL = os.getenv("SUPABASE_URL", "")
