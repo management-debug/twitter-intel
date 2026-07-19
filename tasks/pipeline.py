@@ -6,7 +6,7 @@ from datetime import datetime, timezone, timedelta
 
 from config import USE_SUPABASE
 from db.database import (
-    get_pending_accounts, get_scraped_accounts, get_accounts,
+    get_pending_accounts, get_scraped_accounts, get_all_accounts, get_accounts,
     update_account, bulk_upsert_posts, update_post_media,
     get_posts_missing_media, get_account_posts, update_post_viral,
     create_job, update_job,
@@ -220,9 +220,6 @@ def run_new_only_pipeline():
                             "completed_at": datetime.now(timezone.utc).isoformat()})
 
 
-TOP_N_PER_ACCOUNT = 10  # cost cap: keep only the N best posts per account per refresh
-
-
 def _refresh_one_account(acc, days_back=7, tweets_map=None):
     """Refresh a single account. Thread-safe — no shared state writes.
     Returns (upserted_rows, viral_count). Upserted rows have DB id populated,
@@ -234,15 +231,21 @@ def _refresh_one_account(acc, days_back=7, tweets_map=None):
     try:
         profile = scrape_profile(acc["username"])
         if profile:
-            update_account(acc["id"], {
+            now = datetime.now(timezone.utc).isoformat()
+            update_data = {
                 "followers": profile["followers"],
                 "following": profile["following"],
                 "tweet_count": profile["tweet_count"],
                 "bio": profile["bio"],
                 "bio_link": profile.get("bio_link", ""),
                 "is_verified": profile["is_verified"],
-                "last_scraped_at": datetime.now(timezone.utc).isoformat(),
-            })
+                "last_scraped_at": now,
+            }
+            if acc.get("scrape_status") != "scraped":  # promote pending/error on first success
+                update_data["scrape_status"] = "scraped"
+                if not acc.get("first_scraped_at"):
+                    update_data["first_scraped_at"] = now
+            update_account(acc["id"], update_data)
 
         if tweets_map is not None:
             from scrapers.post_scraper import _parse_tweet
@@ -250,8 +253,6 @@ def _refresh_one_account(acc, days_back=7, tweets_map=None):
             uname = acc["username"].lower()
             posts = [p for p in (_parse_tweet(t, uname, acc["id"], cutoff)
                                  for t in tweets_map.get(uname, [])) if p]
-            posts.sort(key=lambda p: p["likes"], reverse=True)
-            posts = posts[:TOP_N_PER_ACCOUNT]
         else:
             posts = scrape_posts(acc["username"], acc["id"], days_back=days_back)
         avg_likes = acc.get("avg_likes_30d", 0) or 0
@@ -281,7 +282,7 @@ def _run_refresh_window(job_type, days_back, label, accounts=None):
 
     try:
         if accounts is None:
-            accounts = get_scraped_accounts()
+            accounts = get_all_accounts()  # incl. pending — new accounts need no manual new-only
         total = len(accounts)
         update_job(job_id, {"total_accounts": total})
 

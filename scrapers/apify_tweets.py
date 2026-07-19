@@ -22,7 +22,7 @@ log = logging.getLogger(__name__)
 ACTOR = "gentle_cloud~twitter-tweets-scraper"
 BATCH = 10        # account URLs per actor run
 WORKERS = 2       # concurrent runs (4 hit Apify's rate limit on long runs)
-RESULT_COUNT = "200"  # billing cap per run
+RESULT_COUNT = "500"  # billing cap per run (10 accounts × 7d rarely exceed this)
 
 
 def _run_batch(usernames, since_date):

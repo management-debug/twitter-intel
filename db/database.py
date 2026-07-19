@@ -439,6 +439,18 @@ def get_scraped_accounts():
     return [dict(r) for r in rows]
 
 
+def get_all_accounts():
+    """Every account regardless of status — the daily refresh covers all of
+    them, so newly added (pending) accounts are picked up automatically
+    without a manual new-only run."""
+    if USE_SUPABASE:
+        return _sb_get("accounts", {"select": "*", "order": "id.asc"})
+    conn = get_db()
+    rows = conn.execute("SELECT * FROM accounts ORDER BY id").fetchall()
+    conn.close()
+    return [dict(r) for r in rows]
+
+
 # ─── Post Operations ───────────────────────────────────────────────────────
 
 def upsert_post(post_data):
